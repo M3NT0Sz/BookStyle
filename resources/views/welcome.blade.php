@@ -69,33 +69,55 @@
         <section class="books-container">
             <h2>Livros</h2>
             <section class="categori-container">
-                <h1 class="h1">Aventura</h1>
+                <h1 class="h1">Aventuras</h1>
                 <section class="books">
                     <div class="book">
-                        <img src="{{ Vite::asset('resources/img/book1.jpg') }}"alt="">
+                        <a href="#"><img src="{{ Vite::asset('resources/img/book1.jpg') }}" alt=""></a>
                         <h1>Titulo</h1>
                         <p>Autor</p>
                     </div>
                     <div class="book">
-                        <img src="{{ Vite::asset('resources/img/book1.jpg') }}" alt="">
+                    <a href="#"><img src="{{ Vite::asset('resources/img/book1.jpg') }}" alt=""></a>
                         <h1>Titulo</h1>
                         <p>Autor</p>
                     </div>
                     <div class="book">
-                        <img src="{{ Vite::asset('resources/img/book1.jpg') }}" alt="">
+                    <a href="#"><img src="{{ Vite::asset('resources/img/book1.jpg') }}" alt=""></a>
                         <h1>Titulo</h1>
                         <p>Autor</p>
                     </div>
                     <div class="book">
-                        <img src="{{ Vite::asset('resources/img/book1.jpg') }}" alt="">
+                        <a href="#"><img src="{{ Vite::asset('resources/img/book2.jpg') }}" alt=""></a>
+                        <h1>Titulo</h1>
+                        <p>Autor</p>
+                    </div>
+                    <div class="book">
+                        <a href="#"><img src="{{ Vite::asset('resources/img/book2.jpg') }}" alt=""></a>
+                        <h1>Titulo</h1>
+                        <p>Autor</p>
+                    </div>
+                    <div class="book">
+                        <a href="#"><img src="{{ Vite::asset('resources/img/book2.jpg') }}" alt=""></a>
+                        <h1>Titulo</h1>
+                        <p>Autor</p>
+                    </div>
+                    <div class="book">
+                        <a href="#"><img src="{{ Vite::asset('resources/img/book2.jpg') }}" alt=""></a>
+                        <h1>Titulo</h1>
+                        <p>Autor</p>
+                    </div>
+                    <div class="book">
+                        <a href="#"><img src="{{ Vite::asset('resources/img/book2.jpg') }}" alt=""></a>
                         <h1>Titulo</h1>
                         <p>Autor</p>
                     </div>
 
                     <button class="button-left"><</button>
                     <button class="button-right">></button>
-            </section>
 
-        </section>
+                </section>
+                <button class="SeeMore">Ver mais</button>
+
+            </section>
     </main>
 @endsection

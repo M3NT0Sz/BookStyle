@@ -274,11 +274,33 @@ main{
     
 }
 
+.categori-container .SeeMore{
+    background-color: #3498db; 
+    cursor: pointer;
+    color: #F5EFE6;
+    width: 200px;
+    height: 50px;
+    border: none;
+    padding: 10px 20px;
+    margin: 0 auto;
+    border-radius: 5px;
+    font-weight: 700;
+    transition: all 0.3s ease;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.categori-container .SeeMore:hover{
+    background-color: #2E4756; 
+    color: #FFFFFF;
+    transform: scale(1.1);
+}
+
 
 .categori-container .h1{
     color: #2E4756;
     font-size: 40px;
     margin: 0 auto;
+    position: relative;
 }
 
 .books{
@@ -287,25 +309,58 @@ main{
     justify-content: center;
     gap: 50px;
     margin-top: 20px;
+    overflow: hidden;
+    
 }
 
-.books img{
-    width: 200px;
-    height: 300px;
-    border-radius: 5px;
+.book{
     transition: all 0.3s ease;
+    margin-bottom: 10px;
 }
+
+.book:hover{
+    transform: scale(1.1);
+}
+
+
+
+
+.books img{
+    width: 300px;
+    height: 400px;
+    border-radius: 5px;
+    
+}
+
+
 
 .button-left,
 .button-right{
     background-color: #2E4756; 
     cursor: pointer;
     color: #F5EFE6;
+    width: 50px;
+    height: 50px;
     border: none;
     padding: 10px 20px;
     border-radius: 5px;
     font-weight: 700;
     transition: all 0.3s ease;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    position: absolute;
 }
+
+.button-left{
+    left:10px;
+    
+    top: 50%;
+}
+
+.button-right{
+    right: 10px;
+    
+    top: 50%;
+}
+
+
 
