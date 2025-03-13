@@ -3,10 +3,10 @@
 @section('content')
     <header class="header-container">
         <nav class="nav-container">
-            <img class="logo" src="{{ Vite::asset('resources/img/favicon.png') }}" alt="">
+            <a href="{{route('index')}}"><img class="logo" src="{{ Vite::asset('resources/img/favicon.png') }}" alt=""></a>
             <ul class="nav-links">
                 <li>
-                    <a href="#Home">Home</a>
+                    <a href="#">Home</a>
                 </li>
                 <li>
                     <a href="#Home">Home</a>
@@ -19,7 +19,7 @@
                 </li>
             </ul>
             <button class="button-login">
-                Entrar
+                <a href="#">Entrar</a>
             </button>
         </nav>
 
@@ -75,28 +75,33 @@
                         <img src="{{ Vite::asset('resources/img/book1.jpg') }}" alt="">
                         <h2>Nome do Livro</h2>
                         <p>Descrição do livro</p>
-                        <button>Ver mais</button>
+                        <button><a href="">Comprar</a></button>
                     </section>
                     <section class="book">
                         <img src="{{ Vite::asset('resources/img/book2.jpg') }}" alt="">
                         <h2>Nome do Livro</h2>
                         <p>Descrição do livro</p>
-                        <button>Ver mais</button>
+                        <button><a href="">Comprar</a></button>
                     </section>
                     <section class="book">
                         <img src="{{ Vite::asset('resources/img/book1.jpg') }}" alt="">
                         <h2>Nome do Livro</h2>
                         <p>Descrição do livro</p>
-                        <button>Ver mais</button>
+                        <button><a href="">Comprar</a></button>
                     </section>
                     <section class="book">
                         <img src="{{ Vite::asset('resources/img/book2.jpg') }}" alt="">
                         <h2>Nome do Livro</h2>
                         <p>Descrição do livro</p>
-                        <button>Ver mais</button>
+                        <button><a href="">Comprar</a></button>
                     </section>
                 </section>
+                <button class="button-more">
+                    <a href="">Ver Mais</a>
+                </button>
             </section>
+            <button class="next">></button>
+            <button class="prev"><</button>
         </section>
     </main>
 @endsection

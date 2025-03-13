@@ -73,6 +73,11 @@ body {
     transform: scale(1.1);
 }
 
+.button-login a{
+    color: #ecf0f1;
+    text-decoration: none;
+}
+
 .banner-container {
     width: 100%;
     position: relative;
@@ -206,10 +211,136 @@ main{
 }
 
 .book-container{
+    margin-top: 30px;
     display: flex;
     flex-direction: column;
     width: 100%;
     height: auto;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.book-container .next, .prev{
+    position: absolute;
+    top: 50%;
+    width: 50px;
+    height: 50px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 30px;
+    color: #ecf0f1;
+    background-color: #c9cbcc;
+    border: none;
+    border-radius: 100px;
+    transition: all 0.3s ease-in-out;
+}
+
+.next:hover, .prev:hover{
+    background-color: #1abc9c;
+}
+
+.next{
+    right: 20px;
+}
+
+.prev{
+    left: 20px;
+}
+
+.book-container h1{
+    color: #1abc9c;
+    position: absolute;
+    top: 0;
+    display: flex;
+    font-size: 40px;
+    letter-spacing: .2rem;
+    text-transform: uppercase;
+}
+
+.book-content{
+    display: flex;
+    width: 95%;
+    height: 100vh;
+    overflow: hidden;
+    position: relative;
+    justify-content: center;
+}
+
+.pages-book{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.book{
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    transition: all 0.3s ease-in-out;
+}
+
+.book:hover{
+    transform: scale(1.05);
+}
+
+.book h2{
+    color: #1abc9c;
+    font-size: 20px;
+    letter-spacing: .1rem;
+}
+
+.book p{
+    color: #7f8c8d;
+    font-size: 16px;
+}
+.book img{
+    width: 200px;
+    height: 300px;
+}
+
+.book button{
+    background-color: #1abc9c;
+    color: #ffffff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-weight: 700;
+    transition: all 0.3s ease-in-out;
+    cursor: pointer;
+}
+
+.book button:hover{
+    background-color: #f39c12;
+}
+
+.book button a{
+    color: #ecf0f1;
+    text-decoration: none;
+}
+
+.button-more{
+    position: absolute;
+    bottom: 10px;
+    background-color: #1abc9c;
+    color: #ffffff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-weight: 700;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.button-more a{
+    color: #ecf0f1;
+    text-decoration: none;
+}
+
+.button-more:hover{
+    background-color: #f39c12;
+    transform: scale(1.1);
 }
 
 

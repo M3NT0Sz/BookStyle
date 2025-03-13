@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
-});
+})->name('index');
 
 Route::get('/books/index', [BookController::class, 'index'])->name('books.index');
 Route::get('/books/create', [BookController::class, 'create'])->name('books.create');
