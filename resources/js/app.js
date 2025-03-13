@@ -1,5 +1,5 @@
 import.meta.glob([
-    '../images/**',
+    '../img/**',
 ]);
 
 document.addEventListener('DOMContentLoaded', function () {

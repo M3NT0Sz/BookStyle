@@ -17,13 +17,10 @@
                 <li>
                     <a href="#Home">Home</a>
                 </li>
-
-
             </ul>
             <button class="button-login">
                 Entrar
             </button>
-
         </nav>
 
         <div class="banner-container">
