@@ -1,4 +1,8 @@
-document.addEventListener('DOMContentLoaded', function() {
+import.meta.glob([
+    '../images/**',
+]);
+
+document.addEventListener('DOMContentLoaded', function () {
     const booksContainer = document.querySelector('.books');
     const books = document.querySelectorAll('.book');
     const buttonLeft = document.querySelector('.button-left');
