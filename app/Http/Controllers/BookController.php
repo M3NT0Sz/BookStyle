@@ -59,6 +59,11 @@ class BookController extends Controller
         return redirect()->route('books.index');
     }
 
+    public function show($id){
+        $book = Book::findOrFail($id);
+        return view('books.show', ['book' => $book]);
+    }
+
     public function destroy(Book $book)
     {
         $images = json_decode($book->images, true);

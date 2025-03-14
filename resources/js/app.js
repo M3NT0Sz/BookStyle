@@ -1,3 +1,7 @@
+import.meta.glob([
+    '../img/**',
+]);
+
 document.addEventListener("DOMContentLoaded", function () {
     const booksContainer = document.querySelector(".pages-book");
     const books = Array.from(document.querySelectorAll(".book"));
@@ -23,7 +27,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const bookToFade = direction === "next" ? books[0] : books[books.length - 1];
         bookToFade.style.opacity = "0";
         bookToFade.style.transform = "scale(0.9)";
-        
+
         setTimeout(() => {
             if (direction === "next") {
                 const firstBook = books.shift();
