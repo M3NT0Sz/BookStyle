@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('condition');
             $table->float('price');
             $table->string('description');
-            $table->string('image');
+            $table->string('images');
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
