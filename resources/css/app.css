@@ -241,34 +241,37 @@ main{
 }
 
 .next{
-    right: 20px;
+    right: 70px;
 }
 
 .prev{
-    left: 20px;
+    left: 70px;
 }
 
 .book-container h1{
     color: #1abc9c;
     position: absolute;
-    top: 0;
+    top: 64px;
     display: flex;
-    font-size: 40px;
+    font-size: 40px;    
     letter-spacing: .2rem;
     text-transform: uppercase;
 }
 
 .book-content{
     display: flex;
-    width: 95%;
+    width: 78%;
     height: 100vh;
     overflow: hidden;
     position: relative;
     justify-content: center;
+    overflow: hidden;
 }
 
 .pages-book{
     display: flex;
+    width: 100%;
+    overflow: hidden;
     justify-content: center;
     align-items: center;
 }
@@ -296,8 +299,8 @@ main{
     font-size: 16px;
 }
 .book img{
-    width: 200px;
-    height: 300px;
+    width: 250px;
+    height: 400px;
 }
 
 .book button{
@@ -322,10 +325,12 @@ main{
 
 .button-more{
     position: absolute;
-    bottom: 10px;
+    bottom: 50px;
     background-color: #1abc9c;
     color: #ffffff;
     border: none;
+    width: 150px;
+    height: 50px;
     padding: 10px 20px;
     border-radius: 5px;
     font-weight: 700;
@@ -341,6 +346,72 @@ main{
 .button-more:hover{
     background-color: #f39c12;
     transform: scale(1.1);
+}
+
+.about-container{
+    width: 70%;
+    height: 400px;
+    display: flex;
+    margin-top: 50px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    margin: 0 auto;
+    margin-bottom: 20px;
+    
+}
+
+.about-left{
+    width: 45%;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
+
+.about-left h1{
+    color: #1abc9c;
+    margin-bottom: 40px;
+    padding: 10px;
+    font-size: 30px;
+    letter-spacing: .2rem;
+}
+
+.about-left p{
+    color: #7f8c8d;
+    font-size: 16px;
+    letter-spacing: .2rem;
+    text-align: left;
+}
+
+.about-left a{
+    color: #1abc9c;
+    text-decoration: none;
+    margin-top: 10px;
+    font-weight: 700;
+    transition: all 0.3s ease-in-out;
+}
+
+.about-left a:hover{
+    color: #f39c12;
+}
+
+.about-right{
+    width: 55%;
+    background-color: #1abc9c;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    border-top-left-radius: 450px;
+    background-image: url(../img/sobre.png);
+    background-size: cover;
+    animation: moveUpDown 5s ease-in-out infinite;
+}
+
+@keyframes moveUpDown {
+    0%, 100% {
+        background-position: center bottom;
+    }
+    50% {
+        background-position: center top;
+    }
 }
 
 

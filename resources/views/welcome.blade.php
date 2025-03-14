@@ -63,6 +63,10 @@
                 <span class="book2"></span>
                 <span class="book3"></span>
                 <span class="book4"></span>
+                <span class="book1"></span>
+                <span class="book2"></span>
+                <span class="book3"></span>
+                <span class="book4"></span>
             </section>
         </div>
     </header>
@@ -95,6 +99,24 @@
                         <p>Descrição do livro</p>
                         <button><a href="">Comprar</a></button>
                     </section>
+                    <section class="book">
+                        <img src="{{ Vite::asset('resources/img/book2.jpg') }}" alt="">
+                        <h2>Nome do Livro</h2>
+                        <p>Descrição do livro</p>
+                        <button><a href="">Comprar</a></button>
+                    </section>
+                    <section class="book">
+                        <img src="{{ Vite::asset('resources/img/book2.jpg') }}" alt="">
+                        <h2>Nome do Livro</h2>
+                        <p>Descrição do livro</p>
+                        <button><a href="">Comprar</a></button>
+                    </section>
+                    <section class="book">
+                        <img src="{{ Vite::asset('resources/img/book2.jpg') }}" alt="">
+                        <h2>Nome do Livro</h2>
+                        <p>Descrição do livro</p>
+                        <button><a href="">Comprar</a></button>
+                    </section>
                 </section>
                 <button class="button-more">
                     <a href="">Ver Mais</a>
@@ -103,5 +125,19 @@
             <button class="next">></button>
             <button class="prev"><</button>
         </section>
+
+
+        <section class="about-container">
+            <section class="about-left">
+                <h1>QUEM SOMOS</h1>
+                <p>BookStyle é uma plataforma de venda de livros online, onde você pode encontrar os melhores livros do mercado, com os melhores preços e as melhores condições de pagamento. A BookStyle é uma empresa que visa a satisfação do cliente, por isso, trabalhamos com os melhores fornecedores do mercado, para que você tenha a melhor experiência de compra possível.</p>
+                <a href="#">Nos conheça melhor</a>
+            </section>
+            <section class="about-right">
+    
+            </section>
+        </section>
+
+
     </main>
 @endsection
