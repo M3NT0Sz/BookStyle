@@ -210,7 +210,7 @@ main{
     flex-wrap: wrap;
 }
 
-.book-container{
+.book-container {
     margin-top: 30px;
     display: flex;
     flex-direction: column;
@@ -221,7 +221,7 @@ main{
     position: relative;
 }
 
-.book-container .next, .prev{
+.book-container .next, .prev {
     position: absolute;
     top: 50%;
     width: 50px;
@@ -236,29 +236,37 @@ main{
     transition: all 0.3s ease-in-out;
 }
 
-.next:hover, .prev:hover{
+.next:hover, .prev:hover {
     background-color: #1abc9c;
 }
 
-.next{
+.next {
     right: 70px;
 }
 
-.prev{
+.prev {
     left: 70px;
 }
 
-.book-container h1{
+.book-container h1 {
     color: #1abc9c;
     position: absolute;
     top: 64px;
     display: flex;
-    font-size: 40px;    
+    font-size: 40px;
     letter-spacing: .2rem;
     text-transform: uppercase;
 }
 
-.book-content{
+.next .prev {
+    background-color: #1abc9c;
+    color: white;
+    border: none;
+    padding: 10px;
+    margin: 10px;
+    cursor: pointer;
+}
+.book-content {
     display: flex;
     width: 78%;
     height: 100vh;
@@ -268,7 +276,7 @@ main{
     overflow: hidden;
 }
 
-.pages-book{
+.pages-book {
     display: flex;
     width: 100%;
     overflow: hidden;
@@ -276,31 +284,47 @@ main{
     align-items: center;
 }
 
-.book{
+
+.book {
     padding: 20px;
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 10px;
     transition: all 0.3s ease-in-out;
+    align-items: center;
+    text-align: center;
+    width: 280px;
+    min-height: 500px; /* Altura fixa para evitar quebra de layout */
+    overflow: hidden;
 }
 
 .book:hover{
     transform: scale(1.05);
 }
 
-.book h2{
+.book h2 {
     color: #1abc9c;
     font-size: 20px;
     letter-spacing: .1rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.book p{
+
+.book p {
     color: #7f8c8d;
     font-size: 16px;
+    max-height: 60px; /* Limita a altura da descrição */
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
-.book img{
-    width: 250px;
-    height: 400px;
+
+.book img {
+    width: 100%;
+    height: auto;
+    max-height: 400px;
+    object-fit: cover;
 }
 
 .book button{
@@ -318,10 +342,11 @@ main{
     background-color: #f39c12;
 }
 
-.book button a{
-    color: #ecf0f1;
+.book button a {
     text-decoration: none;
+    color: white;
 }
+
 
 .button-more{
     position: absolute;
