@@ -1,0 +1,409 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+main {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    background-color: #ecf0f1;
+    overflow: hidden;
+}
+
+.login-container {
+    width: 50%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-form {
+    width: 400px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+    background-color: rgba(243, 156, 18, 0.8);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    position: relative;
+    animation: Start 1s ease-in-out;
+
+}
+
+@keyframes Start {
+    0% {
+        transform: translateY(-100%);
+    }
+
+    100% {
+        transform: translateY(0);
+    }
+}
+
+.login-form .logo {
+    width: 150px;
+    height: 150px;
+    background-color: #ecf0f1;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 50px;
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.login-form form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    align-items: center;
+}
+
+.login-form label {
+    text-transform: uppercase;
+    color: #ecf0f1;
+    position: absolute;
+    font-size: 20px;
+    display: none;
+}
+
+@keyframes moveUpEmail {
+    0% {
+        top: 0;
+    }
+
+    100% {
+        top: -25px;
+    }
+}
+
+@keyframes moveUpSenha {
+    0% {
+        top: 90px;
+    }
+
+    100% {
+        top: 75px;
+    }
+}
+
+.email {
+    top: -25px;
+    left: 50px;
+    animation: moveUpEmail .3s ease-in-out;
+}
+
+.senha {
+    top: 75px;
+    left: 50px;
+    animation: moveUpSenha .3s ease-in-out;
+}
+
+.login-form input {
+    width: 75%;
+    height: 50px;
+    margin-bottom: 50px;
+    padding: 0 10px;
+    border: 1px solid #ecf0f1;
+    border-radius: 5px;
+    font-size: 1rem;
+    transition: .3s ease-in-out;
+    position: relative;
+    color: #8c9794;
+}
+
+.login-form input:focus {
+    border: 1px solid #f39c12;
+    outline: none;
+}
+
+.login-form input::placeholder {
+    color: #8c9794;
+    text-transform: uppercase;
+    font-size: .8rem;
+    transition: 3s ease-in-out;
+}
+
+.login-form h1 {
+    font-size: 4rem;
+    text-transform: uppercase;
+    color: #ecf0f1;
+    letter-spacing: .4rem;
+    margin-bottom: 20px;
+}
+
+.login-form button {
+    width: 75%;
+    height: 50px;
+    background-color: #1abc9c;
+    border: none;
+    border-radius: 5px;
+    color: #ecf0f1;
+    font-size: 1rem;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: .2rem;
+    transition: .3s ease-in-out;
+    font-weight: bold;
+}
+
+.login-form button:hover {
+    background-color: #16c19f;
+}
+
+.login-form a {
+    color: #ecf0f1;
+    text-decoration: none;
+    margin-top: 20px;
+    font-size: 20px;
+    transition: .3s ease-in-out;
+}
+
+.login-form a:hover {
+    color: #8c9794;
+}
+
+.login-ou {
+    width: 75%;
+    color: #ecf0f1;
+    margin-top: 20px;
+    font-size: 20px;
+    transition: .3s ease-in-out;
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.login-ou p {
+    color: #ecf0f1;
+    margin-top: 20px;
+    width: 40px;
+    font-size: 20px;
+    transition: .3s ease-in-out;
+    text-align: center;
+    background-color: #F1AD3E;
+    z-index: 1;
+
+}
+
+.login-ou span {
+    width: 100%;
+    height: 2px;
+    background-color: #ecf0f1;
+    position: absolute;
+    bottom: 10px;
+}
+
+.icon-logs {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 50px;
+    position: absolute;
+    bottom: 100px;
+}
+
+
+.icon-google {
+    width: 50px;
+    height: 50px;
+    background-color: #ecf0f1;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: .6s ease-in-out;
+    color: #ff3131;
+}
+
+.icon-google:hover {
+    background-color: #ff3131;
+    color: #ecf0f1;
+    transform: scale(1.05);
+    transform: rotate(360deg);
+}
+
+.icon-facebook {
+    width: 50px;
+    height: 50px;
+    background-color: #ecf0f1;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    color: #3498db;
+    transition: .3s ease-in-out;
+}
+
+.icon-facebook:hover {
+    background-color: #3498db;
+    color: #ecf0f1;
+    transform: scale(1.05);
+    transform: rotate(-360deg);
+}
+
+.banner-container {
+    width: 50%;
+    height: 100%;
+    display: flex;
+    position: relative;
+}
+
+.banner-container .livro {
+    opacity: .8;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+}
+
+.banner-container .anel {
+    width: 150px;
+    height: 150px;
+    position: absolute;
+    top: 70%;
+    left: 10%;
+    transform: translate(-50%, -50%);
+    transition: 2s ease-in-out;
+    animation: floatSide 3s ease-in-out infinite alternate, pulse 2s infinite alternate, moveToPosition 2s ease-in-out forwards;
+    z-index: 1;
+}
+
+.banner-container .dragao {
+    width: 300px;
+    height: 300px;
+    position: absolute;
+    top: 20%;
+    left: 10%;
+    transform: translate(-50%, -50%);
+    transition: 2s ease-in-out;
+    animation: floatUpDown 4s ease-in-out infinite alternate, pulse 3s infinite alternate, moveToPosition 2s ease-in-out forwards;
+    z-index: 1;
+}
+
+.banner-container .mont {
+    width: 800px;
+    height: 800px;
+    position: absolute;
+    top: 0%;
+    left: 10%;
+    transition: 2s ease-in-out;
+    transform: rotate(40deg);
+    opacity: .8;
+}
+
+.banner-container .gandalf {
+    width: 150px;
+    height: 150px;
+    position: absolute;
+    top: 80%;
+    left: 30%;
+    transform: translate(-50%, -50%);
+    transition: 2s ease-in-out;
+    animation: floatSide 3s ease-in-out infinite alternate, pulse 2.5s infinite alternate, moveToPosition 2s ease-in-out forwards;
+    z-index: 1;
+}
+
+.banner-container .varinha {
+    width: 150px;
+    height: 150px;
+    position: absolute;
+    top: 80%;
+    left: 70%;
+    transform: translate(-50%, -50%);
+    transition: 2s ease-in-out;
+    animation: floatRotate 3s ease-in-out infinite alternate, moveToPosition 2s ease-in-out forwards;
+    z-index: 1;
+}
+
+.banner-container .espada {
+    width: 150px;
+    height: 150px;
+    position: absolute;
+    top: 80%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transition: 2s ease-in-out;
+    animation: floatRotate 3s ease-in-out infinite alternate, moveToPosition 2s ease-in-out forwards;
+    z-index: 1;
+}
+
+.banner-container .coroa{
+    width: 150px;
+    height: 150px;
+    position: absolute;
+    top: 80%;
+    left: 90%;
+    transform: translate(-50%, -50%);
+    transition: 2s ease-in-out;
+    animation: pulse 3s ease-in-out infinite alternate, moveToPosition 2s ease-in-out forwards;
+    z-index: 1;
+}
+
+.banner-container .banjo{
+    width: 150px;
+    height: 150px;
+    position: absolute;
+    top: 40%;
+    left: -5%;
+    transform: translate(-50%, -50%);
+    transition: 2s ease-in-out;
+    animation: floatUpDown 3s ease-in-out infinite alternate, moveToPosition 2s ease-in-out forwards;
+    z-index: 1;
+}
+
+
+
+
+
+
+/* Animações */
+@keyframes moveToPosition {
+    0% {
+        opacity: 0;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+    100% {
+        /* Posição final dos elementos */
+        opacity: 1;
+    }
+}
+
+
+
+@keyframes floatUpDown {
+    0% { transform: translate(-50%, -50%); }
+    50% { transform: translate(-50%, -55%); }
+    100% { transform: translate(-50%, -50%); }
+}
+
+@keyframes floatSide {
+    0% { transform: translate(-50%, -50%); }
+    50% { transform: translate(-45%, -50%); }
+    100% { transform: translate(-50%, -50%); }
+}
+
+@keyframes floatRotate {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    50% { transform: translate(-50%, -52%) rotate(10deg); }
+    100% { transform: translate(-50%, -50%) rotate(0deg); }
+}
+
+@keyframes pulse {
+    0% { filter: brightness(1); }
+    100% { filter: brightness(1.4); }
+}
