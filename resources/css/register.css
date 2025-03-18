@@ -1,0 +1,195 @@
+
+h1{
+    color: #ffffff;
+    position: relative;
+    margin: 50px;
+    display: flex;
+    font-size: 40px;
+    letter-spacing: .2rem;
+    text-transform: uppercase;
+}
+
+.book-left{
+    width: 50%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.form-book{
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    perspective: 1000px;
+}
+
+.form-container {
+    width: 400px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+    background-color:  rgba(52, 152, 219, 0.8);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    position: relative;
+    transform-origin: left ;
+    transform: rotate(90deg);
+    opacity: 0;
+    transition: transform .6s, opacity .6s ease-in-out;
+}
+
+.form-container.animate{
+    transform: rotate(0deg);
+    opacity: 1;
+}
+
+
+
+.form-container img{
+    width: 150px;
+    height: 150px;
+    background-color: #ffffff;
+    border-radius: 50%;
+    border-radius: 50%;
+    margin-bottom: 50px;
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+
+
+}
+
+.form-container form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    align-items: center;
+}
+
+.form-container label {
+    text-transform: uppercase;
+    color: #ecf0f1;
+    position: absolute;
+    font-size: 20px;
+    display: none;
+}
+
+
+.nome{
+    top: -25px;
+    left: 55px;
+    animation: moveUpNome .5s ease-in-out;
+}
+
+.emailRe{
+    top: 75px;
+    left: 55px;
+    animation: moveUpEmailRe .5s ease-in-out;
+}
+
+
+.senhaRe{
+    top: 175px;
+    left: 55px;
+    animation: moveUpSenhaRe .5s ease-in-out;
+}
+
+.conf-senha{
+    top: 275px;
+    left: 55px;
+    animation: moveUpConfSenha .5s ease-in-out;
+}
+
+.form-container input {
+    width: 75%;
+    height: 50px;
+    margin-bottom: 50px;
+    padding: 0 10px;
+    border: 1px solid #ecf0f1;
+    border-radius: 5px;
+    font-size: 1rem;
+    transition: .3s ease-in-out;
+    position: relative;
+    color: #8c9794;
+}
+
+
+.form-container input:focus {
+    border: 1px solid #f39c12;
+    outline: none;
+}
+
+.form-container input::placeholder {
+    color: #8c9794;
+    text-transform: uppercase;
+    font-size: .8rem;
+    transition: 3s ease-in-out;
+}
+
+@keyframes Start {
+    0% {
+        transform: translateX(200%);
+    }
+
+    100% {
+        transform: translateX(0);
+    }
+}
+
+@keyframes moveUpNome {
+    0% {
+        top: 0;
+    }
+
+    100% {
+        top: -25px;
+    }
+}
+
+@keyframes moveUpEmailRe {
+    0% {
+        top: 100px;
+    }
+
+    100% {
+        top: 75px;
+    }
+}
+
+@keyframes moveUpCpf {
+    0% {
+        top: 200px;
+    }
+
+    100% {
+        top: 175px;
+    }
+}
+
+@keyframes moveUpSenhaRe {
+    0% {
+        top: 200px;
+    }
+
+    100% {
+        top: 175px;
+    }
+}
+
+@keyframes moveUpConfSenha {
+    0% {
+        top: 300px;
+    }
+
+    100% {
+        top: 275px;
+    }
+}
+
+

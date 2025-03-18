@@ -1,20 +1,31 @@
+html, body {
+    overflow: hidden;
+    scroll-behavior: smooth;
+}
+
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+
 }
 
 main {
-    width: 100%;
+    width: 200%;
     height: 100vh;
     display: flex;
     background-color: #ecf0f1;
     overflow: hidden;
+    transition: transform .5s ease-in-out;
+    
 }
 
+
+
 .login-container {
-    width: 50%;
-    height: 100%;
+    width: 100vw;
+    height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -31,11 +42,11 @@ main {
     background-color: rgba(243, 156, 18, 0.8);
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
     position: relative;
-    animation: Start 1s ease-in-out;
+    animation: StartLogin 1s ease-in-out;
 
 }
 
-@keyframes Start {
+@keyframes StartLogin {
     0% {
         transform: translateY(-100%);
     }
@@ -78,7 +89,7 @@ main {
 
 @keyframes moveUpEmail {
     0% {
-        top: 0;
+        top: 10px;
     }
 
     100% {

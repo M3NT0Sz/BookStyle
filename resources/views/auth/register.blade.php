@@ -1,43 +1,51 @@
-@extends('layouts.app')
+@extends('layouts.register')
 
 @section('content')
-    <form action="{{ route('register') }}" method="post">
-        @csrf
-        <div>
-            <label for="name">Name</label>
-            <input type="text" name="name" id="name" value="{{ old('name') }}">
-            @error('name')
-                <div>{{ $message }}</div>
-            @enderror
-        </div>
-        <div>
-            <label for="email">Email</label>
-            <input type="email" name="email" id="email" value="{{ old('email') }}">
-            @error('email')
-                <div>{{ $message }}</div>
-            @enderror
-        </div>
-        <div>
-            <label for="cpf">CPF</label>
-            <input type="text" name="cpf" id="cpf" value="{{ old('cpf') }}">
-            @error('cpf')
-                <div>{{ $message }}</div>
-            @enderror
-        </div>
-        <div>
-            <label for="password">Password</label>
-            <input type="password" name="password" id="password">
-            @error('password')
-                <div>{{ $message }}</div>
-            @enderror
-        </div>
-        <div>
-            <label for="password_confirmation">Confirm Password</label>
-            <input type="password" name="password_confirmation" id="password_confirmation">
-        </div>
-        <div>
-            <button type="submit">Register</button>
-        </div>
-        <a href="{{ route('login') }}">Login</a>
-    </form>
+    <main>
+        <section class="book-left">
+
+        </section>
+        <section class="form-book">
+            <section class="form-container">
+                <a href="{{ route('index') }}"><img class="logo" src="{{ Vite::asset('resources/img/favicon.png') }}"
+                        alt=""></a>
+                <h1>Registrar</h1>
+                <form action="{{ route('register') }}" method="post">
+                    @csrf
+
+                    <label class="nome" for="name" id="nameLabel">Nome</label>
+                    <input type="text" placeholder="Nome" name="name" id="name" value="{{ old('name') }}">
+                    @error('name')
+                        <div>{{ $message }}</div>
+                    @enderror
+
+
+                    <label class="email" for="email" id="emailLabel">Email</label>
+                    <input type="email" placeholder="Email" name="email" id="email" value="{{ old('email') }}">
+                    @error('email')
+                        <div>{{ $message }}</div>
+                    @enderror
+
+                    <label class="senha" for="password" id="passwordLabel">Senha</label>
+                    <input type="password" placeholder="Senha" name="password" id="password">
+                    @error('password')
+                        <div>{{ $message }}</div>
+                    @enderror
+
+
+                    <label class="conf-senha" for="password_confirmation" id="passwordConfirmationLabel">Confirmar
+                        Senha</label>
+                    <input type="password" placeholder="Confirmar senha" name="password_confirmation"
+                        id="password_confirmation">
+
+
+                    <button type="submit">Register</button>
+
+                    <a href="{{ route('login') }}">Login</a>
+                </form>
+            </section>
+
+        </section>
+    </main>
+
 @endsection
