@@ -83,7 +83,7 @@
                     @foreach ($books as $book)
                         <section class="book">
                             @if(!empty($book->images))
-                                <img src="{{ asset('storage/' . json_decode($book->images, true)[0]) }}" alt="{{ $book->name }}">
+                                <img src="{{ asset($book->images) }}" alt="{{ $book->name }}">
                             @endif
                             <h2> {{ $book->name }} </h2>
                             <p> {{ $book->description }} </p>

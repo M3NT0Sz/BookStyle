@@ -6,9 +6,7 @@
         $book = \App\Models\Book::find($bookId);
     @endphp
     @if($book->images)
-        @foreach(json_decode($book->images, true) as $image)
-            <img width="200" src="{{ asset('storage/' . $image) }}" alt="{{ $book->name }}">
-        @endforeach
+        <img width="200" src="{{ asset($book->images) }}" alt="{{ $book->name }}">
     @endif
     <h2>{{ $book->name }}</h2>
     <p>{{ $book->description }}</p>
