@@ -21,7 +21,7 @@
             </ul>
             <button class="button-login">
                 @if(Auth::check())
-                    <a href="#">Perfil</a>
+                    <a href="{{ route('user.profile') }}">Perfil</a>
                 @else
                     <a href="{{ route('login') }}">Entrar</a>
                 @endif

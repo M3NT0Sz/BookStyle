@@ -25,6 +25,7 @@ class BookFactory extends Factory
             'description' => fake()->sentence,
             'images' => 'https://lh6.googleusercontent.com/proxy/EwR7dYBwBBkGApuX1Sjuo89Z3mAThn3czvbnt1aS4AhSWxuG9JT5YAnr2y_tBzsMuK_HXuupUi7hAgjh',
             'user_id' => \App\Models\User::factory(),
+            // 'user_id' => 2,
             'created_at' => fake()->dateTime,
             'updated_at' => fake()->dateTime
         ];

@@ -47,7 +47,7 @@ class BookController extends Controller
             'user_id'=> $user->id,
         ]);
 
-        return redirect()->route('books.index');
+        return redirect()->route('user.profile');
     }
 
     public function edit(){
@@ -56,7 +56,7 @@ class BookController extends Controller
 
     public function update(Request $request, Book $book){
         $book->update($request->all());
-        return redirect()->route('books.index');
+        return redirect()->route('user.profile');
     }
 
     public function show($id){
@@ -75,6 +75,6 @@ class BookController extends Controller
 
         $book->delete();
 
-        return redirect()->route('books.index');
+        return redirect()->route('user.profile');
     }
 }

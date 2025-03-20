@@ -1,10 +1,6 @@
 @extends('layouts.app')
 
 @section('content')
-    @php
-        $bookId = request()->route('book');
-        $book = \App\Models\Book::find($bookId);
-    @endphp
     @if($book->images)
         <img width="200" src="{{ asset($book->images) }}" alt="{{ $book->name }}">
     @endif
