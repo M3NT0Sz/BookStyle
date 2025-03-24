@@ -19,13 +19,13 @@
                     <a href="#Home">Home</a>
                 </li>
             </ul>
-            <button class="button-login">
+            
                 @if(Auth::check())
-                    <a href="{{ route('user.profile') }}">Perfil</a>
+                    <a class="button-login" href="{{ route('user.profile') }}">Perfil</a>
                 @else
-                    <a href="{{ route('login') }}">Entrar</a>
+                    <a class="button-login" href="{{ route('login') }}">Entrar</a>
                 @endif
-            </button>
+        
         </nav>
 
         <div class="banner-container">
@@ -91,9 +91,7 @@
                         </section>
                     @endforeach
                 </section>
-                <button class="button-more">
-                    <a href="{{ route('books.index') }}">Ver Mais</a>
-                </button>
+                    <a class="button-more"  href="{{ route('books.create') }}">Ver Mais</a>
             </section>
             <button class="next">></button>
             <button class="prev">
