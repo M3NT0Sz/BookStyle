@@ -1,0 +1,317 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #ecf0f1;
+    flex-direction: column;
+    position: relative;
+}
+
+h1 {
+    color: #1abc9c;
+    font-size: 40px;
+    letter-spacing: .2rem;
+    text-transform: uppercase;
+    top: 64px;
+    left: 50%;
+    transform: translateX(-50%);
+    position: absolute;
+}
+
+span{
+    background-color: #1abc9c;
+    width: 100%;
+    height: 2px;
+    margin-bottom: 10px;
+    opacity: .5;
+}
+
+.body-form {
+    width: 75%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    background-color: transparent;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.form-author-name {
+    width: 70%;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 100px;
+}
+
+.form-author-name input {
+    width: 400px;
+    height: 40px;
+    padding: 10px;
+    border: 1px solid #3498db;
+    border-radius: 3px;
+    outline: none;
+    transition: .5s ease-in-out;
+}
+
+.form-author-name input:focus {
+    border: 2px solid #3498db;
+    transform: scale(1.05);
+}
+
+.form-author-name label {
+    margin-right: 10px;
+    display: none;
+}
+
+/* Estilização do botão */
+.button-genre {
+    background-color: #3498db;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    border-radius: 5px;
+    transition: 0.3s;
+    display: block;
+    width: 20%;
+    text-align: center;
+    position: absolute;
+    top: 20%;
+}
+
+.button-genre:hover {
+    background-color: #1abc9c;
+}
+
+/* Contêiner da lista de gêneros */
+.form-genre {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+    transition: 1s ease-in-out;
+}
+
+/* Lista de gêneros oculta por padrão */
+.form-genre>div {
+
+    position: absolute;
+    width: 100%;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    margin-top: 5px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    max-height: 300px;
+    overflow-y: auto;
+
+    /* Animação inicial oculta */
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    pointer-events: none
+}
+
+/* Exibir a lista quando ativa */
+.form-genre.active>div {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: all;
+}
+
+/* Estilização dos checkboxes */
+input[type="checkbox"] {
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border: 2px solid #3498db;
+    border-radius: 3px;
+    position: relative;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+/* Checkmark quando selecionado */
+input[type="checkbox"]:checked {
+    background-color: #3498db;
+    border-color: #3498db;
+}
+
+input[type="checkbox"]:checked::after {
+    content: '✔';
+    font-size: 14px;
+    color: white;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* Estilização das labels */
+label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    padding: 5px 0;
+}
+
+/* Categorias */
+strong {
+    display: block;
+    margin-top: 10px;
+    font-size: 16px;
+    color: #333;
+}
+
+.form-condition-price {
+    width: 70%;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 100px;
+    gap: 40px;
+}
+
+.form-condition-price select {
+    width: 200px;
+    height: 40px;
+    padding: 10px;
+    border: 1px solid #3498db;
+    border-radius: 3px;
+    outline: none;
+    transition: .5s ease-in-out;
+}
+
+.form-condition-price input {
+    width: 200px;
+    height: 40px;
+    padding: 10px;
+    border: 1px solid #3498db;
+    border-radius: 3px;
+    outline: none;
+    transition: .5s ease-in-out;
+}
+
+.form-description{
+    width: 70%;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 100px;
+}
+
+.form-description textarea {
+    width: 100%;
+    height: 200px;
+    padding: 10px;
+    border: 1px solid #3498db;
+    border-radius: 3px;
+    outline: none;
+    transition: .5s ease-in-out;
+    resize: none;
+}
+
+/* Contêiner do input */
+.form-images {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+}
+
+/* Escondendo o input padrão */
+.form-images input[type="file"] {
+    display: none;
+}
+
+/* Botão estilizado para upload */
+.upload-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #1abc9c;
+    color: white;
+    padding: 12px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: background 0.3s ease;
+    text-align: center;
+    width: 100%;
+}
+
+.upload-label:hover {
+    background-color: #1e8f78;
+}
+
+/* Ícone opcional para o botão */
+.upload-label::before {
+    content: '📁 ';
+    font-size: 18px;
+}
+
+/* Estilizando a pré-visualização das imagens */
+.image-preview {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 10px;
+    gap: 10px;
+    justify-content: center;
+}
+
+.image-preview img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 5px;
+    border: 2px solid #ddd;
+    transition: 0.3s;
+}
+
+.image-preview img:hover {
+    border-color: #3498db;
+    transform: scale(1.1);
+}
+
+.button-cad{
+    background-color: #3498db;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    border-radius: 5px;
+    transition: 0.3s;
+    display: block;
+    width: 100%;
+    margin-top: 20px;
+    text-align: center;
+}
+
+.button-cad:hover {
+    background-color: #1779ba;
+}
