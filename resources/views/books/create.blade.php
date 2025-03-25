@@ -2,6 +2,8 @@
 
 @section('content')
 <main>
+    <a href="{{ route('index') }}"><img class="logo" src="{{ Vite::asset('resources/img/favicon.png') }}"
+    alt=""></a>
     <h1>Cadastrar Livro</h1>
     <span></span>
 
