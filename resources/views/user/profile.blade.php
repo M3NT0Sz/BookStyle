@@ -1,6 +1,21 @@
-@extends('layouts.app')
+@extends('layouts.profile')
 
 @section('content')
+    <header>
+        <section class="banner">
+            <img class="fundo" src="{{ Vite::asset('resources/img/fundoPerfil.png') }}" alt="">
+
+            <img class="profile" src="{{ Vite::asset('resources/img/sueli.png') }}" alt="">
+
+            <h1>Sueli Silva</h1>
+        </section>
+    </header>
+
+
+
+
+
+
     <a href="{{ route('books.create') }}">Cadastrar livro</a>
     <a href="{{ route('index') }}">Voltar</a>
 
