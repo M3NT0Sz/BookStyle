@@ -28,7 +28,7 @@
                 <span></span>
             </section>
             <section class="icon-logs">
-                <ion-icon class="icon-google" name="logo-google"></ion-icon>
+            <ion-icon class="icon-google" name="logo-google"></ion-icon>
                 <ion-icon class="icon-facebook" name="logo-facebook"></ion-icon>
             </section>
         </section>
