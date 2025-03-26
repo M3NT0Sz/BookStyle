@@ -21,46 +21,33 @@
 
                 <div id="genre">
                     <strong>Ficção:</strong><br>
-                    <label><input type="checkbox" name="genre[]" value="fantasia"> Fantasia</label><br>
-                    <label><input type="checkbox" name="genre[]" value="ficcao-cientifica"> Ficção Científica</label><br>
-                    <label><input type="checkbox" name="genre[]" value="distopia-utopia"> Distopia/Utopia</label><br>
-                    <label><input type="checkbox" name="genre[]" value="ficcao-historica"> Ficção Histórica</label><br>
-                    <label><input type="checkbox" name="genre[]" value="ficcao-contemporanea"> Ficção Contemporânea</label><br>
-                    <label><input type="checkbox" name="genre[]" value="ficcao-realista"> Ficção Realista</label><br>
-                    <label><input type="checkbox" name="genre[]" value="romance"> Romance</label><br>
-                    <label><input type="checkbox" name="genre[]" value="aventura"> Aventura</label><br>
-                    <label><input type="checkbox" name="genre[]" value="terror-horror"> Terror/Horror</label><br>
-                    <label><input type="checkbox" name="genre[]" value="suspense-thriller"> Suspense/Thriller</label><br>
-                    <label><input type="checkbox" name="genre[]" value="policial-crime"> Policial/Crime</label><br>
-                    <label><input type="checkbox" name="genre[]" value="western"> Western</label><br>
-                    <label><input type="checkbox" name="genre[]" value="chick-lit"> Chick-lit</label><br><br>
+                    @foreach (['fantasia' => 'Fantasia', 'ficcao-cientifica' => 'Ficção Científica', 'distopia-utopia' => 'Distopia/Utopia', 'ficcao-historica' => 'Ficção Histórica', 'ficcao-contemporanea' => 'Ficção Contemporânea', 'ficcao-realista' => 'Ficção Realista', 'romance' => 'Romance', 'aventura' => 'Aventura', 'terror-horror' => 'Terror/Horror', 'suspense-thriller' => 'Suspense/Thriller', 'policial-crime' => 'Policial/Crime', 'western' => 'Western', 'chick-lit' => 'Chick-lit'] as $value => $label)
+                        <label><input type="checkbox" name="genre[]" value="{{ $value }}" {{ in_array($value, old('genre', [])) ? 'checked' : '' }}> {{ $label }}</label><br>
+                    @endforeach
+                    <br>
 
                     <strong>Não Ficção:</strong><br>
-                    <label><input type="checkbox" name="genre[]" value="biografia-autobiografia"> Biografia/Autobiografia</label><br>
-                    <label><input type="checkbox" name="genre[]" value="memorias"> Memórias</label><br>
-                    <label><input type="checkbox" name="genre[]" value="ensaios"> Ensaios</label><br>
-                    <label><input type="checkbox" name="genre[]" value="autoajuda"> Autoajuda e Desenvolvimento Pessoal</label><br>
-                    <label><input type="checkbox" name="genre[]" value="ciencia-tecnologia"> Ciência e Tecnologia</label><br>
-                    <label><input type="checkbox" name="genre[]" value="historia"> História</label><br>
-                    <label><input type="checkbox" name="genre[]" value="filosofia"> Filosofia</label><br>
-                    <label><input type="checkbox" name="genre[]" value="religiao-espiritualidade"> Religião e Espiritualidade</label><br>
-                    <label><input type="checkbox" name="genre[]" value="psicologia-psicanalise"> Psicologia e Psicanálise</label><br><br>
+                    @foreach (['biografia-autobiografia' => 'Biografia/Autobiografia', 'memorias' => 'Memórias', 'ensaios' => 'Ensaios', 'autoajuda' => 'Autoajuda e Desenvolvimento Pessoal', 'ciencia-tecnologia' => 'Ciência e Tecnologia', 'historia' => 'História', 'filosofia' => 'Filosofia', 'religiao-espiritualidade' => 'Religião e Espiritualidade', 'psicologia-psicanalise' => 'Psicologia e Psicanálise'] as $value => $label)
+                        <label><input type="checkbox" name="genre[]" value="{{ $value }}" {{ in_array($value, old('genre', [])) ? 'checked' : '' }}> {{ $label }}</label><br>
+                    @endforeach
+                    <br>
 
                     <strong>Literatura Infantojuvenil:</strong><br>
-                    <label><input type="checkbox" name="genre[]" value="contos-fadas"> Contos de Fadas</label><br>
-                    <label><input type="checkbox" name="genre[]" value="fabulas"> Fábulas</label><br>
-                    <label><input type="checkbox" name="genre[]" value="livros-infantis"> Livros Infantis Ilustrados</label><br>
-                    <label><input type="checkbox" name="genre[]" value="young-adult"> Young Adult (YA)</label><br>
-                    <label><input type="checkbox" name="genre[]" value="middle-grade"> Middle Grade (MG)</label><br><br>
+                    @foreach (['contos-fadas' => 'Contos de Fadas', 'fabulas' => 'Fábulas', 'livros-infantis' => 'Livros Infantis Ilustrados', 'young-adult' => 'Young Adult (YA)', 'middle-grade' => 'Middle Grade (MG)'] as $value => $label)
+                        <label><input type="checkbox" name="genre[]" value="{{ $value }}" {{ in_array($value, old('genre', [])) ? 'checked' : '' }}> {{ $label }}</label><br>
+                    @endforeach
+                    <br>
 
                     <strong>Poesia e Teatro:</strong><br>
-                    <label><input type="checkbox" name="genre[]" value="poesia"> Poesia</label><br>
-                    <label><input type="checkbox" name="genre[]" value="teatro-drama"> Teatro/Drama</label><br><br>
+                    @foreach (['poesia' => 'Poesia', 'teatro-drama' => 'Teatro/Drama'] as $value => $label)
+                        <label><input type="checkbox" name="genre[]" value="{{ $value }}" {{ in_array($value, old('genre', [])) ? 'checked' : '' }}> {{ $label }}</label><br>
+                    @endforeach
+                    <br>
 
                     <strong>Mangás, HQs e Graphic Novels:</strong><br>
-                    <label><input type="checkbox" name="genre[]" value="mangas"> Mangás</label><br>
-                    <label><input type="checkbox" name="genre[]" value="hqs"> Histórias em Quadrinhos (HQs)</label><br>
-                    <label><input type="checkbox" name="genre[]" value="graphic-novels"> Graphic Novels</label><br>
+                    @foreach (['mangas' => 'Mangás', 'hqs' => 'Histórias em Quadrinhos (HQs)', 'graphic-novels' => 'Graphic Novels'] as $value => $label)
+                        <label><input type="checkbox" name="genre[]" value="{{ $value }}" {{ in_array($value, old('genre', [])) ? 'checked' : '' }}> {{ $label }}</label><br>
+                    @endforeach
                 </div>
             </div>
 

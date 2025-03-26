@@ -24,7 +24,7 @@ class BookController extends Controller
         $inputs = $request->validate([
             'name' => 'required',
             'author' => 'required',
-            'genre' => 'required',
+            'genre.*' => 'required',
             'condition' => 'required',
             'price' => 'required',
             'description' => 'required|max:255',
@@ -39,7 +39,7 @@ class BookController extends Controller
         Book::create([
             'name' => $inputs['name'],
             'author' => $inputs['author'],
-            'genre' => $inputs['genre'],
+            'genre' => json_encode($inputs['genre']),
             'condition' => $inputs['condition'],
             'price' => $inputs['price'],
             'description'=> $inputs['description'],

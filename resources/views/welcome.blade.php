@@ -83,10 +83,17 @@
                     @foreach ($books as $book)
                         <section class="book">
                             @if(!empty($book->images))
-                                <img src="{{ asset($book->images) }}" alt="{{ $book->name }}">
+                                @php
+                                    $images = is_array($book->images) ? $book->images : json_decode($book->images, true);
+                                @endphp
+                                @if(is_array($images) && !empty($images))
+                                    <img src="{{ asset('storage/' . $images[0]) }}" alt="{{ $book->name }}">
+                                @elseif(!is_array($images))
+                                    <img src="{{ asset($book->images) }}" alt="{{ $book->name }}">
+                                @endif
                             @endif
                             <h2> {{ $book->name }} </h2>
-                            <p> {{ $book->description }} </p>
+                            <p> R${{ $book->price }} </p>
                             <button><a href="{{ route('books.show', $book->id) }}">Comprar</a></button>
                         </section>
                     @endforeach

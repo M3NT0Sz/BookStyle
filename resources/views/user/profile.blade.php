@@ -8,7 +8,16 @@
     @foreach ($books as $book)
         <section>
             @if(!empty($book->images))
-                <img src="{{ asset($book->images) }}" alt="{{ $book->name }}">
+                @php
+                    $images = is_array($book->images) ? $book->images : json_decode($book->images, true);
+                @endphp
+                @if(is_array($images))
+                    @foreach($images as $image)
+                        <img width="50px" src="{{ asset('storage/' . $image) }}" alt="{{ $book->name }}">
+                    @endforeach
+                @else
+                    <img src="{{ asset($book->images) }}" alt="{{ $book->name }}">
+                @endif
             @endif
             <h2> {{ $book->name }} </h2>
             <p> {{ $book->description }} </p>

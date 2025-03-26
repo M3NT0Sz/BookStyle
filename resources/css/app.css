@@ -328,6 +328,7 @@ main{
     max-height: 60px; /* Limita a altura da descrição */
     overflow: hidden;
     text-overflow: ellipsis;
+    flex-grow: 1;
 }
 
 .book img {
