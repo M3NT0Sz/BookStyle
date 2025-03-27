@@ -6,11 +6,18 @@
     padding: 0;
     box-sizing: border-box;
     font-family: "Josefin Sans", sans-serif;
+   
+}
+
+body {
+    background-color: #ecf0f1;
+    position: relative;
+    overflow-X: hidden;
 }
 
 header{
     display: flex;
-
+    flex-direction: column;
 }
 
 .banner{
@@ -20,20 +27,207 @@ header{
     width: 100%;
 }
 
+.banner .icon-edit{
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 2rem;
+    color: #3498db;
+    cursor: pointer;
+}
+
 .banner .fundo{
     width: 100%;
-    height: 75vh;
+    height: 50vh;
     object-fit: cover;
 }
 
-.benner .profile{
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    border: 5px solid #fff;
+.profile{
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: center;
+    position: relative;
+    top: -200px;
+    
 }
+
+.profile img{
+    width: 350px;
+    height: 350px;
+    border-radius: 50%;
+    border: 10px solid #ecf0f1;
+}
+
+.profile h1{
+    font-size: 4rem;
+    color: #1abc9c;
+    letter-spacing: 1rem;
+}
+
+
+
+
+.my-menu{
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    gap: 10rem;
+
+}
+
+.my-book{
+    display: flex;
+    justify-content: space-around;
+    flex-direction: column;
+    width: 250px;
+    height: 350px;
+    background: linear-gradient(135deg, #3498db, #1abc9c);
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.button-my-book:hover {
+    filter: brightness(1.2);
+    transition: 0.3s;
+}
+
+.my-book-h1{
+    font-size: 1.5rem;
+    color: #ecf0f1;
+    text-align: center;
+    margin-top: 10px;
+    text-transform: uppercase;
+}
+
+.button-my-book{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: none;
+    width: 100%;
+    height: 60%;
+    background-color: transparent;
+    margin-top: 10px;
+    cursor: pointer;
+    font-size: 10rem;
+    color: #2c3b44;
+}
+
+
+.container-book {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 75%;
+    margin-top: 20px;
+    margin: 5rem auto;
+
+}
+
+#container-book {
+    max-height: 0; /* Altura inicial 0 para esconder */
+    overflow: hidden; /* Esconde o conteúdo que ultrapassa a altura */
+    opacity: 0; /* Invisível inicialmente */
+    transform: translateY(-20px); /* Move ligeiramente para cima */
+    transition: max-height 0.9s ease, opacity 0.5s ease, transform 0.5s ease; /* Transição suave */
+}
+
+#container-book.show {
+    max-height: 1000px; /* Altura suficiente para mostrar o conteúdo */
+    opacity: 1; /* Torna visível */
+    transform: translateY(0); /* Retorna à posição original */
+}
+
+.book-list {
+    display: flex;
+    flex-direction: row; 
+    flex-wrap: wrap; 
+    justify-content: center;
+    align-items: flex-start; 
+    gap: 50px; 
+}
+
+.book-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 250px;
+    text-align: center;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    background-color: #fff;
+    transition: transform .3s ease-in-out;
+    
+}
+
+.book-item:hover {
+    transform: scale(1.05);
+    transition: transform 0.3s ease-in-out;
+}
+
+.container-book img {
+    width: 200px;
+    height: 300px;
+    margin: 10px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+}
+
+.book-item p{
+    font-size: 1rem;
+    color: #7f8c8d;
+    margin-top: 10px;
+}
+
+.editar-book{
+    display: flex;
+    width: 150px;
+    height: 40px;
+    align-items: center;
+    justify-content: center;
+    background-color: #3498db;
+    color: #ecf0f1;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: .3s ease-in-out;
+}
+
+.editar-book:hover{
+    background-color: #2980b9;
+}
+
+.editar-book a{
+    text-decoration: none;
+    color: #ecf0f1;
+}
+
+.button-delete{
+    display: flex;
+    width: 150px;
+    height: 40px;
+    align-items: center;
+    justify-content: center;
+    background-color: #e74c3c;
+    color: #ecf0f1;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: .3s ease-in-out;
+}
+
+.button-delete:hover{
+    background-color: #c0392b;
+}
+
+
+
+
+
 
