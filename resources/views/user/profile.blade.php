@@ -15,17 +15,50 @@
 
 </header>
 <main>
-    <section class="my-menu"> 
+
+    <div class="nav_profile">
+        <nav class="nav_links">
+            <ul class="nav_itens">
+                <span class="ball"></span>
+                <li class="nav_objects active">
+                    <a href="#perfil">
+                        <i class="fa-regular fa-user icon_profile_user"></i>
+                        <span class="text_profile">Perfil</span>
+                    </a>
+                </li>
+                <li class="nav_objects ">
+                    <a href="#livros">
+                        <i class="fa-solid fa-book icon_profile_book"></i>
+                        <span class="text_profile_book">Livros</span>
+                    </a>
+                </li>
+                <li class="nav_objects">
+                    <a href="#config">
+                        <i class="fa-solid fa-wrench icon_profile"></i>
+                        <span class="text_profile_config">Configurações</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <section id="perfil" class="my-perfil ">
+        <h2>Deu certo Perfil</h2>
+    </section>
+
+    <section id="config" class="config hidden">
+        <h1>Deu certo config</h1>
+    </section>
+
+    <section id="livros" class="my-menu hidden">
         <section class="my-book">
             <h1 class="my-book-h1">Meus livros</h1>
             <button id="toggle-books" class="button-my-book"><i class="fas fa-book-open"></i></button>
-
         </section>
         <section class="my-book">
             <h1 class="my-book-h1">Meus Pedidos</h1>
             <button class="button-my-book"><ion-icon name="cart-outline"></ion-icon></button>
         </section>
-
     </section>
 
     <section id="container-book" class="container-book">
@@ -54,11 +87,12 @@
             </div>
             @endforeach
         </section>
+        <a class="btn-more" href="{{ route('books.create') }}">Cadastrar livro</a>
     </section>
 
 
-    <a href="{{ route('books.create') }}">Cadastrar livro</a>
-    <a href="{{ route('index') }}">Voltar</a>
+
+    <a class="btn-back" href="{{ route('index') }}">Voltar</a>
 
 
 

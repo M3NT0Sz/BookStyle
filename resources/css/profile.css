@@ -70,10 +70,11 @@ header{
 
 .my-menu{
     display: flex;
+    flex-direction: row;
     width: 100%;
     justify-content: center;
-    gap: 10rem;
-
+    align-items: center;
+    gap: 50px;
 }
 
 .my-book{
@@ -116,27 +117,25 @@ header{
 
 
 .container-book {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 75%;
+    display: block;
     margin-top: 20px;
-    margin: 5rem auto;
-
 }
 
 #container-book {
-    max-height: 0; /* Altura inicial 0 para esconder */
+    max-height: 0;
     overflow: hidden; /* Esconde o conteúdo que ultrapassa a altura */
     opacity: 0; /* Invisível inicialmente */
     transform: translateY(-20px); /* Move ligeiramente para cima */
-    transition: max-height 0.9s ease, opacity 0.5s ease, transform 0.5s ease; /* Transição suave */
+    transition: height 1s ease, opacity 0.5s ease, transform 1s ease; /* Transição suave */
+     justify-content: center;
+    align-items: center;
 }
 
 #container-book.show {
-    max-height: 1000px; /* Altura suficiente para mostrar o conteúdo */
+    max-height: 200% ;
     opacity: 1; /* Torna visível */
     transform: translateY(0); /* Retorna à posição original */
+   
 }
 
 .book-list {
@@ -164,7 +163,9 @@ header{
 }
 
 .book-item:hover {
-    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(26, 188, 156, 0.5);
+    transform: scale(1.01);
+
     transition: transform 0.3s ease-in-out;
 }
 
@@ -225,6 +226,223 @@ header{
 .button-delete:hover{
     background-color: #c0392b;
 }
+
+.btn-more{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 250px;
+    padding: 20px 40px;
+    background-color: #3498db;
+    text-decoration: none;
+    border-radius: 5px;
+    text-transform: uppercase;
+    color: #ecf0f1;
+    font-size: 1rem;
+    margin: 40px auto;
+}
+
+.btn-more:hover{
+    background-color: #2980b9;
+    box-shadow: 0 5px 15px rgba(41, 128, 185, 0.8);
+    transition: .3s ease-in-out;
+}
+
+.btn-back{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 150px;
+    padding: 20px 10px;
+    background-color: #1abc9c;
+    text-decoration: none;
+    border-radius: 5px;
+    text-transform: uppercase;
+    color: #ecf0f1;
+    font-size: 1rem;
+    margin: 20px 20px;
+    transition: .5 ease-in-out;
+}
+
+.btn-back:hover{
+    background-color: #16a085;
+    box-shadow: 0 5px 15px rgba(26, 188, 156, 0.8);
+    transform: translateY(-2px);
+    transition: .3s ease-in-out;
+}
+
+.nav_profile{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 100px;
+}
+.nav_links{
+    width: 25%;
+    height: 70px;
+    display: flex;
+    background-color: #16a085;
+    border-radius: 20px;
+}
+
+.nav_itens{
+    display: flex;
+    width: 100%;
+    justify-content: space-around;
+    align-items: center;
+    list-style: none;
+    position: relative;
+}
+
+.text_profile_book{
+    font-size: 1rem;
+    color: #ecf0f1;
+    text-align: center;
+    margin-top: 10px;
+    position: absolute;
+    left: 46%;
+    top: 50%;
+    opacity: 0;
+}
+
+
+
+.nav_itens a{
+    text-decoration: none;
+}
+
+.text_profile{
+    font-size: 1rem;
+    color: #ecf0f1;
+    text-align: center;
+    margin-top: 10px;
+    position: absolute;
+    top: 50%;
+    left: 10%;
+    opacity: 0;
+}
+
+.text_profile_config{
+    font-size: 1rem;
+    color: #ecf0f1;
+    text-align: center;
+    margin-top: 10px;
+    position: absolute;
+    top: 50%;
+    right: 5%;
+    opacity: 0;
+}
+
+.icon_profile{
+    font-size: 2rem;
+    color: #ecf0f1;
+    transition: .3s ease-in-out;
+    position: absolute;
+    top:30%;
+    
+}
+
+.icon_profile_user{
+    font-size: 2rem;
+    color: #ecf0f1;
+    transition: .3s ease-in-out;
+    position: absolute;
+    top: 70%;
+    left: 11%;
+}
+
+.nav_objects .icon_profile_book{
+    font-size: 2rem;
+    color: #ecf0f1;
+    transition: .3s ease-in-out;
+    position: absolute;
+    top: 50%;
+    left: 48%;
+}
+
+.ball{
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    background-color: #16a085;
+    border: 6px solid #ecf0f1;
+    border-radius: 50%;
+    top: -60%;
+    left: 27px;
+    transition: .3s ease-in-out;
+}
+
+.ball::before{
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background-color: #16a085;
+    border-radius: 20px 0 0 0;
+    top: 54%;
+    left: 104%;
+    transition: .3s ease-in-out;
+    box-shadow: 0px -10px 0 0 #ecf0f1;
+}
+
+.ball::after{
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background-color: #16a085;
+    border-radius: 0 20px 0 0;
+    top: 55%;
+    left: -32%;
+    transition: .3s ease-in-out;
+    box-shadow: 0px -10px 0 0 #ecf0f1;
+}
+
+.nav_objects .icon_profile_user{
+    top: 30%;
+}
+
+.nav_objects .icon_profile_book{
+    top: 30%;
+    left: 50%;
+}
+
+/* Adicione transições para suavizar o movimento */
+.nav_objects .icon_profile_user,
+.nav_objects .icon_profile_book,
+.nav_objects .icon_profile {
+    transition: transform 0.3s ease-in-out, color 0.3s ease-in-out;
+}
+
+.nav_objects.active .icon_profile_book{
+    left: 48%;
+    transform: translateY(-120%);
+}
+
+.nav_objects.active .icon_profile_user,
+.nav_objects.active .icon_profile {
+    transform: translateY(-40px); /* Move o ícone para o centro da bola */
+    
+}
+
+.nav_objects.active .text_profile,
+.nav_objects.active .text_profile_book,
+.nav_objects.active .text_profile_config {
+    opacity: 1; /* Torna o texto visível */
+    transition: opacity 0.3s ease-in-out;
+}
+
+.hidden {
+    display: none;
+}
+
+.visible {
+    display: flex;
+   align-items: center;
+   justify-content: center;
+
+}
+
 
 
 

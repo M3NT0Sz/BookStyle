@@ -42,5 +42,5 @@
             <button type="submit">Editar</button>
         </div>
     </form>
-    <a href="{{ route('books.index') }}">Voltar</a>
+    <a href="{{ route('user.profile') }}">Voltar</a>
 @endsection
