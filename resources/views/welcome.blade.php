@@ -7,13 +7,13 @@
                     alt=""></a>
             <ul class="nav-links">
                 <li>
-                    <a href="#">Home</a>
+                    <a href="{{ route('index') }}">Home</a>
                 </li>
                 <li>
-                    <a href="#Home">Quem Somos</a>
+                    <a href="{{ route('about') }}">Quem Somos</a>
                 </li>
                 <li>
-                    <a href="#Home">Livros</a>
+                    <a href="{{route('books.index') }}">Livros</a>
                 </li>
             </ul>
 
@@ -27,10 +27,9 @@
 
         <div class="banner-container">
             <h1>BookStyle</h1>
-            <p>Encontre suas Histórias</p>
+            <p>Encontre suas Histórias </p>
+            
             <section class="search-container">
-                <input type="text" placeholder="Pesquise por um livro">
-
             </section>
             <section class="books-down">
                 <span class="book1"></span>
@@ -74,34 +73,61 @@
     </header>
     <main>
         <section class="book-container">
-            <h1>Alguns livros</h1>
+            <h1>Livros Novos</h1>
             <section class="book-content">
                 <section class="pages-book">
-                    @foreach ($books as $book)
-                                <section class="book">
-                                    @if(!empty($book->images))
-                                                    @php
-                                                        $images = is_array($book->images) ? $book->images : json_decode($book->images, true);
-                                                    @endphp
-                                                    @if(is_array($images) && !empty($images))
-                                                        <img src="{{ asset('storage/' . $images[0]) }}" alt="{{ $book->name }}">
-                                                    @elseif(!is_array($images))
-                                                        <img src="{{ asset($book->images) }}" alt="{{ $book->name }}">
-                                                    @endif
-                                    @endif
-                                    <h2> {{ $book->name }} </h2>
-                                    <p> R${{ $book->price }} </p>
-                                    <button><a href="{{ route('books.show', $book->id) }}">Comprar</a></button>
-                                </section>
+                    @foreach ($booksNew as $book)
+                    <section class="book">
+                        @if(!empty($book->images))
+                        @php
+                            $images = is_array($book->images) ? $book->images : json_decode($book->images, true);
+                        @endphp
+                        @if(is_array($images) && !empty($images))
+                            <img src="{{ asset('storage/' . $images[0]) }}" alt="{{ $book->name }}">
+                        @elseif(!is_array($images))
+                            <img src="{{ asset($book->images) }}" alt="{{ $book->name }}">
+                        @endif
+                        @endif
+                        <h2>{{ $book->name }}</h2>
+                        <p>R${{ $book->price }}</p>
+                        <button><a href="{{ route('books.show', $book->id) }}">Comprar</a></button>
+                    </section>
                     @endforeach
                 </section>
-                <a class="button-more" href="{{ route('books.create') }}">Ver Mais</a>
+                <a class="button-more" href="{{ route('books.index') }}">Ver Mais</a>
             </section>
-            <button class="next">></button>
-            <button class="prev">
-                < </button>
+            <button class="B1">></button>
+            <button class="B2"><</button>
         </section>
-
+        
+        <section class="book-container">
+            <h1>Livros Antigos</h1>
+            <section class="book-content">
+                <section class="pages-book">
+                    @foreach ($booksOld as $book)
+                    <section class="book">
+                        @if(!empty($book->images))
+                        @php
+                            $images = is_array($book->images) ? $book->images : json_decode($book->images, true);
+                        @endphp
+                        @if(is_array($images) && !empty($images))
+                            <img src="{{ asset('storage/' . $images[0]) }}" alt="{{ $book->name }}">
+                        @elseif(!is_array($images))
+                            <img src="{{ asset($book->images) }}" alt="{{ $book->name }}">
+                        @endif
+                        @endif
+                        <h2>{{ $book->name }}</h2>
+                        <p>R${{ $book->price }}</p>
+                        <button><a href="{{ route('books.show', $book->id) }}">Comprar</a></button>
+                    </section>
+                    @endforeach
+                </section>
+                <a class="button-more" href="{{ route('books.index') }}">Ver Mais</a>
+                
+            </section>
+            <button class="B3">></button>
+            <button class="B4"><</button>
+        </section>
 
         <section class="about-container">
             <section class="about-left">
@@ -115,6 +141,7 @@
             <section class="about-right">
 
             </section>
+            
         </section>
 
 

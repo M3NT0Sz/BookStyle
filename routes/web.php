@@ -6,10 +6,14 @@ use App\Models\Book;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    $books = Book::paginate(8);
-    return view('welcome', ['books'=> $books]);
+    $booksNew = Book::where('condition', 'new')->paginate(8); // Livros novos
+    $booksOld = Book::where('condition', 'used')->paginate(8); // Livros usados
+    return view('welcome', compact('booksNew', 'booksOld'));
 })->name('index');
 
+Route::get('/about', function () {
+    return view('about');
+})->name('about');
 Route::get('/books/index', [BookController::class, 'index'])->name('books.index');
 Route::get('/user/profile', [UserController::class, 'profile'])->name('user.profile');
 Route::get('/books/create', [BookController::class, 'create'])->name('books.create');

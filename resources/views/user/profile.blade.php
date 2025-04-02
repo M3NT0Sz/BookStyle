@@ -57,7 +57,7 @@
         </section>
         <section class="my-book">
             <h1 class="my-book-h1">Meus Pedidos</h1>
-            <button class="button-my-book"><ion-icon name="cart-outline"></ion-icon></button>
+            <button class="button-my-book"><i class="fa-solid fa-cart-shopping"></i></button>
         </section>
     </section>
 

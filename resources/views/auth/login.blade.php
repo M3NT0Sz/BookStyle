@@ -28,8 +28,8 @@
                 <span></span>
             </section>
             <section class="icon-logs">
-            <ion-icon class="icon-google" name="logo-google"></ion-icon>
-                <ion-icon class="icon-facebook" name="logo-facebook"></ion-icon>
+            <i class="fa-brands fa-google icon-google"></i>
+            <i class="fa-brands fa-facebook icon-facebook"></i>
             </section>
         </section>
     </section>
@@ -89,8 +89,8 @@
                 <span></span>
             </section>
             <section class="icon-logs2">
-                <ion-icon class="icon-google2" name="logo-google"></ion-icon>
-                <ion-icon class="icon-facebook2" name="logo-facebook"></ion-icon>
+            <i class="fa-brands fa-google icon-google2"></i>
+            <i class="fa-brands fa-facebook icon-facebook2"></i>
             </section>
         </section>
 
