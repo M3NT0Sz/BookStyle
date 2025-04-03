@@ -31,8 +31,96 @@
     </div>
     <div class="elemento">
         <img src="{{ Vite::asset('resources/img/wave.svg') }}" alt="">
+        <img src="{{ Vite::asset('resources/img/wave.svg') }}" alt="">
+        <img src="{{ Vite::asset('resources/img/wave.svg') }}" alt="">
+        <img src="{{ Vite::asset('resources/img/wave.svg') }}" alt="">
+        <img src="{{ Vite::asset('resources/img/wave.svg') }}" alt="">
+        <img src="{{ Vite::asset('resources/img/wave.svg') }}" alt="">
     </div>
 </header>
 <main>
+    <div class="block">
 
+    </div>
+    <div class="block">
+
+    </div>
+    <div class="block">
+
+    </div>
+    <div class="block">
+
+    </div>
+    <div class="block">
+
+    </div>
+    <div class="block">
+
+    </div>
+    <div class="block">
+
+    </div>
+    <div class="block">
+
+    </div>
+    <div class="block">
+
+    </div>
+    <div class="block">
+
+    </div>
+    <div class="block">
+
+    </div>
+    <div class="block">
+
+    </div>
+    <div class="block">
+
+    </div>
+    <div class="block">
+
+    </div>
+    <div class="block">
+
+    </div>
+    <div class="block">
+
+    </div>
+    <div class="block">
+
+    </div>
+    <div class="block">
+
+    </div>
+    <div class="block">
+
+    </div>
+    <div class="block">
+
+    </div>
+    <div class="block">
+
+    </div>
+    <div class="block">
+
+    </div>
+    <div class="block">
+
+    </div>
+    <div class="block">
+
+    </div>
+    <div class="block">
+
+    </div>
+    <div class="block">
+
+    </div>
+    <div class="block">
+
+    </div>
+    <div class="block">
+
+    </div>
 </main>
