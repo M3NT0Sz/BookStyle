@@ -10,9 +10,8 @@
     </section>
     <section class="profile">
         <img src="{{ Vite::asset('resources/img/sueli.png') }}" alt="">
-        <h1>Sueli Silva</h1>
+        <h1>{{ $user->name }}</h1>
     </section>
-
 </header>
 <main>
 

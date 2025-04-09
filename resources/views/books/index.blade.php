@@ -115,16 +115,19 @@
         <section class="books_container">
             @foreach ($books as $book)
                 <div>
-                    @if(!empty($book->images))
-                            @php
-                                $images = is_array($book->images) ? $book->images : json_decode($book->images, true);
-                            @endphp
-                            @if(is_array($images) && !empty($images))
-                                <img width="200" src="{{ asset('storage/' . $images[0]) }}" alt="{{ $book->name }}">
-                            @elseif(!is_array($images))
-                                <img width="200" src="{{ asset($book->images) }}" alt="{{ $book->name }}">
-                            @endif
-                    @endif
+                    <div class="book_img">
+                        @if(!empty($book->images))
+                                    @php
+                                        $images = is_array($book->images) ? $book->images : json_decode($book->images, true);
+                                    @endphp
+                                    @if(is_array($images) && !empty($images))
+                                        <img width="200" src="{{ asset('storage/' . $images[0]) }}" alt="{{ $book->name }}">
+                                    @elseif(!is_array($images))
+                                        <img width="200" src="{{ asset($book->images) }}" alt="{{ $book->name }}">
+                                    @endif
+                        @endif
+                    </div>
+
                     <h2>{{ $book->name }}</h2>
                     <p>{{ $book->author }}</p>
                     <p>{{ $book->condition }}</p>

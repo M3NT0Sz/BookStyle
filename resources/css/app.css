@@ -304,12 +304,18 @@ h1 {
     transform: translateY(-10px);
 }
 
-.book img {
+.book_img{
     width: 100%;
-    height: auto;
-    max-height: 400px;
-    border-radius: 10px;
-    object-fit: cover;
+    height: 75%;
+    
+}
+
+.book_img img{
+    width: 100%;
+    min-width: 200px;
+    min-height: 400px;
+    border-radius: 5px;
+    
 }
 
 .book h2 {

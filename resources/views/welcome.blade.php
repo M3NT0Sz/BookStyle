@@ -78,6 +78,7 @@
                 <section class="pages-book">
                     @foreach ($booksNew as $book)
                     <section class="book">
+                    <div class="book_img">
                         @if(!empty($book->images))
                         @php
                             $images = is_array($book->images) ? $book->images : json_decode($book->images, true);
@@ -88,6 +89,8 @@
                             <img src="{{ asset($book->images) }}" alt="{{ $book->name }}">
                         @endif
                         @endif
+                    </div>
+                        
                         <h2>{{ $book->name }}</h2>
                         <p>R${{ $book->price }}</p>
                         <button><a href="{{ route('books.show', $book->id) }}">Comprar</a></button>
@@ -106,16 +109,19 @@
                 <section class="pages-book">
                     @foreach ($booksOld as $book)
                     <section class="book">
-                        @if(!empty($book->images))
-                        @php
-                            $images = is_array($book->images) ? $book->images : json_decode($book->images, true);
-                        @endphp
-                        @if(is_array($images) && !empty($images))
-                            <img src="{{ asset('storage/' . $images[0]) }}" alt="{{ $book->name }}">
-                        @elseif(!is_array($images))
-                            <img src="{{ asset($book->images) }}" alt="{{ $book->name }}">
-                        @endif
-                        @endif
+                        <div class="book_img">
+                                @if(!empty($book->images))
+                            @php
+                                $images = is_array($book->images) ? $book->images : json_decode($book->images, true);
+                            @endphp
+                            @if(is_array($images) && !empty($images))
+                                <img src="{{ asset('storage/' . $images[0]) }}" alt="{{ $book->name }}">
+                            @elseif(!is_array($images))
+                                <img src="{{ asset($book->images) }}" alt="{{ $book->name }}">
+                            @endif
+                            @endif
+                        </div>
+                        
                         <h2>{{ $book->name }}</h2>
                         <p>R${{ $book->price }}</p>
                         <button><a href="{{ route('books.show', $book->id) }}">Comprar</a></button>
