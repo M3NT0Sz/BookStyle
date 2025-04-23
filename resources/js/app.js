@@ -1,3 +1,8 @@
+import.meta.glob([
+    '../img/**',
+]);
+
+
 document.addEventListener("DOMContentLoaded", function () {
     const carousels = document.querySelectorAll(".book-container");
 
