@@ -25,4 +25,8 @@ export default defineConfig({
         }),
         tailwindcss(),
     ],
+    server: {
+        host: '127.0.0.1', // Força o uso de IPv4
+        port: 3000,        // Porta alternativa
+    },
 });
