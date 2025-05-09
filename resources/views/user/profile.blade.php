@@ -82,6 +82,7 @@
                             <img src="{{ asset($book->images) }}" alt="{{ $book->name }}">
                         @endif
                     @endif
+                    <h2>{{ $book->name }}</h2>
                     <p> R$ {{ number_format($book->price, 2, ',', '.') }} </p>
                     <button class="editar-book"><a href="{{ route('books.edit', $book->id) }}">Editar</a></button>
                     <form action="{{ route('books.destroy', $book->id) }}" method="post">
