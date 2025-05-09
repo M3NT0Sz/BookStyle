@@ -22,60 +22,22 @@ class Book extends Model
     ];
 
     /**
-     * Create a new book.
+     * Retorna o campo `genre` como um array ao invés de JSON.
      *
-     * @param array $data
-     * @param \Illuminate\Http\UploadedFile[] $images
-     * @param int $userId
-     * @return self
+     * @return array
      */
-    public static function createBook(array $data, array $images, int $userId): self
+    public function getGenreAttribute($value)
     {
-        $paths = [];
-        foreach ($images as $image) {
-            $paths[] = $image->store('img.books');
-        }
-
-        $data['images'] = json_encode($paths);
-        $data['user_id'] = $userId;
-
-        return self::create($data);
+        return json_decode($value, true);
     }
 
     /**
-     * Update the book.
+     * Define o campo `genre` como JSON ao salvar.
      *
-     * @param array $data
-     * @param \Illuminate\Http\UploadedFile[]|null $images
-     * @return bool
+     * @param array $value
      */
-    public function updateBook(array $data, ?array $images = null): bool
+    public function setGenreAttribute($value)
     {
-        if ($images) {
-            $paths = [];
-            foreach ($images as $image) {
-                $paths[] = $image->store('img.books');
-            }
-            $data['images'] = json_encode($paths);
-        }
-
-        return $this->update($data);
-    }
-
-    /**
-     * Delete the book and its images.
-     *
-     * @return bool|null
-     */
-    public function deleteBook(): ?bool
-    {
-        $images = json_decode($this->images, true);
-        if ($images) {
-            foreach ($images as $image) {
-                \Storage::delete($image);
-            }
-        }
-
-        return $this->delete();
+        $this->attributes['genre'] = json_encode($value);
     }
 }
