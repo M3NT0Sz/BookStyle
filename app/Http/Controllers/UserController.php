@@ -15,8 +15,10 @@ class UserController extends Controller
         return view('user.profile', ['books' => $books, 'user' => $user]);
     }
 
-    public function update(Request $request, User $user){
-        $user->update($request->all());
-        return redirect()->route('user.profile');
+    public function update(Request $request, User $user)
+    {
+        $user->updateProfile($request->all());
+
+        return redirect()->route('user.profile')->with('success', 'Perfil atualizado com sucesso!');
     }
 }

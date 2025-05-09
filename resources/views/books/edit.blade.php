@@ -1,10 +1,6 @@
 @extends('layouts.app')
 
 @section('content')
-    @php
-        $bookId = request()->route('book');
-        $book = \App\Models\Book::find($bookId);
-    @endphp
     <form action="{{ route('books.update', ['book' => $book->id]) }}" method="post" enctype="multipart/form-data">
         @csrf
         <div>

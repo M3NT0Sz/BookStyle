@@ -46,14 +46,13 @@
     </section>
 
     <section id="config" class="config hidden">
-        <form action="{{ route('user.update', ['user', $user->id]) }}" method="post">
+        <form action="{{ route('user.update', $user->id) }}" method="post">
             @csrf
-
+            @method('PUT')
             <input type="text" name="name" value="{{ $user->name }}" placeholder="Nome">
             <input type="email" name="email" value="{{ $user->email }}" placeholder="Email">
             <button>Atualizar</button>
         </form>
-        <h1>Deu certo config</h1>
     </section>
 
     <section id="livros" class="my-menu hidden">
@@ -70,27 +69,27 @@
     <section id="container-book" class="container-book">
         <section class="book-list">
             @foreach ($books as $book)
-                    <div class="book-item">
-                        @if(!empty($book->images))
-                                    @php
-                                        $images = is_array($book->images) ? $book->images : json_decode($book->images, true);
-                                    @endphp
-                                    @if(is_array($images))
-                                        @foreach($images as $image)
-                                            <img src="{{ asset('storage/' . $image) }}" alt="{{ $book->name }}">
-                                        @endforeach
-                                    @else
-                                        <img src="{{ asset($book->images) }}" alt="{{ $book->name }}">
-                                    @endif
+                <div class="book-item">
+                    @if(!empty($book->images))
+                        @php
+                            $images = is_array($book->images) ? $book->images : json_decode($book->images, true);
+                        @endphp
+                        @if(is_array($images))
+                            @foreach($images as $image)
+                                <img src="{{ asset('storage/' . $image) }}" alt="{{ $book->name }}">
+                            @endforeach
+                        @else
+                            <img src="{{ asset($book->images) }}" alt="{{ $book->name }}">
                         @endif
-                        <p> R$ {{ number_format($book->price, 2, ',', '.') }} </p>
-                        <button class="editar-book"><a href="{{ route('books.edit', $book->id) }}">Editar</a></button>
-                        <form action="{{ route('books.destroy', $book->id) }}" method="post">
-                            @csrf
-                            @method('DELETE')
-                            <button class="button-delete">Deletar</button>
-                        </form>
-                    </div>
+                    @endif
+                    <p> R$ {{ number_format($book->price, 2, ',', '.') }} </p>
+                    <button class="editar-book"><a href="{{ route('books.edit', $book->id) }}">Editar</a></button>
+                    <form action="{{ route('books.destroy', $book->id) }}" method="post">
+                        @csrf
+                        @method('DELETE')
+                        <button class="button-delete">Deletar</button>
+                    </form>
+                </div>
             @endforeach
         </section>
         <a class="btn-more" href="{{ route('books.create') }}">Cadastrar livro</a>

@@ -46,4 +46,22 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    /**
+     * Update the user's profile.
+     *
+     * @param array $data
+     * @return bool
+     */
+    public function updateProfile(array $data): bool
+    {
+        // Validação dos dados
+        $validated = validator($data, [
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+        ])->validate();
+
+        // Atualiza os dados do usuário
+        return $this->update($validated);
+    }
 }

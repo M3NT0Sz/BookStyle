@@ -21,6 +21,34 @@ class BookController extends Controller
     public function store(Request $request)
     {
         $user = auth()->user();
+
+        // Validação dos dados
+        $inputs = $request->validate([
+            'name' => 'required',
+            'author' => 'required',
+            'genre' => 'required|array', // Certifique-se de validar como array
+            'condition' => 'required',
+            'price' => 'required|numeric',
+            'description' => 'required|max:255',
+            'images.*' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        // Converte o array de gênero para JSON
+        $inputs['genre'] = json_encode($inputs['genre']);
+
+        // Criação do livro
+        Book::createBook($inputs, $request->file('images'), $user->id);
+
+        return redirect()->route('user.profile')->with('success', 'Livro criado com sucesso!');
+    }
+
+    public function edit(Book $book)
+    {
+        return view('books.edit', ['book' => $book]);
+    }
+
+    public function update(Request $request, Book $book)
+    {
         $inputs = $request->validate([
             'name' => 'required',
             'author' => 'required',
@@ -28,52 +56,23 @@ class BookController extends Controller
             'condition' => 'required',
             'price' => 'required',
             'description' => 'required|max:255',
-            'images.*' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $paths = [];
-        foreach($request->file('images') as $image){
-            $paths[] = $image->store('img.books');
-        }
-
-        Book::create([
-            'name' => $inputs['name'],
-            'author' => $inputs['author'],
-            'genre' => json_encode($inputs['genre']),
-            'condition' => $inputs['condition'],
-            'price' => $inputs['price'],
-            'description'=> $inputs['description'],
-            'images'=> json_encode($paths),
-            'user_id'=> $user->id,
-        ]);
+        $book->updateBook($inputs, $request->file('images'));
 
         return redirect()->route('user.profile');
     }
 
-    public function edit(){
-        return view('books.edit');
-    }
-
-    public function update(Request $request, Book $book){
-        $book->update($request->all());
-        return redirect()->route('user.profile');
-    }
-
-    public function show($id){
+    public function show($id)
+    {
         $book = Book::findOrFail($id);
         return view('books.show', ['book' => $book]);
     }
 
     public function destroy(Book $book)
     {
-        $images = json_decode($book->images, true);
-        if ($images) {
-            foreach ($images as $image) {
-                \Storage::delete($image);
-            }
-        }
-
-        $book->delete();
+        $book->deleteBook();
 
         return redirect()->route('user.profile');
     }
