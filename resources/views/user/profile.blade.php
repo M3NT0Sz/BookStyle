@@ -9,7 +9,7 @@
         <ion-icon class="icon-edit" name="create-outline"></ion-icon>
     </section>
     <section class="profile">
-        <img src="{{ Vite::asset('resources/img/sueli.png') }}" alt="">
+        <img src="{{ asset('storage/' . $user->image) }}" alt="{{ $user->name }}">
         <h1>{{ $user->name }}</h1>
     </section>
 </header>
