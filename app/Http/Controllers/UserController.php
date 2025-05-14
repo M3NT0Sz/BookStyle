@@ -17,7 +17,18 @@ class UserController extends Controller
 
     public function update(Request $request, User $user)
     {
-        $user->updateProfile($request->all());
+        $data = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('profile', 'public');
+            $data['image'] = $imagePath;
+        }
+
+        $user->update($data);
 
         return redirect()->route('user.profile')->with('success', 'Perfil atualizado com sucesso!');
     }

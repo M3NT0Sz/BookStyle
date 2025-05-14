@@ -46,11 +46,13 @@
     </section>
 
     <section id="config" class="config hidden">
-        <form action="{{ route('user.update', $user->id) }}" method="post">
+        <form action="{{ route('user.update', $user->id) }}" method="post" enctype="multipart/form-data">
             @csrf
             @method('PUT')
             <input type="text" name="name" value="{{ $user->name }}" placeholder="Nome">
             <input type="email" name="email" value="{{ $user->email }}" placeholder="Email">
+            <label for="image">Foto de Perfil</label>
+            <input type="file" name="image" id="image" accept="image/*">
             <button>Atualizar</button>
         </form>
     </section>
@@ -70,17 +72,15 @@
         <section class="book-list">
             @foreach ($books as $book)
                 <div class="book-item">
-                    @if(!empty($book->images))
-                        @php
-                            $images = is_array($book->images) ? $book->images : json_decode($book->images, true);
-                        @endphp
-                        @if(is_array($images))
-                            @foreach($images as $image)
-                                <img src="{{ asset('storage/' . $image) }}" alt="{{ $book->name }}">
-                            @endforeach
-                        @else
-                            <img src="{{ asset($book->images) }}" alt="{{ $book->name }}">
-                        @endif
+                    @php
+                        $images = is_array($book->images) ? $book->images : json_decode($book->images, true);
+                    @endphp
+                    @if(!empty($images))
+                        @foreach($images as $image)
+                            <img src="{{ asset('storage/' . $image) }}" alt="{{ $book->name }}">
+                        @endforeach
+                    @else
+                        <img src="{{ asset('storage/default-book.png') }}" alt="{{ $book->name }}">
                     @endif
                     <h2>{{ $book->name }}</h2>
                     <p> R$ {{ number_format($book->price, 2, ',', '.') }} </p>
@@ -95,6 +95,5 @@
         </section>
         <a class="btn-more" href="{{ route('books.create') }}">Cadastrar livro</a>
     </section>
-
     <a class="btn-back" href="{{ route('index') }}">Voltar</a>
 </main>
