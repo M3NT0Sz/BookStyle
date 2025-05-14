@@ -10,12 +10,20 @@ class UserController extends Controller
 {
     public function profile()
     {
-        $user = auth()->user();
-        $books = Book::all()->where('user_id', auth()->user()->id);
-        return view('user.profile', ['books' => $books, 'user' => $user]);
+        $userAuth = auth()->user();
+        $user = User::find($userAuth->id);
+        $allBooks = Book::all();
+        $books = array_filter($allBooks, function($book) use ($user) {
+            return $book['user_id'] == $user['id'];
+        });
+        // Garante que $user e $books sejam objetos para a view
+        return view('user.profile', [
+            'books' => array_map(function($book) { return (object) $book; }, $books),
+            'user' => (object) $user
+        ]);
     }
 
-    public function update(Request $request, User $user)
+    public function update(Request $request, $id)
     {
         $data = $request->validate([
             'name' => 'required|string|max:255',
@@ -28,7 +36,7 @@ class UserController extends Controller
             $data['image'] = $imagePath;
         }
 
-        $user->update($data);
+        User::updateProfile($id, $data);
 
         return redirect()->route('user.profile')->with('success', 'Perfil atualizado com sucesso!');
     }

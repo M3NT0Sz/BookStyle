@@ -6,8 +6,16 @@ use App\Models\Book;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    $booksNew = Book::where('condition', 'new')->paginate(8); // Livros novos
-    $booksOld = Book::where('condition', 'used')->paginate(8); // Livros usados
+    $allBooks = Book::all();
+    $booksNew = array_filter($allBooks, function($book) {
+        return $book['condition'] === 'new';
+    });
+    $booksOld = array_filter($allBooks, function($book) {
+        return $book['condition'] === 'used';
+    });
+    // Paginação manual (exemplo simples)
+    $booksNew = array_slice($booksNew, 0, 8);
+    $booksOld = array_slice($booksOld, 0, 8);
     return view('welcome', compact('booksNew', 'booksOld'));
 })->name('index');
 

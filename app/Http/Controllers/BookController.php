@@ -47,12 +47,13 @@ class BookController extends Controller
         return redirect()->route('user.profile')->with('success', 'Livro criado com sucesso!');
     }
 
-    public function edit(Book $book)
+    public function edit($id)
     {
+        $book = Book::find($id);
         return view('books.edit', ['book' => $book]);
     }
 
-    public function update(Request $request, Book $book)
+    public function update(Request $request, $id)
     {
         $inputs = $request->validate([
             'name' => 'required',
@@ -66,6 +67,8 @@ class BookController extends Controller
 
         $inputs['genre'] = json_encode($inputs['genre']);
 
+        $book = Book::find($id);
+
         $this->bookFactory->update($book, $inputs, $request->file('images'));
 
         return redirect()->route('user.profile')->with('success', 'Livro atualizado com sucesso!');
@@ -73,12 +76,13 @@ class BookController extends Controller
 
     public function show($id)
     {
-        $book = Book::findOrFail($id);
+        $book = Book::find($id);
         return view('books.show', ['book' => $book]);
     }
 
-    public function destroy(Book $book)
+    public function destroy($id)
     {
+        $book = Book::find($id);
         $this->bookFactory->delete($book);
 
         return redirect()->route('user.profile')->with('success', 'Livro deletado com sucesso!');

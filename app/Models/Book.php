@@ -2,14 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Notifications\Notifiable;
+use App\Models\DatabaseSingleton;
 
-class Book extends Model
+class Book
 {
-    use HasFactory, Notifiable;
-
     protected $fillable = [
         "name",
         "author",
@@ -21,23 +17,62 @@ class Book extends Model
         "user_id",
     ];
 
-    /**
-     * Retorna o campo `genre` como um array ao invés de JSON.
-     *
-     * @return array
-     */
-    public function getGenreAttribute($value)
+    public static function all()
     {
-        return json_decode($value, true);
+        $pdo = DatabaseSingleton::getInstance()->getConnection();
+        $stmt = $pdo->query('SELECT * FROM books');
+        return $stmt->fetchAll();
     }
 
-    /**
-     * Define o campo `genre` como JSON ao salvar.
-     *
-     * @param array $value
-     */
-    public function setGenreAttribute($value)
+    public static function find($id)
     {
-        $this->attributes['genre'] = json_encode($value);
+        $pdo = DatabaseSingleton::getInstance()->getConnection();
+        $stmt = $pdo->prepare('SELECT * FROM books WHERE id = ?');
+        $stmt->execute([$id]);
+        return $stmt->fetch();
+    }
+
+    public static function create(array $data)
+    {
+        $pdo = DatabaseSingleton::getInstance()->getConnection();
+        $sql = 'INSERT INTO books (name, author, genre, condition, price, description, images, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([
+            $data['name'],
+            $data['author'],
+            $data['genre'],
+            $data['condition'],
+            $data['price'],
+            $data['description'],
+            $data['images'],
+            $data['user_id'],
+        ]);
+        $data['id'] = $pdo->lastInsertId();
+        return $data;
+    }
+
+    public static function update($id, array $data)
+    {
+        $pdo = DatabaseSingleton::getInstance()->getConnection();
+        $sql = 'UPDATE books SET name=?, author=?, genre=?, condition=?, price=?, description=?, images=?, user_id=? WHERE id=?';
+        $stmt = $pdo->prepare($sql);
+        return $stmt->execute([
+            $data['name'],
+            $data['author'],
+            $data['genre'],
+            $data['condition'],
+            $data['price'],
+            $data['description'],
+            $data['images'],
+            $data['user_id'],
+            $id
+        ]);
+    }
+
+    public static function delete($id)
+    {
+        $pdo = DatabaseSingleton::getInstance()->getConnection();
+        $stmt = $pdo->prepare('DELETE FROM books WHERE id = ?');
+        return $stmt->execute([$id]);
     }
 }

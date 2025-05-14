@@ -79,8 +79,6 @@
                         @foreach($images as $image)
                             <img src="{{ asset('storage/' . $image) }}" alt="{{ $book->name }}">
                         @endforeach
-                    @else
-                        <img src="{{ asset('storage/default-book.png') }}" alt="{{ $book->name }}">
                     @endif
                     <h2>{{ $book->name }}</h2>
                     <p> R$ {{ number_format($book->price, 2, ',', '.') }} </p>
