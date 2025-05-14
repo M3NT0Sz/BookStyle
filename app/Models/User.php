@@ -24,12 +24,19 @@ class User extends Authenticatable
     public static function updateProfile($id, array $data)
     {
         $pdo = \App\Models\DatabaseSingleton::getInstance()->getConnection();
+        // Busca imagem atual se não vier nova
+        if (!isset($data['image'])) {
+            $stmt = $pdo->prepare('SELECT image FROM users WHERE id = ?');
+            $stmt->execute([$id]);
+            $current = $stmt->fetch();
+            $data['image'] = $current ? $current['image'] : null;
+        }
         $sql = 'UPDATE users SET name=?, email=?, image=? WHERE id=?';
         $stmt = $pdo->prepare($sql);
         return $stmt->execute([
             $data['name'],
             $data['email'],
-            $data['image'] ?? null,
+            $data['image'],
             $id
         ]);
     }

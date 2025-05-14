@@ -73,6 +73,8 @@
                     </select>
                 </div>
 
+                @include('books.partials.product_fields')
+
                 <div class="form-description">
                     <textarea placeholder="Descrição" name="description" id="description">{{ is_object($book) ? $book->description : ($book['description'] ?? '') }}</textarea>
                 </div>

@@ -69,6 +69,8 @@
                 </select>
             </div>
 
+            @include('books.partials.product_fields')
+
             <div class="form-description">
 
                 <textarea placeholder="Descrição" name="description" id="description">{{ old('description') }}</textarea>
