@@ -41,7 +41,9 @@ class BookController extends Controller
         ]);
 
         $inputs['genre'] = json_encode($inputs['genre']);
-
+        $inputs['product_type'] = $request->input('product_type', 'fisico');
+        $productType = $inputs['product_type'];
+        $product = $this->bookFactory->createProduct($productType, $inputs, $request->file('images'), $user->id);
         $this->bookFactory->create($inputs, $request->file('images'), $user->id);
 
         return redirect()->route('user.profile')->with('success', 'Livro criado com sucesso!');
@@ -66,6 +68,7 @@ class BookController extends Controller
         ]);
 
         $inputs['genre'] = json_encode($inputs['genre']);
+        $inputs['product_type'] = $request->input('product_type', 'fisico');
 
         $book = Book::find($id);
 

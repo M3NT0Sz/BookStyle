@@ -6,6 +6,13 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable
 {
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+        'image',
+    ];
+
     public static function find($id)
     {
         $pdo = \App\Models\DatabaseSingleton::getInstance()->getConnection();

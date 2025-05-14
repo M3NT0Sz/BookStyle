@@ -18,7 +18,6 @@
             </div>
 
             <div class="form-genre">
-
                 <div id="genre">
                     <strong>Ficção:</strong><br>
                     @foreach (['fantasia' => 'Fantasia', 'ficcao-cientifica' => 'Ficção Científica', 'distopia-utopia' => 'Distopia/Utopia', 'ficcao-historica' => 'Ficção Histórica', 'ficcao-contemporanea' => 'Ficção Contemporânea', 'ficcao-realista' => 'Ficção Realista', 'romance' => 'Romance', 'aventura' => 'Aventura', 'terror-horror' => 'Terror/Horror', 'suspense-thriller' => 'Suspense/Thriller', 'policial-crime' => 'Policial/Crime', 'western' => 'Western', 'chick-lit' => 'Chick-lit'] as $value => $label)
@@ -59,6 +58,17 @@
                 </select>
                 <input placeholder="Preço" type="text" name="price" id="price" value="{{ old('price') }}">
             </div>
+
+            <div class="form-condition-price">
+                <label for="product_type">Tipo de Produto</label>
+                <select name="product_type" id="product_type">
+                    <option value="fisico" {{ old('product_type') == 'fisico' ? 'selected' : '' }}>Livro Físico</option>
+                    <option value="ebook" {{ old('product_type') == 'ebook' ? 'selected' : '' }}>Ebook</option>
+                    <option value="gibi" {{ old('product_type') == 'gibi' ? 'selected' : '' }}>Gibi</option>
+                    <option value="box" {{ old('product_type') == 'box' ? 'selected' : '' }}>Box de Livros</option>
+                </select>
+            </div>
+
             <div class="form-description">
 
                 <textarea placeholder="Descrição" name="description" id="description">{{ old('description') }}</textarea>

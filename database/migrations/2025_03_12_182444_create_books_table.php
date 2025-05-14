@@ -20,6 +20,7 @@ return new class extends Migration
             $table->float('price');
             $table->string('description');
             $table->string('images');
+            $table->enum('product_type', ['fisico', 'ebook', 'gibi', 'box'])->default('fisico'); // Adiciona tipo do produto
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
         });

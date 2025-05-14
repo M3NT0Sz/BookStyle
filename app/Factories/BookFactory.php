@@ -4,6 +4,11 @@ namespace App\Factories;
 use App\Models\Book;
 use App\Models\DatabaseSingleton;
 use Illuminate\Support\Facades\Storage;
+use App\Models\PhysicalBook;
+use App\Models\Ebook;
+use App\Models\ComicBook;
+use App\Models\BookBox;
+use App\Models\BookProduct;
 
 class BookFactory implements BookFactoryInterface
 {
@@ -26,8 +31,18 @@ class BookFactory implements BookFactoryInterface
                 $paths[] = $image->store('img.books');
             }
             $data['images'] = json_encode($paths);
+        } else {
+            // Se não enviar novas imagens, mantém as antigas
+            $data['images'] = $book['images'] ?? (is_object($book) ? $book->images : null);
         }
-        return Book::update($book['id'], $data);
+
+        // Atualiza o tipo do produto apenas se vier do formulário
+        if (!array_key_exists('product_type', $data) || !$data['product_type']) {
+            $data['product_type'] = $book['product_type'] ?? (is_object($book) ? $book->product_type : 'fisico');
+        }
+        $data['user_id'] = $book['user_id'] ?? $data['user_id'] ?? null;
+        $result = Book::update($book['id'], $data);
+        return $result !== null ? $result : false;
     }
 
     public function delete($book): bool
@@ -39,5 +54,24 @@ class BookFactory implements BookFactoryInterface
             }
         }
         return Book::delete($book['id']);
+    }
+
+    /**
+     * Factory Method para criar diferentes tipos de produtos de livro
+     */
+    public function createProduct(string $type, array $data, array $images, int $userId): BookProduct
+    {
+        switch (strtolower($type)) {
+            case 'fisico':
+                return new PhysicalBook();
+            case 'ebook':
+                return new Ebook();
+            case 'gibi':
+                return new ComicBook();
+            case 'box':
+                return new BookBox();
+            default:
+                throw new \InvalidArgumentException('Tipo de produto desconhecido');
+        }
     }
 }
