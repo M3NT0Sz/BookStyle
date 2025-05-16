@@ -15,6 +15,9 @@
                 <li>
                     <a href="{{route('books.index') }}">Livros</a>
                 </li>
+                <li>
+                    <a href="{{ route('cart.index') }}">Carrinho</a>
+                </li>
             </ul>
 
             @if(Auth::check())
@@ -32,6 +35,14 @@
             <section class="search-container">
             </section>
             <section class="books-down">
+                <span class="book1"></span>
+                <span class="book2"></span>
+                <span class="book3"></span>
+                <span class="book4"></span>
+                <span class="book1"></span>
+                <span class="book2"></span>
+                <span class="book3"></span>
+                <span class="book4"></span>
                 <span class="book1"></span>
                 <span class="book2"></span>
                 <span class="book3"></span>

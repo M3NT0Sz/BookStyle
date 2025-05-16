@@ -92,6 +92,10 @@
             @endforeach
         </section>
         <a class="btn-more" href="{{ route('books.create') }}">Cadastrar livro</a>
+
+        <a href="{{ route('coupons.index') }}">
+            Cadastrar cupom
+        </a>
     </section>
     <a class="btn-back" href="{{ route('index') }}">Voltar</a>
 </main>

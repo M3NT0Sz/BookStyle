@@ -1,0 +1,53 @@
+<?php
+namespace App\Http\Controllers;
+
+use App\Models\Book;
+use App\Models\Cart;
+use Illuminate\Http\Request;
+
+class CartController extends Controller
+{
+    public function index()
+    {
+        $cart = Cart::get();
+        $books = [];
+        foreach ($cart as $bookId => $quantity) {
+            $book = Book::find($bookId);
+            if ($book) {
+                $book['quantity'] = $quantity;
+                $books[] = $book;
+            }
+        }
+        return view('cart.index', compact('books'));
+    }
+
+    public function add(Request $request, $bookId)
+    {
+        $quantity = $request->input('quantity', 1);
+        $couponCode = $request->input('coupon_code');
+        $discount = 0;
+        $coupon = null;
+        if ($couponCode) {
+            $coupon = \App\Models\Coupon::findByCode($couponCode);
+            if ($coupon) {
+                $cart = session('cart', []);
+                $cart['coupon'] = $coupon;
+                session(['cart' => $cart]);
+            }
+        }
+        \App\Models\Cart::add($bookId, $quantity);
+        return redirect()->back()->with('success', 'Livro adicionado ao carrinho!' . ($coupon ? ' Cupom aplicado!' : ''));
+    }
+
+    public function remove($bookId)
+    {
+        Cart::remove($bookId);
+        return redirect()->route('cart.index')->with('success', 'Livro removido do carrinho!');
+    }
+
+    public function clear()
+    {
+        Cart::clear();
+        return redirect()->route('cart.index')->with('success', 'Carrinho esvaziado!');
+    }
+}

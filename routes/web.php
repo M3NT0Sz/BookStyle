@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\CouponController;
 use App\Models\Book;
 use Illuminate\Support\Facades\Route;
 
@@ -34,3 +36,14 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/user/profile', [UserController::class, 'profile'])->name('user.profile');
     Route::put('/user/update/{user}', [UserController::class, 'update'])->name('user.update');
 });
+
+Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+Route::post('/cart/add/{bookId}', [CartController::class, 'add'])->name('cart.add');
+Route::post('/cart/remove/{bookId}', [CartController::class, 'remove'])->name('cart.remove');
+Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
+Route::get('/coupons', [CouponController::class, 'index'])->name('coupons.index');
+Route::get('/coupons/create', [CouponController::class, 'create'])->name('coupons.create');
+Route::post('/coupons', [CouponController::class, 'store'])->name('coupons.store');
+Route::get('/coupons/{id}/edit', [CouponController::class, 'edit'])->name('coupons.edit');
+Route::put('/coupons/{id}', [CouponController::class, 'update'])->name('coupons.update');
+Route::delete('/coupons/{id}', [CouponController::class, 'destroy'])->name('coupons.destroy');

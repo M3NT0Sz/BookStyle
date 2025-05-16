@@ -17,6 +17,9 @@
                 <li>
                     <a href="{{route('books.index') }}">Livros</a>
                 </li>
+                <li>
+                    <a href="{{ route('cart.index') }}">Carrinho</a>
+                </li>
             </ul>
 
             @if(Auth::check())
@@ -34,6 +37,66 @@
 
             </section>
             <section class="books-down">
+                <span class="book1"></span>
+                <span class="book2"></span>
+                <span class="book3"></span>
+                <span class="book4"></span>
+                <span class="book1"></span>
+                <span class="book2"></span>
+                <span class="book3"></span>
+                <span class="book4"></span>
+                <span class="book1"></span>
+                <span class="book2"></span>
+                <span class="book3"></span>
+                <span class="book4"></span>
+                <span class="book1"></span>
+                <span class="book2"></span>
+                <span class="book3"></span>
+                <span class="book4"></span>
+                <span class="book1"></span>
+                <span class="book2"></span>
+                <span class="book3"></span>
+                <span class="book4"></span>
+                <span class="book1"></span>
+                <span class="book2"></span>
+                <span class="book3"></span>
+                <span class="book4"></span>
+                <span class="book1"></span>
+                <span class="book2"></span>
+                <span class="book3"></span>
+                <span class="book4"></span>
+                <span class="book1"></span>
+                <span class="book2"></span>
+                <span class="book3"></span>
+                <span class="book4"></span>
+                <span class="book1"></span>
+                <span class="book2"></span>
+                <span class="book3"></span>
+                <span class="book4"></span>
+                <span class="book1"></span>
+                <span class="book2"></span>
+                <span class="book3"></span>
+                <span class="book4"></span>
+                <span class="book1"></span>
+                <span class="book2"></span>
+                <span class="book3"></span>
+                <span class="book4"></span>
+                <span class="book1"></span>
+                <span class="book2"></span>
+                <span class="book3"></span>
+                <span class="book4"></span>
+                <span class="book1"></span>
+                <span class="book2"></span>
+                <span class="book3"></span>
+                <span class="book4"></span>
+                <span class="book1"></span>
+                <span class="book2"></span>
+                <span class="book3"></span>
+                <span class="book4"></span>
+                <span class="book1"></span>
+                <span class="book2"></span>
+                <span class="book3"></span>
+                <span class="book4"></span>
                 <span class="book1"></span>
                 <span class="book2"></span>
                 <span class="book3"></span>
@@ -116,23 +179,22 @@
             @foreach ($books as $book)
                 <div>
                     <div class="book_img">
-                        @if(!empty($book->images))
-                                    @php
-                                        $images = is_array($book->images) ? $book->images : json_decode($book->images, true);
-                                    @endphp
-                                    @if(is_array($images) && !empty($images))
-                                        <img width="200" src="{{ asset('storage/' . $images[0]) }}" alt="{{ $book->name }}">
-                                    @elseif(!is_array($images))
-                                        <img width="200" src="{{ asset($book->images) }}" alt="{{ $book->name }}">
-                                    @endif
+                        @php
+                            $images = is_array($book)
+                                ? (isset($book['images']) ? (is_array($book['images']) ? $book['images'] : json_decode($book['images'], true)) : [])
+                                : (isset($book->images) ? (is_array($book->images) ? $book->images : json_decode($book->images, true)) : []);
+                        @endphp
+                        @if(is_array($images) && !empty($images))
+                            <img width="200" src="{{ asset('storage/' . $images[0]) }}" alt="{{ is_array($book) ? $book['name'] : $book->name }}">
+                        @elseif(!is_array($images) && !empty($images))
+                            <img width="200" src="{{ asset('storage/' . $images) }}" alt="{{ is_array($book) ? $book['name'] : $book->name }}">
                         @endif
                     </div>
-
-                    <h2>{{ $book->name }}</h2>
-                    <p>{{ $book->author }}</p>
-                    <p>{{ $book->condition }}</p>
-                    <p>R$ {{ $book->price }}</p>
-                    <a href="{{ route('books.show', $book->id) }}">
+                    <h2>{{ is_array($book) ? $book['name'] : $book->name }}</h2>
+                    <p>{{ is_array($book) ? $book['author'] : $book->author }}</p>
+                    <p>{{ is_array($book) ? $book['condition'] : $book->condition }}</p>
+                    <p>R$ {{ is_array($book) ? $book['price'] : $book->price }}</p>
+                    <a href="{{ route('books.show', is_array($book) ? $book['id'] : $book->id) }}">
                         <button>Comprar</button>
                     </a>
                 </div>
