@@ -16,6 +16,20 @@ class Book
         "images",
         "product_type", // novo campo
         "user_id",
+        // Product-specific fields
+        "file_format",
+        "file_size",
+        "has_drm",
+        "books_count",
+        "titles",
+        "extras",
+        "issue_number",
+        "illustrator",
+        "is_colored",
+        "pages",
+        "cover_type",
+        "weight",
+        "dimensions",
     ];
 
     public static function all()
@@ -41,7 +55,7 @@ class Book
         }
 
         $pdo = DatabaseSingleton::getInstance()->getConnection();
-        $sql = 'INSERT INTO books (name, author, genre, `condition`, price, description, images, product_type, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
+        $sql = 'INSERT INTO books (name, author, genre, `condition`, price, description, images, product_type, user_id, file_format, file_size, has_drm, books_count, titles, extras, issue_number, illustrator, is_colored, pages, cover_type, weight, dimensions) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
             $data['name'],
@@ -53,6 +67,19 @@ class Book
             isset($data['images']) ? $data['images'] : json_encode([]),
             $data['product_type'] ?? 'fisico',
             isset($data['user_id']) ? $data['user_id'] : null,
+            $data['file_format'] ?? null,
+            $data['file_size'] ?? null,
+            $data['has_drm'] ?? null,
+            $data['books_count'] ?? null,
+            $data['titles'] ?? null,
+            $data['extras'] ?? null,
+            $data['issue_number'] ?? null,
+            $data['illustrator'] ?? null,
+            $data['is_colored'] ?? null,
+            $data['pages'] ?? null,
+            $data['cover_type'] ?? null,
+            $data['weight'] ?? null,
+            $data['dimensions'] ?? null,
         ]);
         $data['id'] = $pdo->lastInsertId();
         return $data;
@@ -66,7 +93,7 @@ class Book
         }
 
         $pdo = DatabaseSingleton::getInstance()->getConnection();
-        $sql = 'UPDATE books SET name=?, author=?, genre=?, `condition`=?, price=?, description=?, images=?, product_type=?, user_id=? WHERE id=?';
+        $sql = 'UPDATE books SET name=?, author=?, genre=?, `condition`=?, price=?, description=?, images=?, product_type=?, user_id=?, file_format=?, file_size=?, has_drm=?, books_count=?, titles=?, extras=?, issue_number=?, illustrator=?, is_colored=?, pages=?, cover_type=?, weight=?, dimensions=? WHERE id=?';
         $stmt = $pdo->prepare($sql);
         return $stmt->execute([
             $data['name'],
@@ -78,6 +105,19 @@ class Book
             isset($data['images']) ? $data['images'] : json_encode([]),
             $data['product_type'] ?? 'fisico',
             isset($data['user_id']) ? $data['user_id'] : null,
+            $data['file_format'] ?? null,
+            $data['file_size'] ?? null,
+            $data['has_drm'] ?? null,
+            $data['books_count'] ?? null,
+            $data['titles'] ?? null,
+            $data['extras'] ?? null,
+            $data['issue_number'] ?? null,
+            $data['illustrator'] ?? null,
+            $data['is_colored'] ?? null,
+            $data['pages'] ?? null,
+            $data['cover_type'] ?? null,
+            $data['weight'] ?? null,
+            $data['dimensions'] ?? null,
             $id
         ]);
     }

@@ -2,8 +2,6 @@
 
 namespace App\Providers;
 
-use App\Factories\BookFactory;
-use App\Factories\BookFactoryInterface;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -13,7 +11,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->bind(BookFactoryInterface::class, BookFactory::class);
+        // Não é mais necessário fazer bind da interface BookFactoryInterface
     }
 
     /**
