@@ -69,5 +69,48 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+// NOVO: Destacar botão ativo na navegação do perfil
+
+document.addEventListener('DOMContentLoaded', () => {
+    const navLinks = document.querySelectorAll('.profile-nav-link');
+    const sections = document.querySelectorAll('.profile-section');
+
+    function setActiveSection(hash) {
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            // Remove fundo azul de todos
+            link.style.background = '#ecf0f1';
+            link.style.color = '#3498db';
+        });
+        sections.forEach(section => {
+            section.classList.remove('active');
+        });
+        // Ativa o link e a seção correspondente
+        const activeLink = Array.from(navLinks).find(link => link.getAttribute('href') === hash);
+        const activeSection = document.querySelector(hash);
+        if (activeLink) {
+            activeLink.classList.add('active');
+            activeLink.style.background = '#3498db';
+            activeLink.style.color = '#fff';
+        }
+        if (activeSection) {
+            activeSection.classList.add('active');
+        }
+    }
+
+    // Ao clicar em um link
+    navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const hash = this.getAttribute('href');
+            history.replaceState(null, '', hash);
+            setActiveSection(hash);
+        });
+    });
+
+    // Ao carregar a página, ativa a seção correta
+    setActiveSection(window.location.hash || '#dados');
+});
+
 
 

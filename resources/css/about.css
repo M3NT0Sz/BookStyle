@@ -20,8 +20,8 @@ body {
 }
 
 .logo {
-    width: 150px;
-    height: 150px;
+    width: 8rem;
+    height: 8rem;
     transition: transform .5s ease;
 }
 
@@ -54,9 +54,9 @@ body {
 .nav-links a {
     color: #1abc9c;
     text-decoration: none;
-    font-size: 18px;
+    font-size: 1.1rem;
     font-weight: 700;
-    padding: 10px 15px;
+    padding: 0.6rem 1rem;
     border-radius: 5px;
     transition: .1s ease-in-out;
 }
@@ -72,9 +72,9 @@ body {
     background-color: #1abc9c;
     color: #ffffff;
     border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    font-weight: 700;
+    padding: 0.6rem 1.2rem;
+    border-radius: 0.3125rem;
+    font-size: 1rem;
     transition: all 0.3s ease;
     cursor: pointer;
     color: #ecf0f1;
@@ -91,7 +91,7 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 75vh;
+    height: 60vh;
     background-image: 
         linear-gradient(135deg, rgba(131, 131, 131, 0.5) 35%, rgba(26, 188, 156, 0.7) 65%),url(../img/livros.jpg); /* Imagem de fundo */
     background-size: cover;
@@ -99,22 +99,22 @@ body {
 }
 
 .banner_container h1{
-    font-size: 100px;
+    font-size: 4.5rem;
     color: #fafafa;
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 1.2rem;
 }
 
 .banner_container p{
-    font-size: 50px;
+    font-size: 2rem;
     color: #fafafa;
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 1.2rem;
 }
 
 .elemento{
     width: 100%;
-    height: 300px;
+    height: 10rem;
     display: flex;
     align-items: center;
     background-color: transparent;
@@ -125,10 +125,10 @@ body {
 
 .elemento img{
     width: 100%;
-    height: 300px;
+    height: 10rem;
     object-fit: cover;
     position: absolute;
-    top: -250px;
+    top: -8rem;
     right: 50px;
     z-index: 10;
     
@@ -137,7 +137,7 @@ body {
 .elemento img:nth-child(2){
     top: 0;
     left: 50px;
-    height: 300px;
+    height: 10rem;
     transform: rotate(180deg);
     z-index: 1000;
 }
@@ -149,41 +149,43 @@ body {
     text-align: center;
     align-items: center;
     justify-content: center;
-    padding: 40px;
+    padding: 2.5rem 1rem;
 }
 
 .title_about{
-    font-size: 3rem;
+    font-size: 2.2rem;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     letter-spacing: 5px;
     color: #1abc9c;
     text-shadow: 0 2px 5px #1abc9c;
-    margin-bottom: 20px;
+    margin-bottom: 1.2rem;
 }
 
 .text_about{
-    font-size: 1.5rem;
+    font-size: 1.1rem;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: #2c3e50;
     text-align: center;
     line-height: 1.5;
-    width: 90%;
+    width: 98vw;
+    max-width: 40rem;
     margin: 0 auto;
 }
 
 .mv-container {
     background-color: #ffffff;
-    padding: 40px;
-    border-radius: 15px;
+    padding: 2rem 1rem;
+    border-radius: 1rem;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-    width: 80%;
-    margin: 40px auto;
+    width: 98vw;
+    max-width: 50rem;
+    margin: 2rem auto;
 }
 
 .mv-container h3 {
-    font-size: 2.5rem;
+    font-size: 2rem;
     color: #1abc9c;
-    margin-bottom: 20px;
+    margin-bottom: 1rem;
     text-align: center;
 }
 
@@ -203,30 +205,30 @@ body {
 }
 
 .team-container h3 {
-    font-size: 2.5rem;
+    font-size: 2rem;
     color: #1abc9c;
-    margin-bottom: 30px;
+    margin-bottom: 1rem;
 }
 
 .team-members {
     display: flex;
     justify-content: center;
-    gap: 30px;
+    gap: 1.5rem;
     flex-wrap: wrap;
 }
 
 .member {
     background-color: #ffffff;
-    padding: 20px;
-    border-radius: 15px;
+    padding: 1.2rem;
+    border-radius: 1rem;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    max-width: 710px;
-    height: 350px;
+    max-width: 30rem;
+    height: auto;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: 0.5rem;
 }
 
 .member span{
@@ -236,38 +238,39 @@ body {
 }
 
 .member img {
-    width: 200px;
-    height: 200px;
+    width: 7rem;
+    height: 7rem;
     object-fit: cover;
     border-radius: 50%;
-    margin-bottom: 15px;
+    margin-bottom: 0.8rem;
 }
 
 .member h4 {
-    font-size: 1.4rem;
+    font-size: 1.1rem;
     color: #1abc9c;
 }
 
 .member p {
-    font-size: 1.2rem;
+    font-size: 1rem;
     color: #2c3e50;
 }
 
 
 .depoimentos {
-    padding: 40px 20px;
+    padding: 2rem 1rem;
     background-color: #ffffff;
     text-align: center;
-    margin: 40px auto;
-    width: 80%;
-    border-radius: 15px;
+    margin: 2rem auto;
+    width: 98vw;
+    max-width: 50rem;
+    border-radius: 1rem;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
 }
 
 .depoimentos h3 {
-    font-size: 2.5rem;
+    font-size: 2rem;
     color: #1abc9c;
-    margin-bottom: 20px;
+    margin-bottom: 1rem;
 }
 
 .depoimentos blockquote {
@@ -281,18 +284,19 @@ body {
 
 
 .dados {
-    padding: 40px 20px;
+    padding: 2rem 1rem;
     background-color: #ecf0f1;
     text-align: center;
-    margin: 40px auto;
-    border-radius: 15px;
-    width: 80%;
+    margin: 2rem auto;
+    border-radius: 1rem;
+    width: 98vw;
+    max-width: 50rem;
 }
 
 .dados h3 {
-    font-size: 2.5rem;
+    font-size: 2rem;
     color: #1abc9c;
-    margin-bottom: 20px;
+    margin-bottom: 1rem;
     text-transform: uppercase;
 }
 
@@ -307,19 +311,20 @@ body {
 }
 
 .curiosidades {
-    padding: 40px;
+    padding: 2rem 1rem;
     background-color: #ffffff;
-    border-radius: 15px;
+    border-radius: 1rem;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-    width: 80%;
-    margin: 40px auto;
+    width: 98vw;
+    max-width: 50rem;
+    margin: 2rem auto;
     text-align: center;
 }
 
 .curiosidades h3 {
-    font-size: 2.5rem;
+    font-size: 2rem;
     color: #1abc9c;
-    margin-bottom: 20px;
+    margin-bottom: 1rem;
 }
 
 .curiosidades ul {
@@ -353,26 +358,27 @@ body {
 }
 
 .footer-left img{
-    width: 150px;
-    height: 150px;
+    width: 6rem;
+    height: 6rem;
 }
 
 .footer-left h1{
     color: #3498db;
-    font-size: 40px;
-    margin-left: 40px;
+    font-size: 2rem;
+    margin-left: 1.5rem;
 }
 
 .footer-left p{
     color: #ffffff;
-    font-size: 24px;
-    margin-left: 40px;
+    font-size: 1rem;
+    margin-left: 1.5rem;
     margin-bottom: 10px;
 }
 
 .footer-center{
     display: flex;
-    width: 25%;
+    width: 90vw;
+    max-width: 15rem;
     justify-content: space-between;
 }
 
@@ -386,14 +392,14 @@ body {
 
 .footer-list h2{
     color: #3498db;
-    font-size: 24px;
+    font-size: 1.1rem;
     text-transform: uppercase;
 }
 
 .footer-links{
     list-style: none;
     text-decoration: none;
-    font-size: 20px;
+    font-size: 1rem;
     transition: all 0.3s ease-in-out;
 }
 
@@ -440,27 +446,28 @@ body {
 
 .footer-right{
     display: flex;
-    width: 35%;
+    width: 98vw;
+    max-width: 20rem;
     flex-direction: column;
-    margin-top: 32px;
+    margin-top: 1.5rem;
 }
 
 .footer-right p{
     color: #bdc3c7;
-    font-size: 24px;
+    font-size: 1rem;
     margin-bottom: 20px;
 }
 
 .footer-right h1{
     color: #3498db;
-    font-size: 24px;
-    margin-bottom: 20px;
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
 }
 
 .footer-right a{
     color: #3498db;
     text-decoration: none;
-    font-size: 24px;
+    font-size: 1rem;
     transition: all 0.3s ease-in-out;
 }
 
@@ -473,7 +480,31 @@ body {
     color: #9dc7e4;
     text-align: center;
     padding: 5px;
-    font-size: 16px;
+    font-size: 0.9rem;
+}
+
+@media (max-width: 700px) {
+    .banner_container h1 {
+        font-size: 2.2rem;
+    }
+    .banner_container p {
+        font-size: 1.1rem;
+    }
+    .main_container, .mv-container, .depoimentos, .curiosidades, .dados {
+        padding: 1rem 0.2rem;
+        width: 99vw;
+    }
+    .team-members {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    .member {
+        max-width: 98vw;
+    }
+    .footer-center, .footer-right {
+        width: 99vw;
+        max-width: none;
+    }
 }
 
 
