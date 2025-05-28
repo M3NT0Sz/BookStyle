@@ -15,9 +15,43 @@ class BookController extends Controller
         $this->bookFactory = new BookFactory();
     }
 
-    public function index()
+    public function index(Request $request)
     {
         $books = Book::all();
+        $search = $request->input('search');
+        $genre = $request->input('genre');
+        $author = $request->input('author');
+        $price = $request->input('price');
+        $condition = $request->input('condition');
+
+        $books = array_filter($books, function($book) use ($search, $genre, $author, $price, $condition) {
+            // Busca por texto (nome ou descrição)
+            $match = true;
+            if ($search) {
+                $match = stripos($book['name'], $search) !== false || stripos($book['description'], $search) !== false;
+            }
+            // Filtro por gênero (campo é JSON)
+            if ($match && $genre) {
+                $bookGenres = is_array($book['genre']) ? $book['genre'] : json_decode($book['genre'], true);
+                if (!is_array($bookGenres)) $bookGenres = [$bookGenres];
+                $match = in_array($genre, $bookGenres);
+            }
+            // Filtro por autor
+            if ($match && $author) {
+                $match = stripos($book['author'], $author) !== false;
+            }
+            // Filtro por preço máximo
+            if ($match && $price) {
+                $match = $book['price'] <= floatval($price);
+            }
+            // Filtro por condição
+            if ($match && $condition) {
+                $cond = strtolower($book['condition']);
+                $cond = $cond === 'novo' ? 'new' : ($cond === 'usado' ? 'used' : $cond);
+                $match = $cond === strtolower($condition) || $book['condition'] === $condition;
+            }
+            return $match;
+        });
         return view('books.index', ['books' => $books]);
     }
 

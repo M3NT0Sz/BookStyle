@@ -33,106 +33,9 @@
             <h1>BookStyle</h1>
             <p>Encontre suas Histórias</p>
             <section class="search-container">
-                <input type="text" placeholder="Pesquise por um livro">
-
-            </section>
-            <section class="books-down">
-                <span class="book1"></span>
-                <span class="book2"></span>
-                <span class="book3"></span>
-                <span class="book4"></span>
-                <span class="book1"></span>
-                <span class="book2"></span>
-                <span class="book3"></span>
-                <span class="book4"></span>
-                <span class="book1"></span>
-                <span class="book2"></span>
-                <span class="book3"></span>
-                <span class="book4"></span>
-                <span class="book1"></span>
-                <span class="book2"></span>
-                <span class="book3"></span>
-                <span class="book4"></span>
-                <span class="book1"></span>
-                <span class="book2"></span>
-                <span class="book3"></span>
-                <span class="book4"></span>
-                <span class="book1"></span>
-                <span class="book2"></span>
-                <span class="book3"></span>
-                <span class="book4"></span>
-                <span class="book1"></span>
-                <span class="book2"></span>
-                <span class="book3"></span>
-                <span class="book4"></span>
-                <span class="book1"></span>
-                <span class="book2"></span>
-                <span class="book3"></span>
-                <span class="book4"></span>
-                <span class="book1"></span>
-                <span class="book2"></span>
-                <span class="book3"></span>
-                <span class="book4"></span>
-                <span class="book1"></span>
-                <span class="book2"></span>
-                <span class="book3"></span>
-                <span class="book4"></span>
-                <span class="book1"></span>
-                <span class="book2"></span>
-                <span class="book3"></span>
-                <span class="book4"></span>
-                <span class="book1"></span>
-                <span class="book2"></span>
-                <span class="book3"></span>
-                <span class="book4"></span>
-                <span class="book1"></span>
-                <span class="book2"></span>
-                <span class="book3"></span>
-                <span class="book4"></span>
-                <span class="book1"></span>
-                <span class="book2"></span>
-                <span class="book3"></span>
-                <span class="book4"></span>
-                <span class="book1"></span>
-                <span class="book2"></span>
-                <span class="book3"></span>
-                <span class="book4"></span>
-                <span class="book1"></span>
-                <span class="book2"></span>
-                <span class="book3"></span>
-                <span class="book4"></span>
-                <span class="book1"></span>
-                <span class="book2"></span>
-                <span class="book3"></span>
-                <span class="book4"></span>
-                <span class="book1"></span>
-                <span class="book2"></span>
-                <span class="book3"></span>
-                <span class="book4"></span>
-                <span class="book1"></span>
-                <span class="book2"></span>
-                <span class="book3"></span>
-                <span class="book4"></span>
-                <span class="book1"></span>
-                <span class="book2"></span>
-                <span class="book3"></span>
-                <span class="book4"></span>
-                <span class="book1"></span>
-                <span class="book2"></span>
-                <span class="book3"></span>
-                <span class="book4"></span>
-                <span class="book1"></span>
-                <span class="book2"></span>
-                <span class="book3"></span>
-                <span class="book4"></span>
-                <span class="book1"></span>
-                <span class="book2"></span>
-                <span class="book3"></span>
-                <span class="book4"></span>
-                <span class="book1"></span>
-                <span class="book2"></span>
-                <span class="book3"></span>
-                <span class="book4"></span>
+                <form action="" method="GET">
+                    <input type="text" name="search" placeholder="Pesquise por um livro" value="{{ request('search') }}" style="width:100%;font-size:1.2rem;padding:0.7rem 1rem;">
+                </form>
             </section>
         </div>
 
@@ -168,8 +71,8 @@
                     <label for="condition">Condição:</label>
                     <select id="condition" name="condition">
                         <option value="">Selecione</option>
-                        <option value="novo">Novo</option>
-                        <option value="usado">Usado</option>
+                        <option value="new">Novo</option>
+                        <option value="used">Usado</option>
                     </select>
                 </div>
                 <button type="submit" class="filter-button">Filtrar</button>
