@@ -1,101 +1,83 @@
 @extends('layouts.profile')
 
 @section('content')
-
-
-<header>
-    <section class="banner">
-        <img class="fundo" src="{{ Vite::asset('resources/img/fundoPerfil.png') }}" alt="">
-        <ion-icon class="icon-edit" name="create-outline"></ion-icon>
-    </section>
-    <section class="profile">
-        <img src="{{ asset('storage/' . $user->image) }}" alt="{{ $user->name }}">
-        <h1>{{ $user->name }}</h1>
-    </section>
-</header>
-<main>
-
-    <div class="nav_profile">
-        <nav class="nav_links">
-            <ul class="nav_itens">
-                <span class="ball"></span>
-                <li class="nav_objects active">
-                    <a href="#perfil">
-                        <i class="fa-regular fa-user icon_profile_user"></i>
-                        <span class="text_profile">Perfil</span>
-                    </a>
-                </li>
-                <li class="nav_objects ">
-                    <a href="#livros">
-                        <i class="fa-solid fa-book icon_profile_book"></i>
-                        <span class="text_profile_book">Livros</span>
-                    </a>
-                </li>
-                <li class="nav_objects">
-                    <a href="#config">
-                        <i class="fa-solid fa-wrench icon_profile"></i>
-                        <span class="text_profile_config">Configurações</span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
+<div class="profile-container">
+    <div class="profile-header">
+        <div class="profile-banner">
+            <img class="profile-banner-img" src="{{ Vite::asset('resources/img/fundoPerfil.png') }}" alt="Banner do perfil">
+            <label for="image" class="profile-edit-icon">
+                <ion-icon name="create-outline"></ion-icon>
+            </label>
+        </div>
+        <div class="profile-info">
+            <img class="profile-avatar" src="{{ asset('storage/' . $user->image) }}" alt="{{ $user->name }}">
+            <h1 class="profile-name">{{ $user->name }}</h1>
+            <p class="profile-email">{{ $user->email }}</p>
+        </div>
     </div>
-
-    <section id="perfil" class="my-perfil ">
-        <h2>Deu certo Perfil</h2>
-    </section>
-
-    <section id="config" class="config hidden">
-        <form action="{{ route('user.update', $user->id) }}" method="post" enctype="multipart/form-data">
-            @csrf
-            @method('PUT')
-            <input type="text" name="name" value="{{ $user->name }}" placeholder="Nome">
-            <input type="email" name="email" value="{{ $user->email }}" placeholder="Email">
-            <label for="image">Foto de Perfil</label>
-            <input type="file" name="image" id="image" accept="image/*">
-            <button>Atualizar</button>
-        </form>
-    </section>
-
-    <section id="livros" class="my-menu hidden">
-        <section class="my-book">
-            <h1 class="my-book-h1">Meus livros</h1>
-            <button id="toggle-books" class="button-my-book"><i class="fas fa-book-open"></i></button>
+    <div class="profile-main">
+        <nav class="profile-nav">
+            <a href="#dados" class="profile-nav-link active">Dados</a>
+            <a href="#livros" class="profile-nav-link">Livros</a>
+            <a href="#pedidos" class="profile-nav-link">Pedidos</a>
+            <a href="#config" class="profile-nav-link">Configurações</a>
+        </nav>
+        <section id="dados" class="profile-section">
+            <h2>Meus Dados</h2>
+            <ul class="profile-data-list">
+                <li><strong>Nome:</strong> {{ $user->name }}</li>
+                <li><strong>Email:</strong> {{ $user->email }}</li>
+            </ul>
         </section>
-        <section class="my-book">
-            <h1 class="my-book-h1">Meus Pedidos</h1>
-            <button class="button-my-book"><i class="fa-solid fa-cart-shopping"></i></button>
+        <section id="livros" class="profile-section">
+            <h2>Meus Livros</h2>
+            <div class="profile-books">
+                @forelse ($books as $book)
+                    <div class="profile-book-item">
+                        @php
+                            $images = is_array($book->images) ? $book->images : json_decode($book->images, true);
+                        @endphp
+                        @if(!empty($images))
+                            <img src="{{ asset('storage/' . $images[0]) }}" alt="{{ $book->name }}" class="profile-book-img">
+                        @endif
+                        <div class="profile-book-info">
+                            <h3>{{ $book->name }}</h3>
+                            <p>R$ {{ number_format($book->price, 2, ',', '.') }}</p>
+                        </div>
+                        <div class="profile-book-actions">
+                            <a href="{{ route('books.edit', $book->id) }}" class="profile-book-edit">Editar</a>
+                            <form action="{{ route('books.destroy', $book->id) }}" method="post">
+                                @csrf
+                                @method('DELETE')
+                                <button class="profile-book-delete">Deletar</button>
+                            </form>
+                        </div>
+                    </div>
+                @empty
+                    <p>Você ainda não cadastrou livros.</p>
+                @endforelse
+            </div>
+            <a class="profile-btn" href="{{ route('books.create') }}">Cadastrar livro</a>
         </section>
-    </section>
-
-    <section id="container-book" class="container-book">
-        <section class="book-list">
-            @foreach ($books as $book)
-                <div class="book-item">
-                    @php
-                        $images = is_array($book->images) ? $book->images : json_decode($book->images, true);
-                    @endphp
-                    @if(!empty($images))
-                        @foreach($images as $image)
-                            <img src="{{ asset('storage/' . $image) }}" alt="{{ $book->name }}">
-                        @endforeach
-                    @endif
-                    <h2>{{ $book->name }}</h2>
-                    <p> R$ {{ number_format($book->price, 2, ',', '.') }} </p>
-                    <button class="editar-book"><a href="{{ route('books.edit', $book->id) }}">Editar</a></button>
-                    <form action="{{ route('books.destroy', $book->id) }}" method="post">
-                        @csrf
-                        @method('DELETE')
-                        <button class="button-delete">Deletar</button>
-                    </form>
-                </div>
-            @endforeach
+        <section id="pedidos" class="profile-section">
+            <h2>Meus Pedidos</h2>
+            <p>Em breve você poderá acompanhar seus pedidos aqui.</p>
         </section>
-        <a class="btn-more" href="{{ route('books.create') }}">Cadastrar livro</a>
-
-        <a href="{{ route('coupons.index') }}">
-            Cadastrar cupom
-        </a>
-    </section>
-    <a class="btn-back" href="{{ route('index') }}">Voltar</a>
-</main>
+        <section id="config" class="profile-section">
+            <h2>Configurações</h2>
+            <form class="profile-form" action="{{ route('user.update', $user->id) }}" method="post" enctype="multipart/form-data">
+                @csrf
+                @method('PUT')
+                <label for="name">Nome</label>
+                <input type="text" name="name" value="{{ $user->name }}" placeholder="Nome">
+                <label for="email">Email</label>
+                <input type="email" name="email" value="{{ $user->email }}" placeholder="Email">
+                <label for="image">Foto de Perfil</label>
+                <input type="file" name="image" id="image" accept="image/*">
+                <button class="profile-btn">Atualizar</button>
+            </form>
+        </section>
+    </div>
+    <a class="profile-btn profile-btn-back" href="{{ route('index') }}">Voltar</a>
+</div>
+@endsection
