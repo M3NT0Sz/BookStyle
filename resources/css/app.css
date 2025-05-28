@@ -442,7 +442,7 @@ h1 {
     margin-bottom: 0.625rem;
 }
 
-.footer-center {
+.footer-center, .footer-right {
     display: flex;
     width: 25%;
     justify-content: space-between;
@@ -554,6 +554,221 @@ h1 {
     50% {
         background-position: center top;
     }
+}
+
+/* Responsividade para telas menores */
+@media (max-width: 900px) {
+    .nav-container {
+        flex-direction: row;
+        height: auto;
+        padding: 0.5rem 0.5rem;
+        position: relative;
+    }
+    .hamburger {
+        display: flex;
+        position: absolute;
+        right: 1rem;
+        top: 1rem;
+    }
+    .nav-links {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: flex-start;
+        background: #ecf0f1;
+        position: absolute;
+        top: 4rem;
+        right: 0;
+        width: 70vw;
+        max-width: 300px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        padding: 1rem 1.5rem;
+        border-radius: 0 0 1rem 1rem;
+        display: none;
+        z-index: 1000;
+    }
+    .nav-links.active {
+        display: flex;
+    }
+    .banner-container h1 {
+        font-size: 2.2rem;
+    }
+    .banner-container p {
+        font-size: 1.1rem;
+    }
+    .book-content {
+        flex-wrap: wrap;
+        max-width: 100vw;
+        padding: 0.5rem;
+    }
+    .book {
+        min-width: 95vw;
+        max-width: 99vw;
+        margin-bottom: 1rem;
+        font-size: 1rem;
+        padding: 0.7rem;
+    }
+    .book_img img {
+        min-width: 6rem;
+        min-height: 10rem;
+    }
+    .about-container {
+        flex-direction: column;
+        width: 99vw;
+        box-shadow: none;
+        border-radius: 0.5rem;
+    }
+    .about-left, .about-right {
+        width: 100%;
+        min-width: 0;
+        padding: 1rem 0.5rem;
+    }
+    .footer-content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    .footer-center, .footer-right {
+        width: 99vw;
+        max-width: none;
+    }
+    .footer-left img {
+        width: 4rem;
+        height: 4rem;
+    }
+    .footer-left h1, .footer-left p {
+        margin-left: 0.5rem;
+    }
+}
+
+/* Menu hambúrguer responsivo */
+.hamburger {
+    display: none;
+    flex-direction: column;
+    cursor: pointer;
+    width: 2.5rem;
+    height: 2.5rem;
+    justify-content: center;
+    align-items: center;
+    z-index: 1001;
+}
+.hamburger span {
+    height: 0.3rem;
+    width: 2rem;
+    background: #1abc9c;
+    margin: 0.25rem 0;
+    border-radius: 2px;
+    transition: 0.4s;
+}
+
+@media (max-width: 900px) {
+    .nav-container {
+        flex-direction: row;
+        height: auto;
+        padding: 0.5rem 0.5rem;
+        position: relative;
+    }
+    .hamburger {
+        display: flex;
+        position: absolute;
+        right: 1rem;
+        top: 1rem;
+    }
+    .nav-links {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: flex-start;
+        background: #ecf0f1;
+        position: absolute;
+        top: 4rem;
+        right: 0;
+        width: 70vw;
+        max-width: 300px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        padding: 1rem 1.5rem;
+        border-radius: 0 0 1rem 1rem;
+        display: none;
+        z-index: 1000;
+    }
+    .nav-links.active {
+        display: flex;
+    }
+    .banner-container h1 {
+        font-size: 2.2rem;
+    }
+    .banner-container p {
+        font-size: 1.1rem;
+    }
+    .book-content {
+        flex-wrap: wrap;
+        max-width: 100vw;
+        padding: 0.5rem;
+    }
+    .book {
+        min-width: 95vw;
+        max-width: 99vw;
+        margin-bottom: 1rem;
+        font-size: 1rem;
+        padding: 0.7rem;
+    }
+    .book_img img {
+        min-width: 6rem;
+        min-height: 10rem;
+    }
+    .about-container {
+        flex-direction: column;
+        width: 99vw;
+        box-shadow: none;
+        border-radius: 0.5rem;
+    }
+    .about-left, .about-right {
+        width: 100%;
+        min-width: 0;
+        padding: 1rem 0.5rem;
+    }
+    .footer-content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    .footer-center, .footer-right {
+        width: 99vw;
+        max-width: none;
+    }
+    .footer-left img {
+        width: 4rem;
+        height: 4rem;
+    }
+    .footer-left h1, .footer-left p {
+        margin-left: 0.5rem;
+    }
+}
+
+/* Cards responsivos e melhor espaçamento */
+.book {
+    box-shadow: 0 2px 12px rgba(44,59,68,0.10);
+    margin: 0.5rem 0.2rem;
+    border: 1px solid #e0e0e0;
+}
+
+/* Botões maiores e mais acessíveis em mobile */
+@media (max-width: 600px) {
+    .button-login, .button-more, .book button {
+        font-size: 1.1rem;
+        padding: 0.9rem 1.5rem;
+        border-radius: 0.5rem;
+    }
+    .book h2 {
+        font-size: 1.2rem;
+    }
+    .book p {
+        font-size: 1rem;
+    }
+}
+
+/* Ajuste para evitar rolagem horizontal */
+html, body {
+    max-width: 100vw;
+    overflow-x: hidden;
 }
 
 

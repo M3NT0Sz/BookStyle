@@ -1,4 +1,4 @@
-@extends('layouts.bookRegister')
+@extends('layouts.bookEdit')
 
 @section('content')
     <main class="edit-book-main">

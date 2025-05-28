@@ -500,3 +500,29 @@ strong {
         font-size: 1.2rem;
     }
 }
+
+@media (max-width: 900px) {
+    .book-register-container {
+        max-width: 98vw;
+        padding: 1rem 0.2rem;
+    }
+    .book-register-header h1 {
+        font-size: 1.2rem;
+    }
+    .body-form, .form-author-name, .form-condition-price, .form-description {
+        width: 98vw;
+        min-width: 0;
+    }
+    .form-author-name input, .form-condition-price input, .form-condition-price select {
+        width: 90vw;
+        min-width: 7rem;
+    }
+    .image-preview img {
+        width: 3rem;
+        height: 3rem;
+    }
+    .book-register-form .form-row {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}

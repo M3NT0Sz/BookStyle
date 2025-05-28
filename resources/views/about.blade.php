@@ -15,6 +15,9 @@
             <li>
                 <a href="{{route('books.index') }}">Livros</a>
             </li>
+            <li>
+                <a href="{{ route('cart.index') }}">Carrinho</a>
+            </li>
         </ul>
 
         @if(Auth::check())

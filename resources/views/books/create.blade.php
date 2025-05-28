@@ -233,13 +233,14 @@
     .form-group input,
     .form-group select,
     .form-group textarea {
-        padding: 0.7rem 1rem;
+        padding: 1rem 1rem;
         border: 1.5px solid #d0d7e2;
         border-radius: 0.6rem;
         font-size: 1rem;
         background: #f8faff;
         transition: border-color 0.2s, box-shadow 0.2s;
         outline: none;
+        margin-bottom: 0.5rem;
     }
     .form-group input:focus,
     .form-group select:focus,

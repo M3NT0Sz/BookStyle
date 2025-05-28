@@ -8,12 +8,12 @@
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
     <link rel="shortcut icon" href="{{ Vite::asset('resources/img/favicon.png') }}" type="image/x-icon">
     <title>@yield('title', 'BookStyle')</title>
-    @vite('resources/css/bookRegister.css')
+    @vite('resources/css/editbook.css')
 </head>
 
 <body>
     @yield('content')
-    @vite('resources/js/bookRegister.js')
+    @vite('resources/js/editBook.js')
 </body>
 
 </html>

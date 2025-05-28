@@ -311,12 +311,10 @@ body {
 }
 
 .curiosidades {
-    padding: 2rem 1rem;
+    padding: 2rem 4rem;
     background-color: #ffffff;
     border-radius: 1rem;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-    width: 98vw;
-    max-width: 50rem;
     margin: 2rem auto;
     text-align: center;
 }
@@ -483,6 +481,42 @@ body {
     font-size: 0.9rem;
 }
 
+@media (max-width: 900px) {
+    .banner_container h1 {
+        font-size: 2.2rem;
+    }
+    .banner_container p {
+        font-size: 1.1rem;
+    }
+    .main_container, .mv-container, .depoimentos, .curiosidades, .dados {
+        padding: 1rem 0.2rem;
+        width: 99vw;
+    }
+    .team-members {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    .member {
+        max-width: 98vw;
+    }
+    .footer-center, .footer-right {
+        width: 99vw;
+        max-width: none;
+    }
+    .footer-content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    .footer-left img {
+        width: 4rem;
+        height: 4rem;
+    }
+    .footer-left h1, .footer-left p {
+        margin-left: 0.5rem;
+    }
+}
+
 @media (max-width: 700px) {
     .banner_container h1 {
         font-size: 2.2rem;
@@ -504,6 +538,18 @@ body {
     .footer-center, .footer-right {
         width: 99vw;
         max-width: none;
+    }
+    .footer-content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    .footer-left img {
+        width: 4rem;
+        height: 4rem;
+    }
+    .footer-left h1, .footer-left p {
+        margin-left: 0.5rem;
     }
 }
 
