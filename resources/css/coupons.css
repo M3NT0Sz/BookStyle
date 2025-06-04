@@ -1,0 +1,134 @@
+/* Estilo para a página de cupons */
+.coupons-container {
+    max-width: 900px;
+    margin: 2rem auto;
+    background: #fff;
+    border-radius: 1.5rem;
+    box-shadow: 0 0.5rem 2rem rgba(44, 59, 68, 0.08);
+    padding: 2rem 1.5rem 3rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.coupons-title {
+    color: #1abc9c;
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.coupons-table-wrapper {
+    overflow-x: auto;
+}
+
+.coupons-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #f9f9f9;
+    border-radius: 1rem;
+    box-shadow: 0 2px 8px rgba(44, 59, 68, 0.04);
+}
+
+.coupons-table th, .coupons-table td {
+    padding: 1rem 0.7rem;
+    text-align: center;
+}
+
+.coupons-table th {
+    background: #1abc9c;
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-top-left-radius: 1rem;
+    border-top-right-radius: 1rem;
+}
+
+.coupons-table tr:nth-child(even) {
+    background: #ecf0f1;
+}
+
+.coupons-table tr:hover {
+    background: #d1fae5;
+}
+
+.coupons-table td {
+    color: #2c3e50;
+    font-size: 1rem;
+}
+
+.coupons-actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+.coupons-btn, .coupons-btn-danger {
+    padding: 0.5rem 1.2rem;
+    border: none;
+    border-radius: 2rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    text-decoration: none;
+}
+.coupons-btn {
+    background: #3498db;
+    color: #fff;
+}
+.coupons-btn:hover {
+    background: #1abc9c;
+}
+.coupons-btn-danger {
+    background: #e74c3c;
+    color: #fff;
+}
+.coupons-btn-danger:hover {
+    background: #c0392b;
+}
+
+.coupons-success {
+    background: #d1fae5;
+    color: #059669;
+    border-radius: 0.5rem;
+    padding: 0.7rem 1rem;
+    margin-bottom: 1rem;
+    text-align: center;
+    font-weight: 600;
+}
+
+.coupons-link {
+    display: inline-block;
+    margin: 1.5rem auto 0 auto;
+    background: #1abc9c;
+    color: #fff;
+    border-radius: 2rem;
+    padding: 0.7rem 2rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+    transition: background 0.2s;
+}
+.coupons-link:hover {
+    background: #16a085;
+}
+
+@media (max-width: 700px) {
+    .coupons-container {
+        padding: 0.5rem;
+    }
+    .coupons-title {
+        font-size: 1.3rem;
+    }
+    .coupons-table th, .coupons-table td {
+        padding: 0.5rem 0.2rem;
+        font-size: 0.95rem;
+    }
+    .coupons-link {
+        padding: 0.5rem 1rem;
+        font-size: 1rem;
+    }
+}

@@ -23,6 +23,11 @@ class CartController extends Controller
 
     public function add(Request $request, $bookId)
     {
+        \Log::info('Método add do carrinho chamado', [
+            'bookId_param' => $bookId,
+            'bookId_input' => $request->input('book_id'),
+            'quantity' => $request->input('quantity'),
+        ]);
         $quantity = $request->input('quantity', 1);
         $couponCode = $request->input('coupon_code');
         $discount = 0;

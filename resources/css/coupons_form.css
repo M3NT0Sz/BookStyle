@@ -1,0 +1,100 @@
+/* Estilo para formulários de cupons (criar/editar) */
+.coupons-form-container {
+    max-width: 500px;
+    margin: 2.5rem auto;
+    background: #fff;
+    border-radius: 1.5rem;
+    box-shadow: 0 0.5rem 2rem rgba(44, 59, 68, 0.08);
+    padding: 2.5rem 2rem 2rem 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.coupons-form-title {
+    color: #1abc9c;
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.coupons-form label {
+    color: #3498db;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+    display: block;
+}
+
+.coupons-form input[type="text"],
+.coupons-form input[type="number"],
+.coupons-form input[type="date"],
+.coupons-form select {
+    width: 100%;
+    padding: 0.7rem 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid #ecf0f1;
+    font-size: 1rem;
+    background: #f9f9f9;
+    margin-bottom: 1rem;
+    transition: border 0.2s;
+}
+.coupons-form input:focus,
+.coupons-form select:focus {
+    border: 1.5px solid #1abc9c;
+    outline: none;
+}
+
+.coupons-form-btns {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 1rem;
+}
+.coupons-form-btn, .coupons-form-btn-back {
+    padding: 0.7rem 2rem;
+    border: none;
+    border-radius: 2rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    text-decoration: none;
+}
+.coupons-form-btn {
+    background: #1abc9c;
+    color: #fff;
+}
+.coupons-form-btn:hover {
+    background: #16a085;
+}
+.coupons-form-btn-back {
+    background: #3498db;
+    color: #fff;
+}
+.coupons-form-btn-back:hover {
+    background: #2980b9;
+}
+
+.coupons-form-error {
+    color: #e74c3c;
+    background: #fdecea;
+    border-radius: 0.5rem;
+    padding: 0.5rem 1rem;
+    margin-bottom: 1rem;
+    text-align: center;
+    font-weight: 600;
+}
+
+@media (max-width: 600px) {
+    .coupons-form-container {
+        padding: 1rem 0.5rem;
+    }
+    .coupons-form-title {
+        font-size: 1.2rem;
+    }
+    .coupons-form-btn, .coupons-form-btn-back {
+        padding: 0.5rem 1rem;
+        font-size: 1rem;
+    }
+}

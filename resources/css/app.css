@@ -91,6 +91,7 @@ body {
     position: relative;
     height: 31.25rem; /* 500px */
     background-color: #1abc9c;
+    color: #ecf0f1;
     display: flex;
     flex-direction: column;
     align-items: center;
