@@ -55,4 +55,27 @@ class CartController extends Controller
         Cart::clear();
         return redirect()->route('cart.index')->with('success', 'Carrinho esvaziado!');
     }
+
+    public function applyCoupon(Request $request)
+    {
+        $code = $request->input('coupon_code');
+        if (!$code) {
+            return redirect()->back()->with('coupon_error', 'Informe o código do cupom.');
+        }
+        $coupon = \App\Models\Coupon::findByCode($code);
+        if (!$coupon) {
+            return redirect()->back()->with('coupon_error', 'Cupom inválido.');
+        }
+        if (isset($coupon['expires_at']) && $coupon['expires_at'] && strtotime($coupon['expires_at']) < time()) {
+            return redirect()->back()->with('coupon_error', 'Cupom expirado.');
+        }
+        $cart = session('cart', []);
+        $cart['coupon'] = [
+            'code' => $coupon['code'],
+            'discount' => $coupon['discount'],
+            'type' => $coupon['type'],
+        ];
+        session(['cart' => $cart]);
+        return redirect()->back()->with('coupon_success', 'Cupom aplicado com sucesso!');
+    }
 }

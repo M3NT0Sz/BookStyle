@@ -41,6 +41,7 @@ Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
 Route::post('/cart/add/{bookId}', [CartController::class, 'add'])->name('cart.add');
 Route::post('/cart/remove/{bookId}', [CartController::class, 'remove'])->name('cart.remove');
 Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
+Route::post('/cart/apply-coupon', [CartController::class, 'applyCoupon'])->name('cart.applyCoupon');
 Route::get('/coupons', [CouponController::class, 'index'])->name('coupons.index');
 Route::get('/coupons/create', [CouponController::class, 'create'])->name('coupons.create');
 Route::post('/coupons', [CouponController::class, 'store'])->name('coupons.store');

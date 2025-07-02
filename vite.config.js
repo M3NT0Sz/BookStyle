@@ -20,6 +20,11 @@ export default defineConfig({
                 'resources/js/about.js',
                 'resources/css/bookSell.css',
                 'resources/js/bookSell.js',
+                'resources/css/coupons_form.css',
+                'resources/css/coupons.css',
+                'resources/css/bookShow.css',
+                'resources/js/bookShow.js',
+                'resources/css/cart.css'
             ],
             refresh: true,
         }),

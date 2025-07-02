@@ -9,11 +9,6 @@
             $cartCoupon = session('cart.coupon', null);
             $total = 0;
         @endphp
-        @if($cartCoupon)
-            <div class="cart-coupon-info">
-                <strong>Cupom aplicado:</strong> <span>{{ $cartCoupon['code'] }}</span> <span class="cart-coupon-discount">({{ $cartCoupon['type'] == 'percent' ? $cartCoupon['discount'] . '%' : 'R$' . $cartCoupon['discount'] }})</span>
-            </div>
-        @endif
         @if(count($books) > 0)
             <div class="cart-table-wrapper">
                 <table class="cart-table">
@@ -57,16 +52,40 @@
                     </tbody>
                 </table>
             </div>
-            <div class="cart-summary">
-                <p><strong>Total sem desconto:</strong> <span>R$ {{ number_format($total, 2, ',', '.') }}</span></p>
-                @if($cartCoupon)
+            <div class="cart-summary-coupon-row">
+                <div class="cart-summary">
                     @php
-                        $discount = $cartCoupon['type'] == 'percent' ? ($total * ($cartCoupon['discount'] / 100)) : $cartCoupon['discount'];
-                        $discountedTotal = max($total - $discount, 0);
+                        $cartCoupon = session('cart.coupon', null);
                     @endphp
-                    <p><strong>Desconto:</strong> <span class="cart-discount">-R$ {{ number_format($discount, 2, ',', '.') }}</span></p>
-                    <p><strong>Total com desconto:</strong> <span class="cart-total">R$ {{ number_format($discountedTotal, 2, ',', '.') }}</span></p>
-                @endif
+                    @if($cartCoupon)
+                        <div class="cart-coupon-info">
+                            <strong>Cupom aplicado:</strong> <span>{{ $cartCoupon['code'] }}</span> <span class="cart-coupon-discount">({{ $cartCoupon['type'] == 'percent' ? $cartCoupon['discount'] . '%' : 'R$' . $cartCoupon['discount'] }})</span>
+                        </div>
+                    @endif
+                    <p><strong>Total sem desconto:</strong> <span>R$ {{ number_format($total, 2, ',', '.') }}</span></p>
+                    @if($cartCoupon)
+                        @php
+                            $discount = $cartCoupon['type'] == 'percent' ? ($total * ($cartCoupon['discount'] / 100)) : $cartCoupon['discount'];
+                            $discountedTotal = max($total - $discount, 0);
+                        @endphp
+                        <p><strong>Desconto:</strong> <span class="cart-discount">-R$ {{ number_format($discount, 2, ',', '.') }}</span></p>
+                        <p><strong>Total com desconto:</strong> <span class="cart-total">R$ {{ number_format($discountedTotal, 2, ',', '.') }}</span></p>
+                    @endif
+                </div>
+                <div class="cart-coupon-form-wrapper">
+                    <form class="cart-coupon-form" action="{{ route('cart.applyCoupon') }}" method="POST">
+                        @csrf
+                        <label for="coupon_code">Adicionar cupom:</label>
+                        <input type="text" id="coupon_code" name="coupon_code" placeholder="Digite o código do cupom" required>
+                        <button type="submit">Aplicar</button>
+                    </form>
+                    @if(session('coupon_error'))
+                        <div class="cart-coupon-error">{{ session('coupon_error') }}</div>
+                    @endif
+                    @if(session('coupon_success'))
+                        <div class="cart-coupon-success">{{ session('coupon_success') }}</div>
+                    @endif
+                </div>
             </div>
             <form class="cart-clear-form" action="{{ route('cart.clear') }}" method="POST">
                 @csrf
@@ -80,5 +99,6 @@
             <a class="cart-link" href="{{ route('index') }}">Voltar</a>
         </div>
     </div>
+    <div style="height: 60px;"></div>
     @include('components.footer')
 @endsection

@@ -42,6 +42,79 @@ body, html {
     font-weight: bold;
 }
 
+/* Campo de cupom do carrinho */
+.cart-coupon-form-wrapper {
+    background: #f7fafc;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 18px 20px 12px 20px;
+    margin-bottom: 18px;
+    max-width: 420px;
+    margin-left: auto;
+    margin-right: 0;
+    box-shadow: 0 2px 8px rgba(52, 152, 219, 0.07);
+}
+.cart-coupon-form {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.cart-coupon-form label {
+    font-weight: 500;
+    color: #1a202c;
+    margin-right: 6px;
+}
+.cart-coupon-form input[type="text"] {
+    border: 1.5px solid #b6c2d1;
+    border-radius: 6px;
+    padding: 7px 12px;
+    font-size: 1rem;
+    outline: none;
+    transition: border 0.2s;
+    min-width: 160px;
+}
+.cart-coupon-form input[type="text"]:focus {
+    border: 1.5px solid #3498db;
+    background: #eaf6fb;
+}
+.cart-coupon-form button {
+    background: linear-gradient(90deg, #3498db 60%, #3ecf8e 100%);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 18px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    box-shadow: 0 1px 6px rgba(52, 152, 219, 0.08);
+}
+.cart-coupon-form button:hover {
+    background: linear-gradient(90deg, #2980b9 60%, #2fa06b 100%);
+    transform: scale(1.05);
+}
+.cart-coupon-error {
+    color: #e53e3e;
+    background: #fff5f5;
+    border: 1px solid #fbb6b6;
+    border-radius: 6px;
+    padding: 7px 12px;
+    margin-top: 8px;
+    font-size: 0.98rem;
+    font-weight: 500;
+}
+.cart-coupon-success {
+    color: #1a8917;
+    background: #e6fffa;
+    border: 1px solid #b2f5ea;
+    border-radius: 6px;
+    padding: 7px 12px;
+    margin-top: 8px;
+    font-size: 0.98rem;
+    font-weight: 500;
+}
+
 .cart-table-wrapper {
     overflow-x: auto;
     margin-bottom: 18px;
@@ -186,6 +259,27 @@ body, html {
     box-shadow: 0 -2px 12px rgba(0,0,0,0.06);
 }
 
+/* Layout flexível para resumo e cupom lado a lado */
+.cart-summary-coupon-row {
+    display: flex;
+    gap: 32px;
+    align-items: flex-start;
+    justify-content: flex-end;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+}
+.cart-summary-coupon-row .cart-summary {
+    margin-left: 0;
+    margin-bottom: 0;
+}
+@media (max-width: 900px) {
+    .cart-summary-coupon-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 16px;
+    }
+}
+
 @media (max-width: 700px) {
     .cart-container {
         padding: 16px 4px 24px 4px;
@@ -199,5 +293,14 @@ body, html {
     }
     .footer-container {
         position: static;
+    }
+    .cart-coupon-form-wrapper {
+        padding: 10px 4px 8px 4px;
+        max-width: 100%;
+    }
+    .cart-coupon-form {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
     }
 }
