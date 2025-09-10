@@ -55,8 +55,9 @@ class AdminController extends Controller
         if (!$book) {
             return redirect()->route('admin.books')->with('error', 'Livro não encontrado.');
         }
-        $user = \App\Models\User::find($book->user_id);
-        return view('admin.book_show', compact('book', 'user'));
+        $userId = is_array($book) ? ($book['user_id'] ?? null) : $book->user_id;
+        $user = $userId ? \App\Models\User::find($userId) : null;
+        return view('books.show', compact('book', 'user'));
     }
 
 
@@ -101,5 +102,57 @@ class AdminController extends Controller
         $user->is_admin = $data['is_admin'];
         $user->save();
         return redirect()->route('admin.users')->with('success', 'Status de administrador atualizado!');
+    }
+
+
+        // Exportação de dados
+    public function exportBooks($format)
+    {
+        if (!auth()->check() || !auth()->user()->is_admin) {
+            return redirect('/')->with('error', 'Acesso não autorizado.');
+        }
+        $booksCollection = Book::all();
+        $books = is_object($booksCollection) && method_exists($booksCollection, 'toArray')
+            ? $booksCollection->toArray()
+            : (array) $booksCollection;
+        return $this->exportData($books, $format, 'livros');
+    }
+
+    public function exportUsers($format)
+    {
+        if (!auth()->check() || !auth()->user()->is_admin) {
+            return redirect('/')->with('error', 'Acesso não autorizado.');
+        }
+        $users = User::all()->toArray();
+        return $this->exportData($users, $format, 'usuarios');
+    }
+
+    public function exportCoupons($format)
+    {
+        if (!auth()->check() || !auth()->user()->is_admin) {
+            return redirect('/')->with('error', 'Acesso não autorizado.');
+        }
+        $coupons = Coupon::all()->toArray();
+        return $this->exportData($coupons, $format, 'cupons');
+    }
+
+    private function exportData(array $data, $format, $filename)
+    {
+        if ($format === 'json') {
+            $adapter = new \App\Adapters\JsonExport();
+            $content = $adapter->export($data);
+            $type = 'application/json';
+            $ext = 'json';
+        } elseif ($format === 'csv') {
+            $adapter = new \App\Adapters\CsvExportAdapter();
+            $content = $adapter->export($data);
+            $type = 'text/csv';
+            $ext = 'csv';
+        } else {
+            return redirect()->back()->with('error', 'Formato inválido!');
+        }
+        return response($content)
+            ->header('Content-Type', $type)
+            ->header('Content-Disposition', 'attachment; filename="' . $filename . '.' . $ext . '"');
     }
 }

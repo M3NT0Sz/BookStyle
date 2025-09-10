@@ -4,6 +4,8 @@
 <div class="container">
     <a href="{{ route('admin.dashboard') }}" class="btn btn-secondary mb-3">Voltar para o Dashboard</a>
     <a href="{{ route('coupons.create') }}" class="btn btn-success mb-3">Criar cupom</a>
+    <a href="{{ route('admin.coupons.export', 'json') }}" class="btn btn-success mb-3">Exportar JSON</a>
+    <a href="{{ route('admin.coupons.export', 'csv') }}" class="btn btn-primary mb-3">Exportar CSV</a>
     <h2>Cupons cadastrados</h2>
     <table class="table table-bordered">
         <thead>

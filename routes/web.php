@@ -13,12 +13,15 @@ use App\Http\Controllers\AdminController;
 Route::prefix('admin')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
     Route::get('/books', [AdminController::class, 'books'])->name('admin.books');
+    Route::get('/books/export/{format}', [AdminController::class, 'exportBooks'])->name('admin.books.export');
     Route::get('/books/{id}', [AdminController::class, 'showBook'])->name('admin.books.show');
     Route::delete('/books/{id}', [AdminController::class, 'destroyBook'])->name('admin.books.destroy');
     Route::get('/users', [AdminController::class, 'users'])->name('admin.users');
+    Route::get('/users/export/{format}', [AdminController::class, 'exportUsers'])->name('admin.users.export');
     Route::get('/users/{id}/edit', [AdminController::class, 'editUser'])->name('admin.users.edit');
     Route::put('/users/{id}', [AdminController::class, 'updateUser'])->name('admin.users.update');
     Route::get('/coupons', [AdminController::class, 'coupons'])->name('admin.coupons');
+    Route::get('/coupons/export/{format}', [AdminController::class, 'exportCoupons'])->name('admin.coupons.export');
 });
 
 Route::get('/', function () {

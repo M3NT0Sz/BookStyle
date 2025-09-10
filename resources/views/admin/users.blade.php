@@ -3,6 +3,10 @@
 @section('content')
 <div class="container">
     <a href="{{ route('admin.dashboard') }}" class="btn btn-secondary mb-3">Voltar para o Dashboard</a>
+    <div class="mb-3">
+        <a href="{{ route('admin.users.export', 'json') }}" class="btn btn-success">Exportar JSON</a>
+        <a href="{{ route('admin.users.export', 'csv') }}" class="btn btn-primary">Exportar CSV</a>
+    </div>
     <h2>Usuários cadastrados</h2>
     <table class="table table-bordered">
         <thead>
