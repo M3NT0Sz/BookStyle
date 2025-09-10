@@ -24,7 +24,10 @@ export default defineConfig({
                 'resources/css/coupons.css',
                 'resources/css/bookShow.css',
                 'resources/js/bookShow.js',
-                'resources/css/cart.css'
+                'resources/css/cart.css',
+                'resources/js/books.js',
+                'resources/js/home.js',
+                'resources/css/books.css'
             ],
             refresh: true,
         }),
