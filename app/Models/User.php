@@ -11,6 +11,7 @@ class User extends Authenticatable
         'email',
         'password',
         'image',
+        'is_admin',
     ];
 
     public static function find($id)

@@ -13,6 +13,7 @@
 <body>
     @yield('content')
     @vite('resources/js/app.js')
+    @vite('resources/js/home.js')
 </body>
 
 </html>

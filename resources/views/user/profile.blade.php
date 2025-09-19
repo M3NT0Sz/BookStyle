@@ -58,7 +58,6 @@
                 @endforelse
             </div>
             <a class="profile-btn" href="{{ route('books.create') }}">Cadastrar livro</a>
-            <a class="profile-btn" href="{{ route('coupons.create') }}">Criar cupom</a>
         </section>
         <section id="pedidos" class="profile-section">
             <h2>Meus Pedidos</h2>

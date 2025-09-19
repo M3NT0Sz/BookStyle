@@ -1,291 +1,382 @@
-// bookShow.js - Versão Corrigida para Galeria
+// ===============================================
+// BOOK DETAILS PAGE - JAVASCRIPT MODERNO
+// ===============================================
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('=== INICIANDO GALERIA DE IMAGENS ===');
+    console.log('=== INICIALIZANDO PÁGINA DE DETALHES ===');
     
-    // Animação ao adicionar ao carrinho (corrigida: agora só anima no submit, não no click)
-    const form = document.querySelector('.add-cart-form');
-    if (form) {
-        form.addEventListener('submit', function() {
-            const addCartBtn = form.querySelector('button[type="submit"]');
-            if (addCartBtn) {
-                addCartBtn.style.background = 'linear-gradient(135deg, #059669 0%, #10b981 100%)';
-                addCartBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Adicionando...';
-                addCartBtn.disabled = true;
-            }
-        });
-    }
-    // Removido: evento de click do botão de adicionar ao carrinho
-
-    // GALERIA DE IMAGENS - VERSÃO CORRIGIDA
-    const mainImg = document.getElementById('mainBookImage');
-    const thumbs = document.querySelectorAll('.book-gallery-thumb');
+    // Funcionalidades da Galeria de Imagens
+    initializeGallery();
     
-    console.log('Imagem principal encontrada:', !!mainImg);
-    console.log('Número de miniaturas encontradas:', thumbs.length);
+    // Funcionalidades do Formulário
+    initializePurchaseForm();
     
-    if (mainImg && thumbs.length > 0) {
-        // Debug das URLs das imagens
-        console.log('URL da imagem principal:', mainImg.src);
-        thumbs.forEach(function(thumb, index) {
-            const imgUrl = thumb.getAttribute('data-img');
-            console.log(`Miniatura ${index + 1} URL:`, imgUrl);
-        });
+    // Funcionalidades dos Modais
+    initializeModals();
+    
+    // Animações e Efeitos
+    initializeAnimations();
+    
+    console.log('=== PÁGINA INICIALIZADA ===');
+});
 
-        // Precarregamento das imagens
-        const preloadImages = [];
-        thumbs.forEach(function(thumb) {
-            const imgUrl = thumb.getAttribute('data-img');
-            if (imgUrl) {
-                const preloadImg = new Image();
-                preloadImg.src = imgUrl;
-                preloadImages.push(preloadImg);
-            }
-        });
-
-        // Função para normalizar URL (remove diferenças de formatação)
-        function normalizeUrl(url) {
-            return url.replace(/\\/g, '/').toLowerCase().trim();
-        }
-
-        // Adicionar eventos de clique nas miniaturas
-        thumbs.forEach(function(thumb, index) {
-            thumb.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                
-                console.log(`=== CLIQUE NA MINIATURA ${index + 1} ===`);
-                
-                const newSrc = this.getAttribute('data-img');
-                console.log('Nova URL:', newSrc);
-                console.log('URL atual da imagem principal:', mainImg.src);
-                
-                if (!newSrc) {
-                    console.log('Erro: data-img não encontrado');
-                    return;
-                }
-                
-                // Remove seleção de todas as miniaturas
-                thumbs.forEach(function(t) { 
-                    t.classList.remove('selected'); 
-                });
-                
-                // Adiciona seleção na miniatura clicada
-                this.classList.add('selected');
-                console.log('Miniatura selecionada:', index + 1);
-                
-                // Sempre troca a imagem, mesmo que seja a mesma (para garantir funcionamento)
-                console.log('Iniciando troca da imagem...');
-                
-                // Efeito de transição
-                mainImg.style.transition = 'all 0.3s ease';
-                mainImg.style.opacity = '0.3';
-                mainImg.style.transform = 'scale(0.95)';
-                
-                // Aguarda a transição e troca a imagem
-                setTimeout(() => {
-                    mainImg.src = newSrc;
-                    mainImg.alt = `Imagem do livro ${index + 1}`;
-                    
-                    // Verifica se a imagem carregou
-                    mainImg.onload = function() {
-                        console.log('Imagem carregada com sucesso:', newSrc);
-                        mainImg.style.opacity = '1';
-                        mainImg.style.transform = 'scale(1)';
-                    };
-                    
-                    mainImg.onerror = function() {
-                        console.log('Erro ao carregar imagem:', newSrc);
-                        // Volta para opacity normal mesmo com erro
-                        mainImg.style.opacity = '1';
-                        mainImg.style.transform = 'scale(1)';
-                    };
-                    
-                    // Fallback caso onload não funcione
-                    setTimeout(() => {
-                        if (mainImg.style.opacity !== '1') {
-                            mainImg.style.opacity = '1';
-                            mainImg.style.transform = 'scale(1)';
-                        }
-                    }, 500);
-                    
-                }, 150);
-                
-                console.log('=== FIM DO CLIQUE ===');
-            });
-
-            // Efeito hover nas miniaturas
-            thumb.addEventListener('mouseenter', function() {
-                if (!this.classList.contains('selected')) {
-                    this.style.transition = 'all 0.3s ease';
-                    this.style.transform = 'translateY(-0.125em) scale(1.05)';
-                    this.style.zIndex = '10';
-                }
-            });
-
-            thumb.addEventListener('mouseleave', function() {
-                if (!this.classList.contains('selected')) {
-                    this.style.transform = '';
-                    this.style.zIndex = '';
-                }
-            });
-        });
-
-        // Navegação por teclado
-        document.addEventListener('keydown', function(e) {
-            if (thumbs.length > 1) {
-                const currentSelected = document.querySelector('.book-gallery-thumb.selected');
-                if (currentSelected) {
-                    let currentIndex = Array.from(thumbs).indexOf(currentSelected);
-                    
-                    if (e.key === 'ArrowLeft' && currentIndex > 0) {
-                        e.preventDefault();
-                        thumbs[currentIndex - 1].click();
-                    } else if (e.key === 'ArrowRight' && currentIndex < thumbs.length - 1) {
-                        e.preventDefault();
-                        thumbs[currentIndex + 1].click();
-                    }
-                }
-            }
-        });
-
-        // Garantir que a primeira miniatura esteja selecionada
-        if (thumbs.length > 0) {
-            const firstSelected = document.querySelector('.book-gallery-thumb.selected');
-            if (!firstSelected) {
-                console.log('Selecionando primeira miniatura...');
-                thumbs[0].classList.add('selected');
-            }
-        }
-        
-        console.log('Galeria inicializada com sucesso!');
-    } else {
+// ===============================================
+// GALERIA DE IMAGENS
+// ===============================================
+function initializeGallery() {
+    const mainImage = document.querySelector('.main-image img');
+    const thumbnails = document.querySelectorAll('.thumbnail');
+    
+    if (!mainImage || thumbnails.length === 0) {
         console.log('Galeria não encontrada ou sem miniaturas');
+        return;
     }
+    
+    console.log(`Galeria inicializada: ${thumbnails.length} thumbnails`);
+    
+    // Adicionar eventos de clique nas thumbnails
+    thumbnails.forEach((thumb, index) => {
+        thumb.addEventListener('click', function() {
+            changeMainImage(this.querySelector('img').src, this);
+        });
+    });
+    
+    // Garantir que a primeira thumbnail esteja ativa
+    if (thumbnails.length > 0) {
+        thumbnails[0].classList.add('active');
+    }
+}
 
-    // Efeito parallax sutil na imagem principal
-    if (mainImg) {
-        window.addEventListener('scroll', function() {
-            const scrolled = window.pageYOffset;
-            const rate = scrolled * -0.1;
-            if (Math.abs(rate) < 100) { // Limita o movimento
-                mainImg.style.transform = `translateY(${rate}px)`;
+function changeMainImage(newSrc, clickedThumb) {
+    const mainImage = document.querySelector('.main-image img');
+    const thumbnails = document.querySelectorAll('.thumbnail');
+    
+    if (!mainImage) return;
+    
+    // Remover classe active de todas as thumbnails
+    thumbnails.forEach(thumb => thumb.classList.remove('active'));
+    
+    // Adicionar classe active na thumbnail clicada
+    if (clickedThumb) {
+        clickedThumb.classList.add('active');
+    }
+    
+    // Efeito de transição
+    mainImage.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+    mainImage.style.opacity = '0.3';
+    mainImage.style.transform = 'scale(0.95)';
+    
+    setTimeout(() => {
+        mainImage.src = newSrc;
+        mainImage.onload = function() {
+            mainImage.style.opacity = '1';
+            mainImage.style.transform = 'scale(1)';
+        };
+    }, 150);
+}
+
+// ===============================================
+// FORMULÁRIO DE COMPRA
+// ===============================================
+function initializePurchaseForm() {
+    // Controles de quantidade
+    window.increaseQuantity = function() {
+        const quantityInput = document.getElementById('quantity');
+        if (quantityInput) {
+            const currentValue = parseInt(quantityInput.value) || 1;
+            const maxValue = parseInt(quantityInput.max) || 10;
+            
+            if (currentValue < maxValue) {
+                quantityInput.value = currentValue + 1;
+                updatePrice();
+            }
+        }
+    };
+    
+    window.decreaseQuantity = function() {
+        const quantityInput = document.getElementById('quantity');
+        if (quantityInput) {
+            const currentValue = parseInt(quantityInput.value) || 1;
+            const minValue = parseInt(quantityInput.min) || 1;
+            
+            if (currentValue > minValue) {
+                quantityInput.value = currentValue - 1;
+                updatePrice();
+            }
+        }
+    };
+    
+    // Validação de quantidade
+    const quantityInput = document.getElementById('quantity');
+    if (quantityInput) {
+        quantityInput.addEventListener('input', function() {
+            const value = parseInt(this.value);
+            const min = parseInt(this.min) || 1;
+            const max = parseInt(this.max) || 10;
+            
+            if (value < min) this.value = min;
+            if (value > max) this.value = max;
+            
+            updatePrice();
+        });
+    }
+    
+    // Animação do botão de adicionar ao carrinho
+    const addToCartForm = document.querySelector('.purchase-form');
+    if (addToCartForm) {
+        addToCartForm.addEventListener('submit', function(e) {
+            const submitBtn = this.querySelector('.add-to-cart-btn');
+            if (submitBtn) {
+                submitBtn.style.pointerEvents = 'none';
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adicionando...';
+                
+                // Simular delay para mostrar o loading
+                setTimeout(() => {
+                    // O form será submetido normalmente
+                }, 500);
             }
         });
     }
+}
 
-    // Animação de entrada dos elementos
+function updatePrice() {
+    // Esta função pode ser expandida para calcular preços dinâmicos
+    // Por enquanto, apenas atualiza visualmente se necessário
+    const quantity = parseInt(document.getElementById('quantity')?.value) || 1;
+    console.log('Quantidade atualizada:', quantity);
+}
+
+// ===============================================
+// MODAIS E OVERLAYS
+// ===============================================
+function initializeModals() {
+    // Modal de imagem
+    window.openImageModal = function() {
+        const mainImage = document.querySelector('.main-image img');
+        const modal = document.getElementById('imageModal');
+        const modalImage = document.getElementById('modalImage');
+        
+        if (mainImage && modal && modalImage) {
+            modalImage.src = mainImage.src;
+            modal.style.display = 'flex';
+            
+            setTimeout(() => {
+                modal.style.opacity = '1';
+            }, 10);
+        }
+    };
+    
+    window.closeImageModal = function() {
+        const modal = document.getElementById('imageModal');
+        if (modal) {
+            modal.style.opacity = '0';
+            setTimeout(() => {
+                modal.style.display = 'none';
+            }, 300);
+        }
+    };
+    
+    // Fechar modal com ESC
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeImageModal();
+        }
+    });
+}
+
+// ===============================================
+// FUNÇÕES UTILITÁRIAS
+// ===============================================
+window.shareBook = function() {
+    if (navigator.share) {
+        const bookTitle = document.querySelector('.book-title')?.textContent || 'Livro';
+        const bookUrl = window.location.href;
+        
+        navigator.share({
+            title: bookTitle,
+            text: `Confira este livro: ${bookTitle}`,
+            url: bookUrl
+        }).catch(err => console.log('Erro ao compartilhar:', err));
+    } else {
+        // Fallback para navegadores sem suporte ao Web Share API
+        const bookUrl = window.location.href;
+        navigator.clipboard.writeText(bookUrl).then(() => {
+            showNotification('Link copiado para a área de transferência!', 'success');
+        }).catch(() => {
+            showNotification('Não foi possível copiar o link', 'error');
+        });
+    }
+};
+
+window.addToWishlist = function() {
+    // Implementar funcionalidade de lista de desejos
+    showNotification('Funcionalidade em desenvolvimento', 'info');
+};
+
+// ===============================================
+// ANIMAÇÕES E EFEITOS
+// ===============================================
+function initializeAnimations() {
+    // Intersection Observer para animações de entrada
     const observerOptions = {
         threshold: 0.1,
         rootMargin: '0px 0px -50px 0px'
     };
-
+    
     const observer = new IntersectionObserver(function(entries) {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 entry.target.style.opacity = '1';
                 entry.target.style.transform = 'translateY(0)';
+                
+                // Remove o observer após a animação
+                observer.unobserve(entry.target);
             }
         });
     }, observerOptions);
-
-    // Observa elementos para animação
-    const animatedElements = document.querySelectorAll('.book-meta > span, .book-desc, .book-purchase-row');
+    
+    // Elementos para animar
+    const animatedElements = document.querySelectorAll([
+        '.book-header',
+        '.book-description', 
+        '.book-specs',
+        '.purchase-card'
+    ].join(','));
+    
     animatedElements.forEach((el, index) => {
         el.style.opacity = '0';
-        el.style.transform = 'translateY(1em)';
+        el.style.transform = 'translateY(30px)';
         el.style.transition = `all 0.6s ease ${index * 0.1}s`;
         observer.observe(el);
     });
+    
+    // Efeito parallax sutil
+    let ticking = false;
+    
+    function updateParallax() {
+        const scrolled = window.pageYOffset;
+        const mainImage = document.querySelector('.main-image');
+        
+        if (mainImage) {
+            const rate = scrolled * -0.05;
+            mainImage.style.transform = `translateY(${rate}px)`;
+        }
+        
+        ticking = false;
+    }
+    
+    function requestTick() {
+        if (!ticking) {
+            requestAnimationFrame(updateParallax);
+            ticking = true;
+        }
+    }
+    
+    window.addEventListener('scroll', requestTick, { passive: true });
+}
 
-    // Efeito de zoom na imagem principal
-    if (mainImg) {
-        mainImg.addEventListener('click', function() {
-            const overlay = document.createElement('div');
-            overlay.style.cssText = `
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0,0,0,0.8);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                z-index: 1000;
-                cursor: zoom-out;
-                opacity: 0;
-                transition: opacity 0.3s ease;
-            `;
+// ===============================================
+// SISTEMA DE NOTIFICAÇÕES
+// ===============================================
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    
+    const typeIcons = {
+        success: 'fas fa-check-circle',
+        error: 'fas fa-exclamation-circle',
+        info: 'fas fa-info-circle',
+        warning: 'fas fa-exclamation-triangle'
+    };
+    
+    const typeColors = {
+        success: '#10b981',
+        error: '#ef4444',
+        info: '#3b82f6',
+        warning: '#f59e0b'
+    };
+    
+    notification.innerHTML = `
+        <i class="${typeIcons[type] || typeIcons.info}"></i>
+        <span>${message}</span>
+    `;
+    
+    notification.style.cssText = `
+        position: fixed;
+        top: 2rem;
+        right: 2rem;
+        background: ${typeColors[type] || typeColors.info};
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        z-index: 10001;
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        max-width: 300px;
+        min-width: 250px;
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.transform = 'translateX(0)';
+    }, 100);
+    
+    setTimeout(() => {
+        notification.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+            if (document.body.contains(notification)) {
+                document.body.removeChild(notification);
+            }
+        }, 300);
+    }, 4000);
+}
+
+// ===============================================
+// NAVEGAÇÃO POR TECLADO
+// ===============================================
+document.addEventListener('keydown', function(e) {
+    const thumbnails = document.querySelectorAll('.thumbnail');
+    
+    if (thumbnails.length > 1) {
+        const currentActive = document.querySelector('.thumbnail.active');
+        if (currentActive) {
+            const currentIndex = Array.from(thumbnails).indexOf(currentActive);
             
-            const zoomedImg = document.createElement('img');
-            zoomedImg.src = this.src;
-            zoomedImg.style.cssText = `
-                max-width: 90%;
-                max-height: 90%;
-                object-fit: contain;
-                border-radius: 0.5em;
-                box-shadow: 0 1em 3em rgba(0,0,0,0.5);
-                transform: scale(0.8);
-                transition: transform 0.3s ease;
-            `;
-            
-            overlay.appendChild(zoomedImg);
-            document.body.appendChild(overlay);
-            
-            setTimeout(() => {
-                overlay.style.opacity = '1';
-                zoomedImg.style.transform = 'scale(1)';
-            }, 10);
-            
-            overlay.addEventListener('click', function() {
-                overlay.style.opacity = '0';
-                zoomedImg.style.transform = 'scale(0.8)';
-                setTimeout(() => {
-                    if (document.body.contains(overlay)) {
-                        document.body.removeChild(overlay);
-                    }
-                }, 300);
+            if (e.key === 'ArrowLeft' && currentIndex > 0) {
+                e.preventDefault();
+                thumbnails[currentIndex - 1].click();
+            } else if (e.key === 'ArrowRight' && currentIndex < thumbnails.length - 1) {
+                e.preventDefault();
+                thumbnails[currentIndex + 1].click();
+            }
+        }
+    }
+});
+
+// ===============================================
+// LAZY LOADING DE IMAGENS
+// ===============================================
+function initializeLazyLoading() {
+    if ('IntersectionObserver' in window) {
+        const imageObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const img = entry.target;
+                    img.src = img.dataset.src;
+                    img.classList.remove('lazy');
+                    imageObserver.unobserve(img);
+                }
             });
         });
-        
-        mainImg.style.cursor = 'zoom-in';
-    }
 
-    // Sistema de notificações
-    function showNotification(message, type = 'info') {
-        const notification = document.createElement('div');
-        notification.style.cssText = `
-            position: fixed;
-            top: 2em;
-            right: 2em;
-            background: ${type === 'error' ? '#ef4444' : '#22c55e'};
-            color: white;
-            padding: 1em 1.5em;
-            border-radius: 0.5em;
-            box-shadow: 0 0.25em 1em rgba(0,0,0,0.2);
-            z-index: 1001;
-            transform: translateX(100%);
-            transition: transform 0.3s ease;
-            font-weight: 500;
-        `;
-        notification.textContent = message;
-        
-        document.body.appendChild(notification);
-        
-        setTimeout(() => {
-            notification.style.transform = 'translateX(0)';
-        }, 100);
-        
-        setTimeout(() => {
-            notification.style.transform = 'translateX(100%)';
-            setTimeout(() => {
-                if (document.body.contains(notification)) {
-                    document.body.removeChild(notification);
-                }
-            }, 300);
-        }, 3000);
+        document.querySelectorAll('img[data-src]').forEach(img => {
+            imageObserver.observe(img);
+        });
     }
-
-    console.log('=== SCRIPT CARREGADO COMPLETAMENTE ===');
-});
+}

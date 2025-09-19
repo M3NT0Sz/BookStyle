@@ -1,11 +1,28 @@
 <?php
 
+
+use Illuminate\Support\Facades\Route;
+use App\Models\Book;
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CouponController;
-use App\Models\Book;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AdminController;
+
+// Rotas de administrador (sem middleware admin para teste)
+Route::prefix('admin')->group(function () {
+    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+    Route::get('/books', [AdminController::class, 'books'])->name('admin.books');
+    Route::get('/books/export/{format}', [AdminController::class, 'exportBooks'])->name('admin.books.export');
+    Route::get('/books/{id}', [AdminController::class, 'showBook'])->name('admin.books.show');
+    Route::delete('/books/{id}', [AdminController::class, 'destroyBook'])->name('admin.books.destroy');
+    Route::get('/users', [AdminController::class, 'users'])->name('admin.users');
+    Route::get('/users/export/{format}', [AdminController::class, 'exportUsers'])->name('admin.users.export');
+    Route::get('/users/{id}/edit', [AdminController::class, 'editUser'])->name('admin.users.edit');
+    Route::put('/users/{id}', [AdminController::class, 'updateUser'])->name('admin.users.update');
+    Route::get('/coupons', [AdminController::class, 'coupons'])->name('admin.coupons');
+    Route::get('/coupons/export/{format}', [AdminController::class, 'exportCoupons'])->name('admin.coupons.export');
+});
 
 Route::get('/', function () {
     $allBooks = Book::all();
@@ -42,9 +59,3 @@ Route::post('/cart/add/{bookId}', [CartController::class, 'add'])->name('cart.ad
 Route::post('/cart/remove/{bookId}', [CartController::class, 'remove'])->name('cart.remove');
 Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
 Route::post('/cart/apply-coupon', [CartController::class, 'applyCoupon'])->name('cart.applyCoupon');
-Route::get('/coupons', [CouponController::class, 'index'])->name('coupons.index');
-Route::get('/coupons/create', [CouponController::class, 'create'])->name('coupons.create');
-Route::post('/coupons', [CouponController::class, 'store'])->name('coupons.store');
-Route::get('/coupons/{id}/edit', [CouponController::class, 'edit'])->name('coupons.edit');
-Route::put('/coupons/{id}', [CouponController::class, 'update'])->name('coupons.update');
-Route::delete('/coupons/{id}', [CouponController::class, 'destroy'])->name('coupons.destroy');
