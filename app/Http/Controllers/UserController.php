@@ -12,7 +12,7 @@ class UserController extends Controller
     {
         $userAuth = auth()->user();
         $user = User::find($userAuth->id);
-        $allBooks = Book::all();
+        $allBooks = Book::getAllBooks();
         $books = array_filter($allBooks, function($book) use ($user) {
             return $book['user_id'] == $user['id'];
         });

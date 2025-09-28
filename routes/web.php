@@ -25,7 +25,7 @@ Route::prefix('admin')->group(function () {
 });
 
 Route::get('/', function () {
-    $allBooks = Book::all();
+    $allBooks = Book::getAllBooks();
     $booksNew = array_filter($allBooks, function($book) {
         return $book['condition'] === 'new';
     });
@@ -59,3 +59,5 @@ Route::post('/cart/add/{bookId}', [CartController::class, 'add'])->name('cart.ad
 Route::post('/cart/remove/{bookId}', [CartController::class, 'remove'])->name('cart.remove');
 Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
 Route::post('/cart/apply-coupon', [CartController::class, 'applyCoupon'])->name('cart.applyCoupon');
+Route::get('/cart/count', [CartController::class, 'count'])->name('cart.count');
+Route::post('/cart/update-quantity/{bookId}', [CartController::class, 'updateQuantity'])->name('cart.updateQuantity');

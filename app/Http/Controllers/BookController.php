@@ -17,7 +17,7 @@ class BookController extends Controller
 
     public function index(Request $request)
     {
-        $books = Book::all();
+        $books = Book::getAllBooks();
         $search = $request->input('search');
         $genre = $request->input('genre');
         $author = $request->input('author');
@@ -111,15 +111,15 @@ class BookController extends Controller
             $inputs['dimensions'] = json_encode($inputs['dimensions']);
         }
 
-        Book::create($inputs);
+        Book::createBook($inputs);
 
         return redirect()->route('user.profile')->with('success', 'Livro criado com sucesso!');
     }
 
-    public function edit($id)
+    public function editOffer($id)
     {
-        $book = Book::find($id);
-        return view('books.edit', ['book' => $book]);
+        $book = Book::findBook($id);
+        return view('books.editSellOffer', compact('book'));
     }
 
     public function update(Request $request, $id)
@@ -152,7 +152,7 @@ class BookController extends Controller
         $inputs['genre'] = json_encode($inputs['genre']);
         $inputs['product_type'] = $request->input('product_type', 'fisico');
 
-        $book = Book::find($id);
+        $book = Book::findBook($id);
         $inputs['user_id'] = $book['user_id'] ?? null;
 
         // Atualização das imagens
@@ -186,15 +186,21 @@ class BookController extends Controller
             }
         }
 
-        Book::update($id, $inputs);
+        Book::updateBook($id, $inputs);
 
         return redirect()->route('user.profile')->with('success', 'Livro atualizado com sucesso!');
     }
 
     public function show($id)
     {
-        $book = Book::find($id);
-        return view('books.show', ['book' => $book]);
+        $book = Book::findBook($id);
+        if (!$book) {
+            return redirect()->route('books.index')->with('error', 'Livro não encontrado.');
+        }
+        
+        $userId = is_array($book) ? ($book['user_id'] ?? null) : $book->user_id;
+        $user = $userId ? \App\Models\User::find($userId) : null;
+        return view('books.show', compact('book', 'user'));
     }
 
     public function destroy($id)

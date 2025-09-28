@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class User extends Authenticatable
 {
@@ -13,6 +14,22 @@ class User extends Authenticatable
         'image',
         'is_admin',
     ];
+
+    /**
+     * Relacionamento com itens do carrinho
+     */
+    public function cartItems(): HasMany
+    {
+        return $this->hasMany(CartItem::class);
+    }
+
+    /**
+     * Relacionamento com livros (que o usuário cadastrou)
+     */
+    public function books(): HasMany
+    {
+        return $this->hasMany(Book::class);
+    }
 
     public static function find($id)
     {

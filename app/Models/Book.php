@@ -3,8 +3,11 @@
 namespace App\Models;
 
 use App\Models\DatabaseSingleton;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Book
+class Book extends Model
 {
     protected $fillable = [
         "name",
@@ -32,14 +35,37 @@ class Book
         "dimensions",
     ];
 
-    public static function all()
+    protected $casts = [
+        'price' => 'float',
+        'has_drm' => 'boolean',
+        'is_colored' => 'boolean',
+        'images' => 'array',
+    ];
+
+    /**
+     * Relacionamento com itens do carrinho
+     */
+    public function cartItems(): HasMany
+    {
+        return $this->hasMany(CartItem::class);
+    }
+
+    /**
+     * Relacionamento com o usuário que cadastrou o livro
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public static function getAllBooks($columns = ['*'])
     {
         $pdo = DatabaseSingleton::getInstance()->getConnection();
         $stmt = $pdo->query('SELECT * FROM books');
         return $stmt->fetchAll();
     }
 
-    public static function find($id)
+    public static function findBook($id, $columns = ['*'])
     {
         $pdo = DatabaseSingleton::getInstance()->getConnection();
         $stmt = $pdo->prepare('SELECT * FROM books WHERE id = ?');
@@ -47,7 +73,7 @@ class Book
         return $stmt->fetch();
     }
 
-    public static function create(array $data)
+    public static function createBook(array $data)
     {
         // Se não houver user_id válido, retorna null e não executa o insert/update
         if (!isset($data['user_id']) || empty($data['user_id'])) {
@@ -85,7 +111,7 @@ class Book
         return $data;
     }
 
-    public static function update($id, array $data)
+    public static function updateBook($id, array $data)
     {
         // Se não houver user_id válido, retorna null e não executa o insert/update
         if (!isset($data['user_id']) || empty($data['user_id'])) {
@@ -122,7 +148,7 @@ class Book
         ]);
     }
 
-    public static function delete($id)
+    public static function deleteBook($id)
     {
         $pdo = DatabaseSingleton::getInstance()->getConnection();
         $stmt = $pdo->prepare('DELETE FROM books WHERE id = ?');

@@ -22,7 +22,7 @@ class AdminController extends Controller
         if (!auth()->check() || !auth()->user()->is_admin) {
             return redirect('/')->with('error', 'Acesso não autorizado.');
         }
-        $books = Book::all();
+        $books = Book::getAllBooks();
         return view('admin.books', compact('books'));
     }
 
@@ -51,7 +51,7 @@ class AdminController extends Controller
         if (!auth()->check() || !auth()->user()->is_admin) {
             return redirect('/')->with('error', 'Acesso não autorizado.');
         }
-        $book = Book::find($id);
+        $book = Book::findBook($id);
         if (!$book) {
             return redirect()->route('admin.books')->with('error', 'Livro não encontrado.');
         }
@@ -67,7 +67,7 @@ class AdminController extends Controller
         if (!auth()->check() || !auth()->user()->is_admin) {
             return redirect('/')->with('error', 'Acesso não autorizado.');
         }
-        $book = Book::find($id);
+        $book = Book::findBook($id);
         if ($book) {
             $book->delete();
             return redirect()->route('admin.books')->with('success', 'Livro deletado com sucesso!');
@@ -111,7 +111,7 @@ class AdminController extends Controller
         if (!auth()->check() || !auth()->user()->is_admin) {
             return redirect('/')->with('error', 'Acesso não autorizado.');
         }
-        $booksCollection = Book::all();
+        $booksCollection = Book::getAllBooks();
         $books = is_object($booksCollection) && method_exists($booksCollection, 'toArray')
             ? $booksCollection->toArray()
             : (array) $booksCollection;
@@ -123,7 +123,9 @@ class AdminController extends Controller
         if (!auth()->check() || !auth()->user()->is_admin) {
             return redirect('/')->with('error', 'Acesso não autorizado.');
         }
-        $users = User::all()->toArray();
+        $users = User::all();
+        // Certificar que $users é um array
+        $users = is_object($users) && method_exists($users, 'toArray') ? $users->toArray() : (array) $users;
         return $this->exportData($users, $format, 'usuarios');
     }
 
@@ -132,7 +134,9 @@ class AdminController extends Controller
         if (!auth()->check() || !auth()->user()->is_admin) {
             return redirect('/')->with('error', 'Acesso não autorizado.');
         }
-        $coupons = Coupon::all()->toArray();
+        $coupons = Coupon::all();
+        // Certificar que $coupons é um array
+        $coupons = is_object($coupons) && method_exists($coupons, 'toArray') ? $coupons->toArray() : (array) $coupons;
         return $this->exportData($coupons, $format, 'cupons');
     }
 
