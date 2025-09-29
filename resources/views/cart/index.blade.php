@@ -209,10 +209,17 @@
                 
                 <div class="cart-actions-section">
                     <div class="primary-actions">
-                        <a href="#" class="btn btn-primary btn-large">
-                            <i class="fas fa-credit-card"></i>
-                            Finalizar Compra
-                        </a>
+                        @auth
+                            <a href="{{ route('checkout') }}" class="btn btn-primary btn-large">
+                                <i class="fas fa-credit-card"></i>
+                                Finalizar Compra
+                            </a>
+                        @else
+                            <a href="{{ route('login') }}" class="btn btn-primary btn-large">
+                                <i class="fas fa-sign-in-alt"></i>
+                                Fazer Login para Finalizar
+                            </a>
+                        @endauth
                         <form action="{{ route('cart.clear') }}" method="POST" class="clear-cart-form">
                             @csrf
                             <button type="submit" class="btn btn-danger" 
@@ -256,6 +263,52 @@
             @endif
         </div>
     </div>
+    
+    <!-- Mensagens de alerta -->
+    @if(session('success'))
+        <div style="position: fixed; top: 20px; right: 20px; background: #28a745; color: white; padding: 15px 20px; border-radius: 5px; z-index: 1000; max-width: 400px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-check-circle"></i>
+                <div>
+                    {{ session('success') }}
+                    @if(session('order_created'))
+                        <div style="margin-top: 5px;">
+                            <a href="{{ route('orders.show', session('order_created')) }}" style="color: #fff; text-decoration: underline;">
+                                Ver detalhes do pedido
+                            </a>
+                        </div>
+                    @endif
+                </div>
+                <button onclick="this.parentElement.parentElement.remove()" style="background: none; border: none; color: white; font-size: 18px; cursor: pointer;">×</button>
+            </div>
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div style="position: fixed; top: 20px; right: 20px; background: #dc3545; color: white; padding: 15px 20px; border-radius: 5px; z-index: 1000; max-width: 400px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-exclamation-circle"></i>
+                <span>{{ session('error') }}</span>
+                <button onclick="this.parentElement.parentElement.remove()" style="background: none; border: none; color: white; font-size: 18px; cursor: pointer;">×</button>
+            </div>
+        </div>
+    @endif
+    
+    <script>
+        // Auto-ocultar alertas após 8 segundos
+        setTimeout(function() {
+            const alerts = document.querySelectorAll('[style*="position: fixed"]');
+            alerts.forEach(function(alert) {
+                alert.style.opacity = '0';
+                alert.style.transition = 'opacity 0.5s';
+                setTimeout(function() {
+                    if (alert.parentNode) {
+                        alert.parentNode.removeChild(alert);
+                    }
+                }, 500);
+            });
+        }, 8000);
+    </script>
     
     @include('components.footer')
 @endsection

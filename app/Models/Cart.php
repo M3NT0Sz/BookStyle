@@ -60,7 +60,16 @@ class Cart
             return self::clearSession();
         }
 
-        CartItem::where('user_id', Auth::id())->delete();
+        // Limpar carrinho do banco de dados para usuário logado
+        $deleted = CartItem::where('user_id', Auth::id())->delete();
+        
+        // Também limpar da sessão por segurança
+        session()->forget('cart');
+        
+        // Log para debug (pode remover em produção)
+        \Log::info('Carrinho limpo para usuário ' . Auth::id() . '. Itens removidos: ' . $deleted);
+        
+        return $deleted;
     }
 
     /**

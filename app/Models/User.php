@@ -24,6 +24,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Relacionamento com pedidos
+     */
+    public function orders(): HasMany
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    /**
      * Relacionamento com livros (que o usuário cadastrou)
      */
     public function books(): HasMany

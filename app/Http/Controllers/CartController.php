@@ -12,8 +12,10 @@ class CartController extends Controller
     public function index()
     {
         if (Auth::check()) {
-            // Para usuários logados, usar dados do banco
-            $cartItems = Cart::getWithDetails();
+            // Para usuários logados, usar dados do banco - FRESH QUERY
+            $cartItems = CartItem::with('book')
+                                ->where('user_id', Auth::id())
+                                ->get();
             $books = [];
             
             foreach ($cartItems as $item) {
