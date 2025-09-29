@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 use App\Models\Book;
 use App\Models\Cart;
 use App\Models\CartItem;
+use App\Models\Coupon;
+use App\Services\SmartCouponService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -23,6 +25,26 @@ class CartController extends Controller
                 $book['quantity'] = $item->quantity;
                 $books[] = $book;
             }
+            
+            // ========== INTEGRAÇÃO CUPONS INTELIGENTES ==========
+            // Análise automática de comportamento
+            SmartCouponService::analyzeBehaviorAndSuggestCoupons(Auth::id());
+            
+            // Verificar carrinho de alto valor
+            $cartTotal = array_sum(array_map(function($book) {
+                return $book['price'] * $book['quantity'];
+            }, $books));
+            
+            if ($cartTotal >= 200) {
+                SmartCouponService::handleHighValueCart(Auth::id(), $cartTotal);
+            }
+            
+            // Obter sugestões de cupons
+            $suggestedCoupons = SmartCouponService::getSuggestedCoupons(Auth::id(), $books);
+            
+            // Obter cupons disponíveis
+            $availableCoupons = Coupon::getAvailableCouponsForUser(Auth::id());
+            
         } else {
             // Para usuários não logados, usar sessão (compatibilidade)
             $cart = Cart::get();
@@ -35,9 +57,12 @@ class CartController extends Controller
                     $books[] = $book;
                 }
             }
+            
+            $suggestedCoupons = [];
+            $availableCoupons = [];
         }
         
-        return view('cart.index', compact('books'));
+        return view('cart.index', compact('books', 'suggestedCoupons', 'availableCoupons'));
     }
 
     public function add(Request $request, $bookId)
@@ -96,20 +121,48 @@ class CartController extends Controller
         if (!$code) {
             return redirect()->back()->with('coupon_error', 'Informe o código do cupom.');
         }
-        $coupon = \App\Models\Coupon::findByCode($code);
+        
+        $coupon = Coupon::findByCode($code);
         if (!$coupon) {
             return redirect()->back()->with('coupon_error', 'Cupom inválido.');
         }
-        if (isset($coupon['expires_at']) && $coupon['expires_at'] && strtotime($coupon['expires_at']) < time()) {
-            return redirect()->back()->with('coupon_error', 'Cupom expirado.');
+        
+        // ========== VALIDAÇÃO INTELIGENTE DE CUPONS ==========
+        if (Auth::check()) {
+            $userId = Auth::id();
+            
+            // Obter itens do carrinho para validação
+            $cartItems = CartItem::with('book')->where('user_id', $userId)->get();
+            $books = [];
+            foreach ($cartItems as $item) {
+                $book = $item->book->toArray();
+                $book['quantity'] = $item->quantity;
+                $books[] = $book;
+            }
+            
+            // Validação inteligente
+            $validation = Coupon::isValidForUser($coupon, $userId, $books);
+            
+            if (!$validation['valid']) {
+                return redirect()->back()->with('coupon_error', $validation['message']);
+            }
+        } else {
+            // Validação básica para usuários não logados
+            if (isset($coupon['expires_at']) && $coupon['expires_at'] && strtotime($coupon['expires_at']) < time()) {
+                return redirect()->back()->with('coupon_error', 'Cupom expirado.');
+            }
         }
+        
+        // Aplicar cupom
         $cart = session('cart', []);
         $cart['coupon'] = [
+            'id' => $coupon['id'],
             'code' => $coupon['code'],
             'discount' => $coupon['discount'],
             'type' => $coupon['type'],
         ];
         session(['cart' => $cart]);
+        
         return redirect()->back()->with('coupon_success', 'Cupom aplicado com sucesso!');
     }
 

@@ -41,8 +41,36 @@ class AdminController extends Controller
         if (!auth()->check() || !auth()->user()->is_admin) {
             return redirect('/')->with('error', 'Acesso não autorizado.');
         }
-        $coupons = Coupon::all();
-        return view('admin.coupons', compact('coupons'));
+        
+        // Buscar todos os cupons com estatísticas
+        $pdo = \App\Models\DatabaseSingleton::getInstance()->getConnection();
+        $stmt = $pdo->query("
+            SELECT c.*, u.name as user_name,
+                   CASE 
+                       WHEN c.trigger_type = 'manual' THEN 'Manual'
+                       WHEN c.trigger_type = 'first_purchase' THEN 'Primeiro Pedido'
+                       WHEN c.trigger_type = 'cart_abandonment' THEN 'Abandono de Carrinho'
+                       WHEN c.trigger_type = 'birthday' THEN 'Aniversário'
+                       WHEN c.trigger_type = 'genre_based' THEN 'Baseado em Gênero'
+                       WHEN c.trigger_type = 'loyalty' THEN 'Fidelidade'
+                       WHEN c.trigger_type = 'high_value_cart' THEN 'Carrinho Alto Valor'
+                       ELSE 'Outros'
+                   END as trigger_type_display
+            FROM coupons c 
+            LEFT JOIN users u ON c.user_id = u.id 
+            ORDER BY c.created_at DESC
+        ");
+        $coupons = $stmt->fetchAll();
+        
+        // Estatísticas gerais
+        $stats = [
+            'total_coupons' => count($coupons),
+            'active_coupons' => count(array_filter($coupons, fn($c) => $c['is_active'])),
+            'auto_generated' => count(array_filter($coupons, fn($c) => $c['is_auto_generated'])),
+            'total_usage' => array_sum(array_column($coupons, 'used_count'))
+        ];
+        
+        return view('admin.coupons', compact('coupons', 'stats'));
     }
 
 

@@ -202,6 +202,81 @@
                                         </div>
                                     @endif
                                 </div>
+
+                                {{-- ========== SEÇÃO DE CUPONS INTELIGENTES ========== --}}
+                                @auth
+                                    {{-- Notificação de novo cupom --}}
+                                    @if(session('new_coupon'))
+                                        <div class="new-coupon-notification">
+                                            <div class="new-coupon-content">
+                                                <i class="fas fa-gift"></i>
+                                                <div class="new-coupon-text">
+                                                    <h4>🎉 Novo cupom disponível!</h4>
+                                                    <p>{{ session('new_coupon.message') }}</p>
+                                                </div>
+                                                <button onclick="this.parentElement.style.display='none'" class="close-notification">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    @endif
+
+                                    {{-- Cupons Sugeridos --}}
+                                    @if(isset($suggestedCoupons) && count($suggestedCoupons) > 0)
+                                        <div class="smart-coupons-section">
+                                            <h4><i class="fas fa-magic"></i> Cupons Recomendados para Você</h4>
+                                            <div class="smart-coupons-grid">
+                                                @foreach($suggestedCoupons as $suggestion)
+                                                    @php $coupon = $suggestion['coupon']; @endphp
+                                                    <div class="smart-coupon-card">
+                                                        <div class="smart-coupon-header">
+                                                            <span class="coupon-type-badge">
+                                                                @switch($coupon['trigger_type'])
+                                                                    @case('first_purchase')
+                                                                        <i class="fas fa-star"></i> Boas-vindas
+                                                                        @break
+                                                                    @case('birthday')
+                                                                        <i class="fas fa-birthday-cake"></i> Aniversário
+                                                                        @break
+                                                                    @case('loyalty')
+                                                                        <i class="fas fa-trophy"></i> Fidelidade
+                                                                        @break
+                                                                    @case('high_value_cart')
+                                                                        <i class="fas fa-gem"></i> VIP
+                                                                        @break
+                                                                    @case('genre_based')
+                                                                        <i class="fas fa-book"></i> Gênero
+                                                                        @break
+                                                                    @default
+                                                                        <i class="fas fa-gift"></i> Especial
+                                                                @endswitch
+                                                            </span>
+                                                            <div class="coupon-discount-display">
+                                                                {{ $coupon['type'] == 'percent' ? $coupon['discount'] . '% OFF' : 'R$ ' . number_format($coupon['discount'], 2, ',', '.') . ' OFF' }}
+                                                            </div>
+                                                        </div>
+                                                        <div class="smart-coupon-body">
+                                                            <div class="coupon-code-display">{{ $coupon['code'] }}</div>
+                                                            <p class="coupon-message">{{ $suggestion['message'] }}</p>
+                                                            @if($coupon['expires_at'])
+                                                                <div class="coupon-expires">
+                                                                    <i class="fas fa-clock"></i>
+                                                                    Válido até {{ date('d/m/Y', strtotime($coupon['expires_at'])) }}
+                                                                </div>
+                                                            @endif
+                                                        </div>
+                                                        <div class="smart-coupon-actions">
+                                                            <button class="apply-smart-coupon" onclick="applySuggestedCoupon('{{ $coupon['code'] }}')">
+                                                                <i class="fas fa-check"></i>
+                                                                Aplicar Cupom
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                    @endif
+                                @endauth
                             </div>
                         </div>
                     </div>
@@ -308,7 +383,231 @@
                 }, 500);
             });
         }, 8000);
+
+        // ========== FUNCIONALIDADES DE CUPONS INTELIGENTES ==========
+        function applySuggestedCoupon(couponCode) {
+            document.getElementById('coupon_code').value = couponCode;
+            document.querySelector('.coupon-form').submit();
+        }
+
+        // Auto-ocultar notificação de novo cupom após 10 segundos
+        setTimeout(function() {
+            const notification = document.querySelector('.new-coupon-notification');
+            if (notification) {
+                notification.style.opacity = '0';
+                notification.style.transition = 'opacity 0.5s';
+                setTimeout(function() {
+                    notification.style.display = 'none';
+                }, 500);
+            }
+        }, 10000);
     </script>
+
+    {{-- ========== ESTILOS PARA CUPONS INTELIGENTES ========== --}}
+    <style>
+        /* Notificação de novo cupom */
+        .new-coupon-notification {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            animation: slideInFromTop 0.5s ease-out;
+            position: relative;
+        }
+
+        .new-coupon-content {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .new-coupon-content i {
+            font-size: 2rem;
+            color: #fff;
+        }
+
+        .new-coupon-text h4 {
+            margin: 0;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .new-coupon-text p {
+            margin: 0.5rem 0 0 0;
+            opacity: 0.9;
+        }
+
+        .close-notification {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            padding: 0.5rem;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .close-notification:hover {
+            opacity: 1;
+        }
+
+        /* Seção de cupons inteligentes */
+        .smart-coupons-section {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 15px;
+            border: 1px solid #dee2e6;
+        }
+
+        .smart-coupons-section h4 {
+            color: #495057;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .smart-coupons-section h4 i {
+            color: #007bff;
+        }
+
+        .smart-coupons-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+
+        /* Cards de cupons sugeridos */
+        .smart-coupon-card {
+            background: white;
+            border-radius: 12px;
+            border: 2px solid #e9ecef;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .smart-coupon-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+            border-color: #007bff;
+        }
+
+        .smart-coupon-header {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .coupon-type-badge {
+            font-size: 0.85rem;
+            font-weight: 600;
+            opacity: 0.9;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .coupon-discount-display {
+            font-size: 1.4rem;
+            font-weight: 700;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+
+        .smart-coupon-body {
+            padding: 1.5rem;
+        }
+
+        .coupon-code-display {
+            background: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            border-radius: 8px;
+            padding: 0.75rem;
+            text-align: center;
+            font-family: 'Courier New', monospace;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #495057;
+            margin-bottom: 1rem;
+        }
+
+        .coupon-message {
+            color: #6c757d;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            margin-bottom: 1rem;
+        }
+
+        .coupon-expires {
+            font-size: 0.85rem;
+            color: #dc3545;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-weight: 500;
+        }
+
+        .smart-coupon-actions {
+            padding: 0 1.5rem 1.5rem 1.5rem;
+        }
+
+        .apply-smart-coupon {
+            width: 100%;
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            border: none;
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .apply-smart-coupon:hover {
+            background: linear-gradient(135deg, #218838, #1ea085);
+            transform: scale(1.02);
+        }
+
+        /* Animação */
+        @keyframes slideInFromTop {
+            0% {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .smart-coupons-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .new-coupon-content {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
     
     @include('components.footer')
 @endsection

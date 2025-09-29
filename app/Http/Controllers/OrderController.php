@@ -6,6 +6,8 @@ use App\Models\Cart;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Book;
+use App\Models\Coupon;
+use App\Services\SmartCouponService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -166,6 +168,16 @@ class OrderController extends Controller
             session()->save(); // Forçar salvamento da sessão
 
             DB::commit();
+
+            // ========== TRIGGERS INTELIGENTES DE CUPONS ==========
+            // Detectar primeiro pedido e gerar cupom de boas-vindas futuro
+            SmartCouponService::handleFirstPurchase($userId);
+            
+            // Marcar cupom como usado se foi aplicado
+            $sessionCart = session('cart', []);
+            if (isset($sessionCart['coupon']) && isset($sessionCart['coupon']['id'])) {
+                Coupon::markAsUsed($sessionCart['coupon']['id']);
+            }
 
             // Redirecionar para o carrinho para mostrar que foi esvaziado
             return redirect()->route('cart.index')
