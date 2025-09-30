@@ -828,7 +828,7 @@
                             </a>
                             
                             @if($order->status === 'delivered')
-                                <button class="btn btn-secondary" onclick="downloadInvoice({{ $order->id }})">
+                                <button class="btn btn-secondary" onclick="downloadInvoice('{{ $order->id }}')">
                                     <i class="fas fa-download"></i>
                                     Nota Fiscal
                                 </button>
@@ -847,7 +847,7 @@
                             @endif
                             
                             @if($order->status === 'delivered')
-                                <button class="btn btn-secondary" onclick="reorderItems({{ $order->id }})">
+                                <button class="btn btn-secondary" onclick="reorderItems('{{ $order->id }}')">
                                     <i class="fas fa-redo"></i>
                                     Pedir Novamente
                                 </button>

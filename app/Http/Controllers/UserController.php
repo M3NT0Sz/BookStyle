@@ -5,12 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\Book;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
     public function profile()
     {
-        $userAuth = auth()->user();
+        $userAuth = Auth::user();
         $user = User::find($userAuth->id);
         
         // Garante que o usuário tenha a propriedade image
@@ -18,13 +19,26 @@ class UserController extends Controller
             $user['image'] = 'perfil.png';
         }
         
-        $allBooks = Book::getAllBooks();
-        $books = array_filter($allBooks, function($book) use ($user) {
-            return $book['user_id'] == $user['id'];
-        });
-        // Garante que $user e $books sejam objetos para a view
+        // Busca livros do usuário usando Eloquent
+        $books = collect([]); // Inicializa como coleção vazia
+        try {
+            $allBooks = Book::getAllBooks();
+            if ($allBooks) {
+                $userBooks = array_filter($allBooks, function($book) use ($user) {
+                    return isset($book['user_id']) && $book['user_id'] == $user['id'];
+                });
+                $books = collect(array_map(function($book) { 
+                    return (object) $book; 
+                }, $userBooks));
+            }
+        } catch (\Exception $e) {
+            // Se houver erro, mantém coleção vazia
+            $books = collect([]);
+        }
+        
+        // Garante que $user seja objeto para a view
         return view('user.profile', [
-            'books' => array_map(function($book) { return (object) $book; }, $books),
+            'books' => $books,
             'user' => (object) $user
         ]);
     }
