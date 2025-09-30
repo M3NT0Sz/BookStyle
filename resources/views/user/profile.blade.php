@@ -10,7 +10,7 @@
             </label>
         </div>
         <div class="profile-info">
-            <img class="profile-avatar" src="{{ asset('storage/' . $user->image) }}" alt="{{ $user->name }}">
+            <img class="profile-avatar" src="{{ asset('storage/' . (isset($user->image) ? $user->image : 'perfil.png')) }}" alt="{{ $user->name }}">
             <h1 class="profile-name">{{ $user->name }}</h1>
             <p class="profile-email">{{ $user->email }}</p>
         </div>

@@ -27,7 +27,8 @@ export default defineConfig({
                 'resources/css/cart.css',
                 'resources/js/books.js',
                 'resources/js/home.js',
-                'resources/css/books.css'
+                'resources/css/books.css',
+                'resources/css/orders.css'
             ],
             refresh: true,
         }),

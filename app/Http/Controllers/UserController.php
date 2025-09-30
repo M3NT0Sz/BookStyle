@@ -12,6 +12,12 @@ class UserController extends Controller
     {
         $userAuth = auth()->user();
         $user = User::find($userAuth->id);
+        
+        // Garante que o usuário tenha a propriedade image
+        if (!isset($user['image']) || empty($user['image'])) {
+            $user['image'] = 'perfil.png';
+        }
+        
         $allBooks = Book::getAllBooks();
         $books = array_filter($allBooks, function($book) use ($user) {
             return $book['user_id'] == $user['id'];

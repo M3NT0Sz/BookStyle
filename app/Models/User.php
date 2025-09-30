@@ -44,7 +44,7 @@ class User extends Authenticatable
         $pdo = \App\Models\DatabaseSingleton::getInstance()->getConnection();
         $stmt = $pdo->prepare('SELECT * FROM users WHERE id = ?');
         $stmt->execute([$id]);
-        return $stmt->fetch();
+        return $stmt->fetch(\PDO::FETCH_ASSOC);
     }
 
     public static function updateProfile($id, array $data)
@@ -54,8 +54,8 @@ class User extends Authenticatable
         if (!isset($data['image'])) {
             $stmt = $pdo->prepare('SELECT image FROM users WHERE id = ?');
             $stmt->execute([$id]);
-            $current = $stmt->fetch();
-            $data['image'] = $current ? $current['image'] : null;
+            $current = $stmt->fetch(\PDO::FETCH_ASSOC);
+            $data['image'] = $current ? ($current['image'] ?? 'perfil.png') : 'perfil.png';
         }
         $sql = 'UPDATE users SET name=?, email=?, image=? WHERE id=?';
         $stmt = $pdo->prepare($sql);
