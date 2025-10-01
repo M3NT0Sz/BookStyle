@@ -4,8 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Book;
 use App\Models\User;
+use App\Models\Order;
 use App\Models\Coupon;
+use App\Adapters\CsvExportAdapter;
+use App\Adapters\JsonExport;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class AdminController extends Controller
 {
@@ -26,6 +30,37 @@ class AdminController extends Controller
         return view('admin.books', compact('books'));
     }
 
+    public function exportBooks($format)
+    {
+        if (!auth()->check() || !auth()->user()->is_admin) {
+            return redirect('/')->with('error', 'Acesso não autorizado.');
+        }
+
+        $books = Book::getAllBooks();
+
+        if ($format === 'csv') {
+            $adapter = new CsvExportAdapter();
+            $content = $adapter->export($books);
+            $filename = 'books_' . date('Y-m-d_H-i-s') . '.csv';
+            
+            return response($content, 200, [
+                'Content-Type' => 'text/csv',
+                'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            ]);
+        } elseif ($format === 'json') {
+            $adapter = new JsonExport();
+            $content = $adapter->export($books);
+            $filename = 'books_' . date('Y-m-d_H-i-s') . '.json';
+            
+            return response($content, 200, [
+                'Content-Type' => 'application/json',
+                'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            ]);
+        }
+
+        return redirect()->route('admin.books')->with('error', 'Formato de exportação inválido.');
+    }
+
     public function users()
     {
         if (!auth()->check() || !auth()->user()->is_admin) {
@@ -35,44 +70,36 @@ class AdminController extends Controller
         return view('admin.users', compact('users'));
     }
 
-
-    public function coupons()
+    public function exportUsers($format)
     {
         if (!auth()->check() || !auth()->user()->is_admin) {
             return redirect('/')->with('error', 'Acesso não autorizado.');
         }
-        
-        // Buscar todos os cupons com estatísticas
-        $pdo = \App\Models\DatabaseSingleton::getInstance()->getConnection();
-        $stmt = $pdo->query("
-            SELECT c.*, u.name as user_name,
-                   CASE 
-                       WHEN c.trigger_type = 'manual' THEN 'Manual'
-                       WHEN c.trigger_type = 'first_purchase' THEN 'Primeiro Pedido'
-                       WHEN c.trigger_type = 'cart_abandonment' THEN 'Abandono de Carrinho'
-                       WHEN c.trigger_type = 'birthday' THEN 'Aniversário'
-                       WHEN c.trigger_type = 'genre_based' THEN 'Baseado em Gênero'
-                       WHEN c.trigger_type = 'loyalty' THEN 'Fidelidade'
-                       WHEN c.trigger_type = 'high_value_cart' THEN 'Carrinho Alto Valor'
-                       ELSE 'Outros'
-                   END as trigger_type_display
-            FROM coupons c 
-            LEFT JOIN users u ON c.user_id = u.id 
-            ORDER BY c.created_at DESC
-        ");
-        $coupons = $stmt->fetchAll();
-        
-        // Estatísticas gerais
-        $stats = [
-            'total_coupons' => count($coupons),
-            'active_coupons' => count(array_filter($coupons, fn($c) => $c['is_active'])),
-            'auto_generated' => count(array_filter($coupons, fn($c) => $c['is_auto_generated'])),
-            'total_usage' => array_sum(array_column($coupons, 'used_count'))
-        ];
-        
-        return view('admin.coupons', compact('coupons', 'stats'));
-    }
 
+        $users = User::all()->toArray();
+
+        if ($format === 'csv') {
+            $adapter = new CsvExportAdapter();
+            $content = $adapter->export($users);
+            $filename = 'users_' . date('Y-m-d_H-i-s') . '.csv';
+            
+            return response($content, 200, [
+                'Content-Type' => 'text/csv',
+                'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            ]);
+        } elseif ($format === 'json') {
+            $adapter = new JsonExport();
+            $content = $adapter->export($users);
+            $filename = 'users_' . date('Y-m-d_H-i-s') . '.json';
+            
+            return response($content, 200, [
+                'Content-Type' => 'application/json',
+                'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            ]);
+        }
+
+        return redirect()->route('admin.users')->with('error', 'Formato de exportação inválido.');
+    }
 
     public function showBook($id)
     {
@@ -88,18 +115,19 @@ class AdminController extends Controller
         return view('books.show', compact('book', 'user'));
     }
 
-
-
     public function destroyBook($id)
     {
         if (!auth()->check() || !auth()->user()->is_admin) {
             return redirect('/')->with('error', 'Acesso não autorizado.');
         }
-        $book = Book::findBook($id);
+        
+        // Usar o modelo Eloquent em vez do método estático
+        $book = Book::find($id);
         if ($book) {
             $book->delete();
             return redirect()->route('admin.books')->with('success', 'Livro deletado com sucesso!');
         }
+        
         return redirect()->route('admin.books')->with('error', 'Livro não encontrado.');
     }
 
@@ -120,8 +148,8 @@ class AdminController extends Controller
         if (!auth()->check() || !auth()->user()->is_admin) {
             return redirect('/')->with('error', 'Acesso não autorizado.');
         }
-        $user = User::query()->where('id', $id)->first();
-        if (!$user || !is_object($user)) {
+        $user = User::find($id);
+        if (!$user) {
             return redirect()->route('admin.users')->with('error', 'Usuário não encontrado.');
         }
         $data = $request->validate([
@@ -129,32 +157,32 @@ class AdminController extends Controller
         ]);
         $user->is_admin = $data['is_admin'];
         $user->save();
-        return redirect()->route('admin.users')->with('success', 'Status de administrador atualizado!');
+        return redirect()->route('admin.users')->with('success', 'Usuário atualizado com sucesso!');
     }
 
-
-        // Exportação de dados
-    public function exportBooks($format)
+    public function coupons()
     {
         if (!auth()->check() || !auth()->user()->is_admin) {
             return redirect('/')->with('error', 'Acesso não autorizado.');
         }
-        $booksCollection = Book::getAllBooks();
-        $books = is_object($booksCollection) && method_exists($booksCollection, 'toArray')
-            ? $booksCollection->toArray()
-            : (array) $booksCollection;
-        return $this->exportData($books, $format, 'livros');
-    }
-
-    public function exportUsers($format)
-    {
-        if (!auth()->check() || !auth()->user()->is_admin) {
-            return redirect('/')->with('error', 'Acesso não autorizado.');
-        }
-        $users = User::all();
-        // Certificar que $users é um array
-        $users = is_object($users) && method_exists($users, 'toArray') ? $users->toArray() : (array) $users;
-        return $this->exportData($users, $format, 'usuarios');
+        
+        $coupons = Coupon::getAllCoupons();
+        
+        // Calcular estatísticas dos cupons
+        $stats = [
+            'total_coupons' => count($coupons),
+            'active_coupons' => count(array_filter($coupons, function($coupon) {
+                return $coupon['is_active'] ?? false;
+            })),
+            'auto_generated' => count(array_filter($coupons, function($coupon) {
+                return $coupon['is_auto_generated'] ?? false;
+            })),
+            'total_usage' => array_sum(array_map(function($coupon) {
+                return $coupon['used_count'] ?? 0;
+            }, $coupons))
+        ];
+        
+        return view('admin.coupons', compact('coupons', 'stats'));
     }
 
     public function exportCoupons($format)
@@ -162,137 +190,303 @@ class AdminController extends Controller
         if (!auth()->check() || !auth()->user()->is_admin) {
             return redirect('/')->with('error', 'Acesso não autorizado.');
         }
-        $coupons = Coupon::all();
-        // Certificar que $coupons é um array
-        $coupons = is_object($coupons) && method_exists($coupons, 'toArray') ? $coupons->toArray() : (array) $coupons;
-        return $this->exportData($coupons, $format, 'cupons');
-    }
 
-    private function exportData(array $data, $format, $filename)
-    {
-        if ($format === 'json') {
-            $adapter = new \App\Adapters\JsonExport();
-            $content = $adapter->export($data);
-            $type = 'application/json';
-            $ext = 'json';
-        } elseif ($format === 'csv') {
-            $adapter = new \App\Adapters\CsvExportAdapter();
-            $content = $adapter->export($data);
-            $type = 'text/csv';
-            $ext = 'csv';
-        } else {
-            return redirect()->back()->with('error', 'Formato inválido!');
+        $coupons = Coupon::getAllCoupons();
+
+        if ($format === 'csv') {
+            $adapter = new CsvExportAdapter();
+            $content = $adapter->export($coupons);
+            $filename = 'coupons_' . date('Y-m-d_H-i-s') . '.csv';
+            
+            return response($content, 200, [
+                'Content-Type' => 'text/csv',
+                'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            ]);
+        } elseif ($format === 'json') {
+            $adapter = new JsonExport();
+            $content = $adapter->export($coupons);
+            $filename = 'coupons_' . date('Y-m-d_H-i-s') . '.json';
+            
+            return response($content, 200, [
+                'Content-Type' => 'application/json',
+                'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            ]);
         }
-        return response($content)
-            ->header('Content-Type', $type)
-            ->header('Content-Disposition', 'attachment; filename="' . $filename . '.' . $ext . '"');
+
+        return redirect()->route('admin.coupons')->with('error', 'Formato de exportação inválido.');
     }
 
-    /**
-     * Gerenciar pedidos (admin)
-     */
     public function orders()
     {
         if (!auth()->check() || !auth()->user()->is_admin) {
             return redirect('/')->with('error', 'Acesso não autorizado.');
         }
-        
-        $orders = \App\Models\Order::with(['user', 'orderItems.book'])
+
+        $orders = Order::with(['user', 'orderItems.book'])
             ->orderBy('created_at', 'desc')
             ->paginate(20);
-            
+
         return view('admin.orders', compact('orders'));
     }
 
-    /**
-     * Mostrar detalhes de um pedido (admin)
-     */
-    public function showOrder($id)
-    {
-        if (!auth()->check() || !auth()->user()->is_admin) {
-            return redirect('/')->with('error', 'Acesso não autorizado.');
-        }
-        
-        $order = \App\Models\Order::with(['user', 'orderItems.book'])->findOrFail($id);
-        
-        return view('admin.order-details', compact('order'));
-    }
-
-    /**
-     * Atualizar status do pedido (admin)
-     */
-    public function updateOrderStatus(Request $request, $id)
-    {
-        if (!auth()->check() || !auth()->user()->is_admin) {
-            return redirect('/')->with('error', 'Acesso não autorizado.');
-        }
-        
-        $request->validate([
-            'status' => 'required|in:pending,processing,shipped,delivered,cancelled'
-        ]);
-        
-        $order = \App\Models\Order::findOrFail($id);
-        
-        $oldStatus = $order->status;
-        $order->status = $request->status;
-        
-        // Atualizar timestamps específicos
-        if ($request->status === 'shipped' && $oldStatus !== 'shipped') {
-            $order->shipped_at = now();
-        } elseif ($request->status === 'delivered' && $oldStatus !== 'delivered') {
-            $order->delivered_at = now();
-        }
-        
-        $order->save();
-        
-        return redirect()->route('admin.orders.show', $order)
-            ->with('success', 'Status do pedido atualizado com sucesso.');
-    }
-
-    /**
-     * Exportar pedidos
-     */
     public function exportOrders($format)
     {
         if (!auth()->check() || !auth()->user()->is_admin) {
             return redirect('/')->with('error', 'Acesso não autorizado.');
         }
+
+        $orders = Order::with(['user', 'orderItems.book'])->get()->toArray();
+
+        if ($format === 'csv') {
+            $adapter = new CsvExportAdapter();
+            $content = $adapter->export($orders);
+            $filename = 'orders_' . date('Y-m-d_H-i-s') . '.csv';
+            
+            return response($content, 200, [
+                'Content-Type' => 'text/csv',
+                'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            ]);
+        } elseif ($format === 'json') {
+            $adapter = new JsonExport();
+            $content = $adapter->export($orders);
+            $filename = 'orders_' . date('Y-m-d_H-i-s') . '.json';
+            
+            return response($content, 200, [
+                'Content-Type' => 'application/json',
+                'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            ]);
+        }
+
+        return redirect()->route('admin.orders')->with('error', 'Formato de exportação inválido.');
+    }
+
+    public function showOrder($id)
+    {
+        if (!auth()->check() || !auth()->user()->is_admin) {
+            return redirect('/')->with('error', 'Acesso não autorizado.');
+        }
+
+        $order = Order::with(['user', 'orderItems.book'])->find($id);
         
-        $orders = \App\Models\Order::with(['user', 'orderItems'])->get();
+        if (!$order) {
+            return redirect()->route('admin.orders')->with('error', 'Pedido não encontrado.');
+        }
+
+        return view('admin.order_show', compact('order'));
+    }
+
+    public function updateOrderStatus(Request $request, $id)
+    {
+        if (!auth()->check() || !auth()->user()->is_admin) {
+            return redirect('/')->with('error', 'Acesso não autorizado.');
+        }
+
+        $request->validate([
+            'status' => 'required|in:pending,processing,shipped,delivered,cancelled'
+        ]);
+
+        $order = Order::find($id);
         
-        // Preparar dados para exportação
-        $data = $orders->map(function ($order) {
-            return [
-                'ID' => $order->id,
-                'Número do Pedido' => $order->order_number,
-                'Cliente' => $order->user->name,
-                'Email' => $order->user->email,
-                'Total' => $order->total,
-                'Status' => $order->status_label,
-                'Método de Pagamento' => $order->payment_method,
-                'Data do Pedido' => $order->created_at->format('d/m/Y H:i'),
-                'Itens' => $order->orderItems->count(),
-            ];
-        })->toArray();
+        if (!$order) {
+            return redirect()->route('admin.orders')->with('error', 'Pedido não encontrado.');
+        }
+
+        $order->status = $request->status;
         
-        $filename = 'pedidos_' . now()->format('Y-m-d_H-i-s');
-        
-        if ($format === 'json') {
-            $adapter = new \App\Adapters\JsonExport();
-            $content = $adapter->export($data);
-            $type = 'application/json';
-            $ext = 'json';
-        } elseif ($format === 'csv') {
-            $adapter = new \App\Adapters\CsvExportAdapter();
-            $content = $adapter->export($data);
-            $type = 'text/csv';
-            $ext = 'csv';
-        } else {
-            return redirect()->back()->with('error', 'Formato inválido!');
+        // Atualizar timestamps específicos
+        if ($request->status === 'shipped' && !$order->shipped_at) {
+            $order->shipped_at = now();
+        } elseif ($request->status === 'delivered' && !$order->delivered_at) {
+            $order->delivered_at = now();
         }
         
-        return response($content)
-            ->header('Content-Type', $type)
-            ->header('Content-Disposition', 'attachment; filename="' . $filename . '.' . $ext . '"');
+        $order->save();
+
+        return redirect()->route('admin.orders.show', $order->id)
+            ->with('success', 'Status do pedido atualizado com sucesso!');
+    }
+
+    // ============================================
+    // MÉTODOS DE CUPONS
+    // ============================================
+
+    public function createCoupon()
+    {
+        if (!auth()->check() || !auth()->user()->is_admin) {
+            return redirect('/')->with('error', 'Acesso não autorizado.');
+        }
+
+        return view('admin.coupons.create');
+    }
+
+    public function storeCoupon(Request $request)
+    {
+        if (!auth()->check() || !auth()->user()->is_admin) {
+            return redirect('/')->with('error', 'Acesso não autorizado.');
+        }
+
+        $request->validate([
+            'code' => 'required|string|unique:coupons,code|max:50',
+            'type' => 'required|in:percent,fixed',
+            'discount' => 'required|numeric|min:0',
+            'trigger_type' => 'required|string',
+            'user_id' => 'nullable|exists:users,id',
+            'max_uses' => 'nullable|integer|min:1',
+            'minimum_cart_value' => 'nullable|numeric|min:0',
+            'expires_at' => 'nullable|date|after:today',
+            'applicable_genres' => 'nullable|array',
+            'is_active' => 'boolean'
+        ]);
+
+        try {
+            $data = $request->all();
+            $data['is_auto_generated'] = false;
+            $data['used_count'] = 0;
+            $data['generated_at'] = now();
+            
+            if (isset($data['applicable_genres']) && is_array($data['applicable_genres'])) {
+                $data['applicable_genres'] = json_encode($data['applicable_genres']);
+            }
+
+            Coupon::createCoupon($data);
+
+            return redirect()->route('admin.coupons')
+                ->with('success', 'Cupom criado com sucesso!');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Erro ao criar cupom: ' . $e->getMessage());
+        }
+    }
+
+    public function editCoupon($id)
+    {
+        if (!auth()->check() || !auth()->user()->is_admin) {
+            return redirect('/')->with('error', 'Acesso não autorizado.');
+        }
+
+        $coupon = Coupon::findCoupon($id);
+        if (!$coupon) {
+            return redirect()->route('admin.coupons')->with('error', 'Cupom não encontrado.');
+        }
+
+        return view('admin.coupons.edit', compact('coupon'));
+    }
+
+    public function updateCoupon(Request $request, $id)
+    {
+        if (!auth()->check() || !auth()->user()->is_admin) {
+            return redirect('/')->with('error', 'Acesso não autorizado.');
+        }
+
+        $request->validate([
+            'code' => 'required|string|max:50|unique:coupons,code,' . $id,
+            'type' => 'required|in:percent,fixed',
+            'discount' => 'required|numeric|min:0',
+            'trigger_type' => 'required|string',
+            'user_id' => 'nullable|exists:users,id',
+            'max_uses' => 'nullable|integer|min:1',
+            'minimum_cart_value' => 'nullable|numeric|min:0',
+            'expires_at' => 'nullable|date',
+            'applicable_genres' => 'nullable|array',
+            'is_active' => 'boolean'
+        ]);
+
+        try {
+            $data = $request->all();
+            
+            if (isset($data['applicable_genres']) && is_array($data['applicable_genres'])) {
+                $data['applicable_genres'] = json_encode($data['applicable_genres']);
+            }
+
+            Coupon::updateCoupon($id, $data);
+
+            return redirect()->route('admin.coupons')
+                ->with('success', 'Cupom atualizado com sucesso!');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Erro ao atualizar cupom: ' . $e->getMessage());
+        }
+    }
+
+    public function destroyCoupon($id)
+    {
+        if (!auth()->check() || !auth()->user()->is_admin) {
+            return redirect('/')->with('error', 'Acesso não autorizado.');
+        }
+
+        try {
+            Coupon::deleteCoupon($id);
+            return redirect()->route('admin.coupons')
+                ->with('success', 'Cupom excluído com sucesso!');
+        } catch (\Exception $e) {
+            return redirect()->route('admin.coupons')
+                ->with('error', 'Erro ao excluir cupom: ' . $e->getMessage());
+        }
+    }
+
+    public function toggleCouponStatus(Request $request, $id)
+    {
+        if (!auth()->check() || !auth()->user()->is_admin) {
+            return redirect('/')->with('error', 'Acesso não autorizado.');
+        }
+
+        try {
+            $isActive = $request->input('is_active', true);
+            Coupon::updateCoupon($id, ['is_active' => $isActive]);
+            
+            $status = $isActive ? 'ativado' : 'desativado';
+            return redirect()->route('admin.coupons')
+                ->with('success', "Cupom {$status} com sucesso!");
+        } catch (\Exception $e) {
+            return redirect()->route('admin.coupons')
+                ->with('error', 'Erro ao alterar status do cupom: ' . $e->getMessage());
+        }
+    }
+
+    public function generateSmartCoupons(Request $request)
+    {
+        if (!auth()->check() || !auth()->user()->is_admin) {
+            return redirect('/')->with('error', 'Acesso não autorizado.');
+        }
+
+        try {
+            // Simular geração de cupons inteligentes
+            $generatedCount = 0;
+            
+            // Gerar cupons baseados em diferentes triggers
+            $triggers = [
+                'first_purchase' => 'FIRST20',
+                'cart_abandonment' => 'COMEBACK15',
+                'loyalty' => 'LOYAL25'
+            ];
+
+            foreach ($triggers as $trigger => $baseCode) {
+                $code = $baseCode . rand(100, 999);
+                $discount = rand(10, 30);
+                
+                $couponData = [
+                    'code' => $code,
+                    'type' => 'percent',
+                    'discount' => $discount,
+                    'trigger_type' => $trigger,
+                    'max_uses' => rand(50, 200),
+                    'is_active' => true,
+                    'is_auto_generated' => true,
+                    'generated_at' => now(),
+                    'expires_at' => now()->addMonths(3)->toDateString()
+                ];
+
+                Coupon::createCoupon($couponData);
+                $generatedCount++;
+            }
+
+            return redirect()->route('admin.coupons')
+                ->with('success', "Sucesso! {$generatedCount} cupons inteligentes foram gerados automaticamente.");
+        } catch (\Exception $e) {
+            return redirect()->route('admin.coupons')
+                ->with('error', 'Erro ao gerar cupons inteligentes: ' . $e->getMessage());
+        }
     }
 }

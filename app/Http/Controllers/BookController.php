@@ -206,7 +206,11 @@ class BookController extends Controller
     public function destroy($id)
     {
         $book = Book::find($id);
-        Book::delete($book['id']);
-        return redirect()->route('user.profile')->with('success', 'Livro deletado com sucesso!');
+        if ($book) {
+            $book->delete();
+            return redirect()->route('user.profile')->with('success', 'Livro deletado com sucesso!');
+        }
+        
+        return redirect()->route('user.profile')->with('error', 'Livro não encontrado.');
     }
 }

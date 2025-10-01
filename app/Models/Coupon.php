@@ -50,7 +50,12 @@ class Coupon extends Model
     public static function getAllCoupons()
     {
         $pdo = \App\Models\DatabaseSingleton::getInstance()->getConnection();
-        $stmt = $pdo->query('SELECT * FROM coupons WHERE is_active = 1');
+        $stmt = $pdo->query('
+            SELECT c.*, u.name as user_name 
+            FROM coupons c 
+            LEFT JOIN users u ON c.user_id = u.id 
+            ORDER BY c.created_at DESC
+        ');
         return $stmt->fetchAll();
     }
 

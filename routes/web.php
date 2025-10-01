@@ -22,6 +22,13 @@ Route::prefix('admin')->group(function () {
     Route::get('/users/{id}/edit', [AdminController::class, 'editUser'])->name('admin.users.edit');
     Route::put('/users/{id}', [AdminController::class, 'updateUser'])->name('admin.users.update');
     Route::get('/coupons', [AdminController::class, 'coupons'])->name('admin.coupons');
+    Route::get('/coupons/create', [AdminController::class, 'createCoupon'])->name('admin.coupons.create');
+    Route::post('/coupons', [AdminController::class, 'storeCoupon'])->name('admin.coupons.store');
+    Route::get('/coupons/{id}/edit', [AdminController::class, 'editCoupon'])->name('admin.coupons.edit');
+    Route::put('/coupons/{id}', [AdminController::class, 'updateCoupon'])->name('admin.coupons.update');
+    Route::delete('/coupons/{id}', [AdminController::class, 'destroyCoupon'])->name('admin.coupons.destroy');
+    Route::put('/coupons/{id}/toggle', [AdminController::class, 'toggleCouponStatus'])->name('admin.coupons.toggle');
+    Route::post('/coupons/generate-smart', [AdminController::class, 'generateSmartCoupons'])->name('admin.coupons.generateSmart');
     Route::get('/coupons/export/{format}', [AdminController::class, 'exportCoupons'])->name('admin.coupons.export');
     
     // Rotas de administração de pedidos
@@ -65,7 +72,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
     Route::get('/orders/filter/status', [OrderController::class, 'filterByStatus'])->name('orders.filter');
     Route::get('/orders/search', [OrderController::class, 'search'])->name('orders.search');
-    Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
+    Route::delete('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
     
     // Rotas de checkout
     Route::get('/checkout', [OrderController::class, 'checkout'])->name('checkout');

@@ -171,7 +171,7 @@ class OrderController extends Controller
 
             // ========== TRIGGERS INTELIGENTES DE CUPONS ==========
             // Detectar primeiro pedido e gerar cupom de boas-vindas futuro
-            SmartCouponService::handleFirstPurchase($userId);
+            SmartCouponService::handleFirstPurchase(Auth::id());
             
             // Marcar cupom como usado se foi aplicado
             $sessionCart = session('cart', []);
