@@ -149,13 +149,11 @@
                         
                         <div class="book-rating">
                             <div class="stars">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
+                                @for($i = 1; $i <= 5; $i++)
+                                    <i class="fas fa-star {{ $i <= round($averageRating) ? 'filled' : '' }}"></i>
+                                @endfor
                             </div>
-                            <span class="rating-text">(4.8) • 127 avaliações</span>
+                            <span class="rating-text">({{ number_format($averageRating, 1) }}) • {{ $totalReviews }} {{ $totalReviews == 1 ? 'avaliação' : 'avaliações' }}</span>
                         </div>
                     </div>
                     

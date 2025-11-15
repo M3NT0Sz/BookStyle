@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Services\SentimentAnalysisService;
 
 class Review extends Model
 {
@@ -14,6 +15,9 @@ class Review extends Model
         'rating',
         'comment',
         'images',
+        'sentiment',
+        'sentiment_score',
+        'sentiment_confidence',
         'is_verified_purchase',
         'is_approved'
     ];
@@ -22,8 +26,36 @@ class Review extends Model
         'images' => 'array',
         'is_verified_purchase' => 'boolean',
         'is_approved' => 'boolean',
-        'rating' => 'integer'
+        'rating' => 'integer',
+        'sentiment_score' => 'decimal:2',
+        'sentiment_confidence' => 'decimal:2'
     ];
+
+    /**
+     * Boot do modelo - analisa sentimento automaticamente ao criar
+     */
+    protected static function boot()
+    {
+        parent::boot();
+        
+        static::creating(function ($review) {
+            if (!empty($review->comment)) {
+                $analysis = SentimentAnalysisService::analyze($review->comment);
+                $review->sentiment = $analysis['sentiment'];
+                $review->sentiment_score = $analysis['score'];
+                $review->sentiment_confidence = $analysis['confidence'];
+            }
+        });
+        
+        static::updating(function ($review) {
+            if ($review->isDirty('comment') && !empty($review->comment)) {
+                $analysis = SentimentAnalysisService::analyze($review->comment);
+                $review->sentiment = $analysis['sentiment'];
+                $review->sentiment_score = $analysis['score'];
+                $review->sentiment_confidence = $analysis['confidence'];
+            }
+        });
+    }
 
     /**
      * Relacionamento com usuário

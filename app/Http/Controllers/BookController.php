@@ -212,6 +212,16 @@ class BookController extends Controller
         $averageRating = $bookModel->getAverageRating();
         $totalReviews = $bookModel->getReviewsCount();
         
+        // Gerar resumo IA das avaliações
+        $reviewsSummary = null;
+        if ($totalReviews > 0) {
+            $allReviews = \App\Models\Review::where('book_id', $id)
+                ->approved()
+                ->get();
+            
+            $reviewsSummary = \App\Services\SentimentAnalysisService::generateSummary($allReviews);
+        }
+        
         // Distribuição de estrelas
         $ratingDistribution = [];
         for ($i = 5; $i >= 1; $i--) {
@@ -252,7 +262,7 @@ class BookController extends Controller
         
         $bookId = $id;
         
-        return view('books.show', compact('book', 'user', 'reviews', 'averageRating', 'totalReviews', 'ratingDistribution', 'userCanReview', 'userOrderId', 'bookId'));
+        return view('books.show', compact('book', 'user', 'reviews', 'averageRating', 'totalReviews', 'ratingDistribution', 'userCanReview', 'userOrderId', 'bookId', 'reviewsSummary'));
     }
 
     public function destroy($id)

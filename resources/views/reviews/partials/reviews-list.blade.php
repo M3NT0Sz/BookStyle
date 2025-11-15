@@ -17,6 +17,32 @@
         </div>
         
         @if($totalReviews > 0)
+            <!-- Resumo IA das Avaliações -->
+            @if(isset($reviewsSummary))
+                <div class="ai-summary-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 2rem; border-radius: 16px; margin-bottom: 2rem; box-shadow: 0 10px 40px rgba(102, 126, 234, 0.3);">
+                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
+                        <div style="background: rgba(255,255,255,0.2); padding: 0.75rem; border-radius: 12px; backdrop-filter: blur(10px);">
+                            <i class="fas fa-brain" style="font-size: 2rem; color: white;"></i>
+                        </div>
+                        <div>
+                            <h3 style="color: white; margin: 0; font-size: 1.5rem; font-weight: 700;">Análise Inteligente das Avaliações</h3>
+                            <p style="color: rgba(255,255,255,0.9); margin: 0.25rem 0 0 0; font-size: 0.9rem;">Powered by IA</p>
+                        </div>
+                    </div>
+
+                    <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 1.5rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.2);">
+                        <div style="background: rgba(255,255,255,0.95); padding: 1.75rem; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                            <div style="display: flex; align-items: start; gap: 0.75rem; margin-bottom: 0;">
+                                <i class="fas fa-quote-left" style="color: #667eea; font-size: 1.5rem; margin-top: 0.25rem; flex-shrink: 0;"></i>
+                                <div style="color: #1f2937; line-height: 1.9; font-size: 1rem; text-align: justify;">
+                                    {!! nl2br(e($reviewsSummary)) !!}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endif
+            
             <div class="rating-summary">
                 <div class="rating-score">
                     <div class="score-number">{{ number_format($averageRating, 1) }}</div>
@@ -61,14 +87,31 @@
                         </div>
                         
                         <div class="review-rating">
-                            @for($i = 1; $i <= 5; $i++)
-                                <i class="fas fa-star {{ $i <= $review->rating ? 'filled' : '' }}"></i>
-                            @endfor
-                            @if($review->is_verified_purchase)
-                                <span class="verified-badge">
-                                    <i class="fas fa-check-circle"></i> Compra Verificada
-                                </span>
-                            @endif
+                            <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                                <!-- Estrelas de rating -->
+                                <div class="stars-container" style="display: flex; gap: 0.25rem;">
+                                    @for($i = 1; $i <= 5; $i++)
+                                        <i class="fas fa-star" style="color: {{ $i <= $review->rating ? '#fbbf24' : '#e5e7eb' }}; font-size: 1.1rem;"></i>
+                                    @endfor
+                                </div>
+                                
+                                <!-- Badge de Sentimento com ícone maior -->
+                                @php
+                                    $sentimentData = \App\Services\SentimentAnalysisService::getSentimentIcon($review->sentiment ?? 'NEUTRO');
+                                    $thumbIcon = $review->sentiment === 'POSITIVO' ? 'fa-thumbs-up' : ($review->sentiment === 'NEGATIVO' ? 'fa-thumbs-down' : 'fa-minus-circle');
+                                @endphp
+                                <div class="sentiment-container" style="display: flex; align-items: center; gap: 0.5rem; background: {{ $sentimentData['color'] }}; padding: 0.5rem 1rem; border-radius: 25px; box-shadow: 0 2px 8px {{ $sentimentData['color'] }}40;">
+                                    <i class="fas {{ $thumbIcon }}" style="font-size: 1.25rem; color: white;"></i>
+                                    <span style="color: white; font-weight: 700; font-size: 0.875rem;">{{ $sentimentData['text'] }}</span>
+                                </div>
+                                
+                                <!-- Compra Verificada -->
+                                @if($review->is_verified_purchase)
+                                    <span class="verified-badge" style="background: #10b98115; color: #10b981; padding: 0.4rem 1rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; display: inline-flex; align-items: center; gap: 0.35rem;">
+                                        <i class="fas fa-check-circle"></i> Compra Verificada
+                                    </span>
+                                @endif
+                            </div>
                         </div>
                     </div>
                     

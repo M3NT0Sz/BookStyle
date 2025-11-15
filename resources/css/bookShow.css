@@ -277,8 +277,13 @@ body, html {
 }
 
 .stars i {
-    color: #f39c12;
+    color: #e0e0e0;
     font-size: 1.1rem;
+    transition: color 0.2s;
+}
+
+.stars i.filled {
+    color: #f39c12;
 }
 
 .rating-text {
