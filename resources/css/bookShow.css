@@ -629,6 +629,39 @@ body, html {
     transform: translateY(-2px);
 }
 
+/* Wishlist Button Favorited State */
+.btn-secondary.favorited {
+    background: #ffe5e8;
+    border-color: #ff4757;
+    color: #ff4757;
+}
+
+.btn-secondary.favorited:hover {
+    background: #ff4757;
+    color: white;
+    border-color: #ff4757;
+    transform: translateY(-2px);
+}
+
+.btn-secondary.favorited i {
+    animation: heartBeat 0.5s ease;
+}
+
+@keyframes heartBeat {
+    0%, 100% {
+        transform: scale(1);
+    }
+    25% {
+        transform: scale(1.3);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    75% {
+        transform: scale(1.2);
+    }
+}
+
 /* Image Modal */
 .image-modal {
     display: none;

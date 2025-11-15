@@ -1339,6 +1339,10 @@
                     <i class="fas fa-shopping-bag"></i>
                     Pedidos
                 </button>
+                <button class="nav-tab" data-section="favoritos">
+                    <i class="fas fa-heart"></i>
+                    Favoritos
+                </button>
                 <button class="nav-tab" data-section="cupons">
                     <i class="fas fa-tag"></i>
                     Seus Cupons
@@ -1616,6 +1620,124 @@
                     Explorar Livros
                 </a>
             </div>
+        </div>
+
+        <!-- Seção: Favoritos -->
+        <div id="favoritos" class="profile-section">
+            <h2 class="section-title">
+                <i class="fas fa-heart"></i>
+                Meus Favoritos
+            </h2>
+
+            @php
+                $wishlistItems = Auth::user()->wishlist()->with('book')->orderBy('created_at', 'desc')->get();
+            @endphp
+
+            @if($wishlistItems->count() > 0)
+                <div class="books-grid">
+                    @foreach($wishlistItems as $item)
+                        @php
+                            $book = $item->book;
+                            $images = is_string($book->images) ? json_decode($book->images, true) : $book->images;
+                            $firstImage = is_array($images) && !empty($images) ? $images[0] : 'default.jpg';
+                        @endphp
+                        
+                        <div class="book-card">
+                            <div style="position: relative;">
+                                <img src="{{ asset('storage/' . $firstImage) }}" 
+                                     alt="{{ $book->name }}" 
+                                     class="book-image"
+                                     onerror="this.src='{{ Vite::asset('resources/img/default-book.jpg') }}'">
+                                
+                                <button onclick="removeFromWishlist({{ $book->id }})" 
+                                        style="position: absolute; top: 10px; right: 10px; background: rgba(239, 68, 68, 0.9); color: white; border: none; border-radius: 50%; width: 36px; height: 36px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.2); transition: all 0.3s;"
+                                        onmouseover="this.style.transform='scale(1.1)'"
+                                        onmouseout="this.style.transform='scale(1)'"
+                                        title="Remover dos favoritos">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                                
+                                @if($item->price_alert && $book->price <= $item->price_alert)
+                                    <div style="position: absolute; top: 10px; left: 10px; background: #10b981; color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
+                                        🎉 Preço Baixou!
+                                    </div>
+                                @endif
+                            </div>
+                            
+                            <div class="book-info">
+                                <h3 class="book-title" title="{{ $book->name }}">{{ $book->name }}</h3>
+                                <p class="book-author">{{ $book->author }}</p>
+                                <p class="book-genre">{{ $book->genre }}</p>
+                                
+                                <div style="margin: 12px 0;">
+                                    <span style="font-size: 24px; font-weight: bold; color: #10b981;">
+                                        R$ {{ number_format($book->price, 2, ',', '.') }}
+                                    </span>
+                                    
+                                    @if($item->price_alert)
+                                        <span style="display: block; font-size: 12px; color: #6b7280; margin-top: 4px;">
+                                            Alerta: R$ {{ number_format($item->price_alert, 2, ',', '.') }}
+                                        </span>
+                                    @endif
+                                </div>
+                                
+                                <div style="margin: 12px 0;">
+                                    <label style="display: block; font-size: 12px; font-weight: 600; color: #374151; margin-bottom: 6px;">
+                                        🔔 Alerta de Preço
+                                    </label>
+                                    <div style="display: flex; gap: 8px;">
+                                        <input type="number" 
+                                               step="0.01" 
+                                               min="0"
+                                               value="{{ $item->price_alert }}"
+                                               placeholder="Ex: 25.00"
+                                               style="flex: 1; padding: 8px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px;"
+                                               id="price-alert-{{ $book->id }}">
+                                        <button onclick="updatePriceAlert({{ $book->id }})"
+                                                style="background: #3b82f6; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 14px; transition: all 0.3s;"
+                                                onmouseover="this.style.background='#2563eb'"
+                                                onmouseout="this.style.background='#3b82f6'">
+                                            Salvar
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="book-actions" style="display: flex; gap: 8px; margin-top: 12px;">
+                                    <a href="{{ route('books.show', $book->id) }}" 
+                                       class="btn btn-primary" 
+                                       style="flex: 1; text-align: center; padding: 10px; text-decoration: none;">
+                                        Ver Detalhes
+                                    </a>
+                                    <form action="{{ route('cart.add', $book->id) }}" method="POST" style="flex: 1;">
+                                        @csrf
+                                        <button type="submit" 
+                                                class="btn btn-success" 
+                                                style="width: 100%; padding: 10px;">
+                                            🛒 Carrinho
+                                        </button>
+                                    </form>
+                                </div>
+                                
+                                <p style="text-align: center; font-size: 11px; color: #9ca3af; margin-top: 8px;">
+                                    Adicionado {{ $item->created_at->diffForHumans() }}
+                                </p>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            @else
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="fas fa-heart-broken"></i>
+                    </div>
+                    <h3 class="empty-title">Sua lista de favoritos está vazia</h3>
+                    <p class="empty-description">Explore nosso catálogo e adicione seus livros favoritos aqui!</p>
+                    <a href="{{ route('books.index') }}" class="btn btn-primary">
+                        <i class="fas fa-search"></i>
+                        Explorar Livros
+                    </a>
+                </div>
+            @endif
         </div>
 
         <!-- Seção: Cupons -->
@@ -2161,6 +2283,58 @@ document.addEventListener('DOMContentLoaded', function() {
         transform: translateX(400px);
         opacity: 0;
     }
+}
+
+// Funções para gerenciar Wishlist (Favoritos)
+function removeFromWishlist(bookId) {
+    if (!confirm('Deseja remover este livro da sua lista de favoritos?')) return;
+    
+    fetch(`/wishlist/${bookId}`, {
+        method: 'DELETE',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification('Removido dos favoritos!', 'success');
+            setTimeout(() => location.reload(), 1000);
+        } else {
+            showNotification(data.message, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        showNotification('Erro ao remover item', 'error');
+    });
+}
+
+function updatePriceAlert(bookId) {
+    const priceInput = document.getElementById(`price-alert-${bookId}`);
+    const priceAlert = priceInput.value;
+    
+    fetch(`/wishlist/${bookId}/price-alert`, {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ price_alert: priceAlert || null })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification(data.message, 'success');
+        } else {
+            showNotification(data.message, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        showNotification('Erro ao atualizar alerta', 'error');
+    });
 }
 </style>
 

@@ -208,10 +208,8 @@ window.shareBook = function() {
     }
 };
 
-window.addToWishlist = function() {
-    // Implementar funcionalidade de lista de desejos
-    showNotification('Funcionalidade em desenvolvimento', 'info');
-};
+// Função addToWishlist será definida no template Blade
+// pois precisa acessar o ID do livro via Blade syntax
 
 // ===============================================
 // ANIMAÇÕES E EFEITOS

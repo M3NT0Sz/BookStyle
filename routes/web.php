@@ -97,6 +97,14 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/notifications/mark-all-read', [\App\Http\Controllers\NotificationController::class, 'markAllAsRead'])->name('notifications.markAllAsRead');
     Route::delete('/notifications/{id}', [\App\Http\Controllers\NotificationController::class, 'destroy'])->name('notifications.destroy');
     Route::post('/notifications/clear-read', [\App\Http\Controllers\NotificationController::class, 'clearRead'])->name('notifications.clearRead');
+    
+    // Rotas de Wishlist (Lista de Desejos)
+    Route::get('/wishlist', [\App\Http\Controllers\WishlistController::class, 'index'])->name('wishlist.index');
+    Route::post('/wishlist/add', [\App\Http\Controllers\WishlistController::class, 'store'])->name('wishlist.add');
+    Route::delete('/wishlist/{bookId}', [\App\Http\Controllers\WishlistController::class, 'destroy'])->name('wishlist.remove');
+    Route::get('/wishlist/check/{bookId}', [\App\Http\Controllers\WishlistController::class, 'check'])->name('wishlist.check');
+    Route::post('/wishlist/{bookId}/price-alert', [\App\Http\Controllers\WishlistController::class, 'updatePriceAlert'])->name('wishlist.updatePriceAlert');
+    Route::get('/wishlist/count', [\App\Http\Controllers\WishlistController::class, 'count'])->name('wishlist.count');
 });
 
 // Rotas públicas de avaliações

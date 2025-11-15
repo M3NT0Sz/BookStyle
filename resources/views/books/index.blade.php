@@ -194,6 +194,15 @@
                                         <div class="book-listing-badge {{ $bookData['condition'] == 'new' ? 'new' : 'used' }}">
                                             {{ $bookData['condition'] == 'new' ? 'Novo' : 'Usado' }}
                                         </div>
+
+                                        @auth
+                                            <button onclick="toggleWishlist({{ $bookData['id'] }}); event.stopPropagation();" 
+                                                    data-wishlist-btn="{{ $bookData['id'] }}"
+                                                    class="wishlist-btn-listing"
+                                                    title="Adicionar aos favoritos">
+                                                <i class="far fa-heart"></i>
+                                            </button>
+                                        @endauth
                                     </div>
                                     
                                     <div class="book-listing-info">
@@ -306,6 +315,212 @@
         <p class="footer-bottom">@2025 BookStyle. Todos os direitos reservados.</p>
 
     </footer>
+
+    <style>
+        .book-listing-badge {
+            position: absolute;
+            top: 60px;
+            right: 12px;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            z-index: 1;
+        }
+
+        .book-listing-badge.new {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            color: white;
+            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+        }
+
+        .book-listing-badge.used {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            color: white;
+            box-shadow: 0 4px 15px rgba(243, 156, 18, 0.3);
+        }
+
+        .wishlist-btn-listing {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(239, 68, 68, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 10;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .wishlist-btn-listing:hover {
+            transform: scale(1.15);
+            box-shadow: 0 4px 16px rgba(239, 68, 68, 0.25);
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        .wishlist-btn-listing i {
+            font-size: 18px;
+            color: #6b7280;
+            transition: all 0.3s;
+        }
+
+        .wishlist-btn-listing.favorited i {
+            color: #ef4444;
+        }
+
+        .wishlist-btn-listing:active {
+            transform: scale(0.95);
+        }
+
+        @keyframes heartBeat {
+            0%, 100% { transform: scale(1); }
+            25% { transform: scale(1.2); }
+            50% { transform: scale(1); }
+        }
+
+        .wishlist-btn-listing.favorited {
+            animation: heartBeat 0.5s ease-in-out;
+        }
+
+        .toast-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 16px 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: slideInRight 0.3s ease-out;
+        }
+
+        .toast-notification.success {
+            border-left: 4px solid #10b981;
+        }
+
+        .toast-notification.error {
+            border-left: 4px solid #ef4444;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    </style>
+
+    <script>
+        // Gerenciador de Wishlist
+        function toggleWishlist(bookId) {
+            const btn = document.querySelector(`[data-wishlist-btn="${bookId}"]`);
+            const icon = btn.querySelector('i');
+            const isFavorited = icon.classList.contains('fas');
+
+            if (isFavorited) {
+                // Remover
+                fetch(`/wishlist/${bookId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        icon.classList.remove('fas');
+                        icon.classList.add('far');
+                        btn.classList.remove('favorited');
+                        showToast('Removido dos favoritos', 'success');
+                    } else {
+                        showToast(data.message, 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro:', error);
+                    showToast('Erro ao remover dos favoritos', 'error');
+                });
+            } else {
+                // Adicionar
+                fetch('/wishlist/add', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ book_id: bookId })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        icon.classList.remove('far');
+                        icon.classList.add('fas');
+                        btn.classList.add('favorited');
+                        showToast(data.message, 'success');
+                    } else {
+                        showToast(data.message, 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro:', error);
+                    showToast('Erro ao adicionar aos favoritos', 'error');
+                });
+            }
+        }
+
+        function showToast(message, type) {
+            const toast = document.createElement('div');
+            toast.className = `toast-notification ${type}`;
+            toast.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}" style="color: ${type === 'success' ? '#10b981' : '#ef4444'}; font-size: 20px;"></i>
+                <span style="color: #374151; font-weight: 500;">${message}</span>
+            `;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.animation = 'slideInRight 0.3s ease-out reverse';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Verificar quais livros estão na wishlist ao carregar a página
+        @auth
+        document.addEventListener('DOMContentLoaded', function() {
+            const buttons = document.querySelectorAll('[data-wishlist-btn]');
+            buttons.forEach(btn => {
+                const bookId = btn.getAttribute('data-wishlist-btn');
+                fetch(`/wishlist/check/${bookId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.inWishlist) {
+                            const icon = btn.querySelector('i');
+                            icon.classList.remove('far');
+                            icon.classList.add('fas');
+                            btn.classList.add('favorited');
+                        }
+                    })
+                    .catch(error => console.error('Erro ao verificar wishlist:', error));
+            });
+        });
+        @endauth
+    </script>
 
 @push('scripts')
 @vite('resources/js/books.js')

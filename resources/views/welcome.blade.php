@@ -903,6 +903,7 @@
 
     </footer>
 
+    <script src="{{ asset('js/wishlist.js') }}"></script>
     <script>
         let notificationsDropdown = null;
         let notificationsLoaded = false;

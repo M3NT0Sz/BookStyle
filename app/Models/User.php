@@ -80,6 +80,41 @@ class User extends Authenticatable
     }
 
     /**
+     * Relacionamento com lista de desejos (wishlist)
+     */
+    public function wishlist(): HasMany
+    {
+        return $this->hasMany(Wishlist::class);
+    }
+
+    /**
+     * Verificar se um livro está na wishlist
+     */
+    public function hasInWishlist($bookId): bool
+    {
+        return $this->wishlist()->where('book_id', $bookId)->exists();
+    }
+
+    /**
+     * Adicionar livro à wishlist
+     */
+    public function addToWishlist($bookId, $priceAlert = null): Wishlist
+    {
+        return $this->wishlist()->create([
+            'book_id' => $bookId,
+            'price_alert' => $priceAlert
+        ]);
+    }
+
+    /**
+     * Remover livro da wishlist
+     */
+    public function removeFromWishlist($bookId): bool
+    {
+        return $this->wishlist()->where('book_id', $bookId)->delete();
+    }
+
+    /**
      * Verificar se o usuário pode avaliar um produto
      */
     public function canReviewBook($bookId, $orderId): bool

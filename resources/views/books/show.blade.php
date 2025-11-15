@@ -309,6 +309,169 @@
 
     @include('components.footer')
     @vite('resources/js/bookShow.js')
+    
+    <script>
+        // Wishlist functionality
+        const BOOK_ID = {{ $bookId ?? 'null' }};
+        let isInWishlist = false;
+        let isProcessing = false;
+        
+        // Criar função de toast simples
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#f59e0b'};
+                color: white;
+                padding: 15px 20px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                z-index: 10000;
+                font-weight: 500;
+                animation: slideIn 0.3s ease;
+            `;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+        
+        // Substituir a função original
+        window.addToWishlist = async function() {
+            console.log('Clique detectado! BOOK_ID:', BOOK_ID);
+            
+            @guest
+                showToast('Faça login para adicionar aos favoritos', 'error');
+                setTimeout(() => window.location.href = '/login', 1500);
+                return;
+            @endguest
+            
+            if (!BOOK_ID || isProcessing) {
+                console.log('Bloqueado - BOOK_ID:', BOOK_ID, 'isProcessing:', isProcessing);
+                return;
+            }
+            
+            isProcessing = true;
+            const btn = document.querySelector('.btn.btn-secondary[onclick="addToWishlist()"]');
+            const icon = btn?.querySelector('i');
+            
+            console.log('Botão encontrado:', btn);
+            console.log('Estado atual - isInWishlist:', isInWishlist);
+            
+            try {
+                if (isInWishlist) {
+                    // Remover
+                    console.log('Tentando remover...');
+                    const response = await fetch(`/wishlist/${BOOK_ID}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    const data = await response.json();
+                    console.log('Resposta remover:', response.status, data);
+                    
+                    if (data.success) {
+                        isInWishlist = false;
+                        btn?.classList.remove('favorited');
+                        if (icon) icon.style.color = '';
+                        showToast(data.message || 'Removido dos favoritos');
+                    } else {
+                        throw new Error(data.message);
+                    }
+                } else {
+                    // Adicionar
+                    console.log('Tentando adicionar...');
+                    const response = await fetch('/wishlist/add', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ book_id: BOOK_ID })
+                    });
+                    
+                    const data = await response.json();
+                    console.log('Resposta adicionar:', response.status, data);
+                    
+                    if (data.success) {
+                        isInWishlist = true;
+                        btn?.classList.add('favorited');
+                        if (icon) icon.style.color = '#ff4757';
+                        showToast(data.message || 'Adicionado aos favoritos!');
+                    } else {
+                        throw new Error(data.message);
+                    }
+                }
+            } catch (error) {
+                console.error('Erro completo:', error);
+                showToast(error.message || 'Erro ao processar', 'error');
+            } finally {
+                isProcessing = false;
+            }
+        };
+        
+        // Verificar estado inicial
+        window.addEventListener('DOMContentLoaded', async function() {
+            console.log('Página carregada, verificando estado...');
+            
+            if (!BOOK_ID) {
+                console.log('BOOK_ID não definido');
+                return;
+            }
+            
+            @guest
+                console.log('Usuário não está logado');
+                return;
+            @endguest
+            
+            try {
+                const response = await fetch(`/wishlist/check/${BOOK_ID}`, {
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                console.log('Estado inicial:', data);
+                
+                isInWishlist = data.inWishlist || false;
+                
+                const btn = document.querySelector('.btn.btn-secondary[onclick="addToWishlist()"]');
+                const icon = btn?.querySelector('i');
+                
+                if (isInWishlist && btn) {
+                    btn.classList.add('favorited');
+                    if (icon) icon.style.color = '#ff4757';
+                }
+            } catch (error) {
+                console.error('Erro ao verificar estado:', error);
+            }
+        });
+        
+        // CSS para animações
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
 @endsection
 
 
