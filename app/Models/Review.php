@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Storage;
 use App\Services\SentimentAnalysisService;
 
 class Review extends Model
@@ -47,12 +48,44 @@ class Review extends Model
             }
         });
         
+        static::created(function ($review) {
+            // Notificar o vendedor do livro sobre a nova avaliação
+            $book = $review->book;
+            if ($book && $book->user_id && $book->user_id != $review->user_id) {
+                \App\Services\NotificationService::notifyReviewReceived(
+                    $book->user_id,
+                    $review->id,
+                    $book->id,
+                    $book->name,
+                    $review->rating
+                );
+            }
+        });
+        
         static::updating(function ($review) {
             if ($review->isDirty('comment') && !empty($review->comment)) {
                 $analysis = SentimentAnalysisService::analyze($review->comment);
                 $review->sentiment = $analysis['sentiment'];
                 $review->sentiment_score = $analysis['score'];
                 $review->sentiment_confidence = $analysis['confidence'];
+            }
+        });
+        
+        // Deletar imagens quando a review for deletada
+        static::deleting(function ($review) {
+            if ($review->hasImages()) {
+                foreach ($review->images as $imageUrl) {
+                    // Suporta ambos os formatos:
+                    // Antigo: http://bookstyle.test/storage/reviews/imagem.jpg
+                    // Novo: /storage/reviews/imagem.jpg
+                    // Resultado: reviews/imagem.jpg (caminho no disco public)
+                    $path = preg_replace('/^(https?:\/\/[^\/]+)?\/storage\//', '', $imageUrl);
+                    
+                    // Deletar usando Storage disk public
+                    if (Storage::disk('public')->exists($path)) {
+                        Storage::disk('public')->delete($path);
+                    }
+                }
             }
         });
     }

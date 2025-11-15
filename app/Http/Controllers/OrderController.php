@@ -8,6 +8,7 @@ use App\Models\OrderItem;
 use App\Models\Book;
 use App\Models\Coupon;
 use App\Services\SmartCouponService;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -157,6 +158,7 @@ class OrderController extends Controller
             // Aplicar desconto de cupom se houver
             $discount = 0;
             $couponCode = null;
+            $couponId = null;
             if (session('cart_coupon')) {
                 $cartCoupon = session('cart_coupon');
                 $discount = $cartCoupon['type'] == 'percent' 
@@ -164,10 +166,11 @@ class OrderController extends Controller
                     : $cartCoupon['discount'];
                 $discount = min($discount, $total); // Não pode ser maior que o total
                 $couponCode = $cartCoupon['code'];
+                $couponId = $cartCoupon['id'] ?? null;
                 
-                // Marcar cupom como usado
-                if (isset($cartCoupon['id'])) {
-                    Coupon::markAsUsed($cartCoupon['id']);
+                // Marcar cupom como usado no sistema antigo
+                if ($couponId) {
+                    Coupon::markAsUsed($couponId);
                 }
             }
 
@@ -179,6 +182,12 @@ class OrderController extends Controller
                 'discount_amount' => $discount,
                 'coupon_code' => $couponCode
             ]);
+
+            // NOVO: Registrar uso do cupom pelo usuário (sistema de uso único + cooldown)
+            if ($couponId && Auth::check()) {
+                $user = Auth::user();
+                $user->markCouponAsUsed($couponId, $order->id);
+            }
 
             // Limpar o carrinho do usuário específico - LIMPEZA ROBUSTA
             if (Auth::check()) {
@@ -192,6 +201,14 @@ class OrderController extends Controller
             session()->save(); // Forçar salvamento da sessão
 
             DB::commit();
+
+            // ========== NOTIFICAÇÃO: PEDIDO CRIADO ==========
+            NotificationService::notifyOrderCreated(
+                Auth::id(),
+                $order->id,
+                $order->order_number,
+                $finalTotal
+            );
 
             // ========== TRIGGERS INTELIGENTES DE CUPONS ==========
             // Detectar primeiro pedido e gerar cupom de boas-vindas futuro

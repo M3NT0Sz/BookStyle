@@ -946,6 +946,90 @@
     margin-bottom: 2rem;
 }
 
+/* Alertas de Cooldown de Cupons */
+.coupon-cooldown-alert {
+    background: linear-gradient(135deg, #ff9a76 0%, #ff6b95 100%);
+    border-radius: 20px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 30px rgba(255, 107, 149, 0.3);
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+    color: white;
+}
+
+.coupon-available-alert {
+    background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+    border-radius: 20px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 30px rgba(132, 250, 176, 0.3);
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+    color: white;
+}
+
+.cooldown-icon,
+.available-icon {
+    font-size: 3rem;
+    opacity: 0.9;
+}
+
+.cooldown-content,
+.available-content {
+    flex: 1;
+}
+
+.cooldown-content h4,
+.available-content h4 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.cooldown-content p,
+.available-content p {
+    margin: 0.5rem 0;
+    opacity: 0.95;
+    font-size: 1rem;
+}
+
+.cooldown-counter {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    margin: 1rem 0;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 15px;
+    backdrop-filter: blur(10px);
+    justify-content: center;
+}
+
+.days-count {
+    font-size: 3rem;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.days-label {
+    font-size: 1.25rem;
+    font-weight: 600;
+    opacity: 0.9;
+}
+
+.cooldown-date {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    justify-content: center;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-top: 0.5rem;
+}
+
 .coupon-apply-card {
     background: white;
     border-radius: 15px;
@@ -1561,32 +1645,32 @@
                     <div class="coupon-apply-card">
                         <h3><i class="fas fa-ticket-alt"></i> Aplicar Cupom no Carrinho</h3>
                         <p class="coupon-apply-description">Digite o código do cupom abaixo para aplicá-lo no seu carrinho</p>
-                        <form class="coupon-form" action="{{ route('cart.applyCoupon') }}" method="POST">
-                            @csrf
-                            <div class="coupon-input-group">
-                                <input type="text" name="coupon_code" placeholder="Digite o código do cupom" required>
-                                <button type="submit">
-                                    <i class="fas fa-check"></i>
-                                    Aplicar
-                                </button>
-                            </div>
-                        </form>
-                        
-                        @if(session('coupon_error'))
-                            <div class="alert alert-error">
-                                <i class="fas fa-exclamation-circle"></i>
-                                {{ session('coupon_error') }}
-                            </div>
-                        @endif
-                        
-                        @if(session('coupon_success'))
-                            <div class="alert alert-success">
-                                <i class="fas fa-check-circle"></i>
-                                {{ session('coupon_success') }}
-                            </div>
-                        @endif
+                            <form class="coupon-form" action="{{ route('cart.applyCoupon') }}" method="POST">
+                                @csrf
+                                <div class="coupon-input-group">
+                                    <input type="text" name="coupon_code" placeholder="Digite o código do cupom" required>
+                                    <button type="submit">
+                                        <i class="fas fa-check"></i>
+                                        Aplicar
+                                    </button>
+                                </div>
+                            </form>
+                            
+                            @if(session('coupon_error'))
+                                <div class="alert alert-error">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    {{ session('coupon_error') }}
+                                </div>
+                            @endif
+                            
+                            @if(session('coupon_success'))
+                                <div class="alert alert-success">
+                                    <i class="fas fa-check-circle"></i>
+                                    {{ session('coupon_success') }}
+                                </div>
+                            @endif
+                        </div>
                     </div>
-                </div>
 
                 <!-- Cupons Recomendados -->
                 @if(count($suggestedCoupons) > 0)

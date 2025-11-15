@@ -61,7 +61,9 @@ class ReviewController extends Controller
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $image) {
                 $path = $image->store('reviews', 'public');
-                $imageUrls[] = Storage::url($path);
+                // Salvar apenas o path relativo (/storage/reviews/file.jpg) 
+                // ao invés da URL completa (http://domain.com/storage/reviews/file.jpg)
+                $imageUrls[] = '/storage/' . $path;
             }
         }
 

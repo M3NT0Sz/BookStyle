@@ -13,6 +13,14 @@ class User extends Authenticatable
         'password',
         'image',
         'is_admin',
+        'last_coupon_used_at',
+        'coupons_cooldown_days',
+    ];
+
+    protected $casts = [
+        'last_coupon_used_at' => 'datetime',
+        'coupons_cooldown_days' => 'integer',
+        'is_admin' => 'boolean',
     ];
 
     /**
@@ -48,6 +56,30 @@ class User extends Authenticatable
     }
 
     /**
+     * Relacionamento com notificações
+     */
+    public function notifications(): HasMany
+    {
+        return $this->hasMany(Notification::class);
+    }
+
+    /**
+     * Obter notificações não lidas
+     */
+    public function unreadNotifications()
+    {
+        return $this->notifications()->unread()->orderBy('created_at', 'desc');
+    }
+
+    /**
+     * Contar notificações não lidas
+     */
+    public function unreadNotificationsCount(): int
+    {
+        return $this->notifications()->unread()->count();
+    }
+
+    /**
      * Verificar se o usuário pode avaliar um produto
      */
     public function canReviewBook($bookId, $orderId): bool
@@ -74,6 +106,88 @@ class User extends Authenticatable
 
         // Verificar se o livro está no pedido
         return $order->orderItems()->where('book_id', $bookId)->exists();
+    }
+
+    /**
+     * Relacionamento com cupons usados
+     */
+    public function usedCoupons()
+    {
+        return $this->belongsToMany(Coupon::class, 'coupon_user')
+            ->withPivot('order_id', 'used_at')
+            ->withTimestamps();
+    }
+
+    /**
+     * Verificar se o usuário já usou um cupom específico
+     */
+    public function hasUsedCoupon($couponId): bool
+    {
+        return $this->usedCoupons()->where('coupon_id', $couponId)->exists();
+    }
+
+    /**
+     * Verificar se o usuário pode usar cupons automáticos (cooldown apenas para IA)
+     */
+    public function canUseAutoCoupons(): bool
+    {
+        if (!$this->last_coupon_used_at) {
+            return true; // Nunca usou cupom automático
+        }
+
+        $cooldownDays = 7; // 7 dias de cooldown para cupons IA
+        $nextAvailableDate = $this->last_coupon_used_at->addDays($cooldownDays);
+        
+        return now()->greaterThanOrEqualTo($nextAvailableDate);
+    }
+
+    /**
+     * Obter data quando próximo cupom automático estará disponível
+     */
+    public function getNextAutoCouponAvailableDate()
+    {
+        if (!$this->last_coupon_used_at) {
+            return now();
+        }
+
+        $cooldownDays = 7; // 7 dias
+        return $this->last_coupon_used_at->addDays($cooldownDays);
+    }
+
+    /**
+     * Obter dias restantes até próximo cupom automático
+     */
+    public function getDaysUntilNextAutoCoupon(): int
+    {
+        if ($this->canUseAutoCoupons()) {
+            return 0;
+        }
+
+        return now()->diffInDays($this->getNextAutoCouponAvailableDate(), false);
+    }
+
+    /**
+     * Marcar cupom como usado pelo usuário
+     * Atualiza cooldown APENAS se for cupom automático (gerado por IA)
+     */
+    public function markCouponAsUsed($couponId, $orderId = null)
+    {
+        // Registrar uso na tabela pivot
+        $this->usedCoupons()->attach($couponId, [
+            'order_id' => $orderId,
+            'used_at' => now(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        // Verificar se é cupom automático (gerado por IA)
+        $coupon = \App\Models\Coupon::find($couponId);
+        if ($coupon && $coupon->is_auto_generated) {
+            // Atualizar último uso APENAS para cupons automáticos
+            $this->update([
+                'last_coupon_used_at' => now(),
+            ]);
+        }
     }
 
     public static function find($id)

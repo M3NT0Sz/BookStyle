@@ -39,11 +39,12 @@ class CartController extends Controller
                 SmartCouponService::handleHighValueCart(Auth::id(), $cartTotal);
             }
             
-            // Obter sugestões de cupons
+            // Obter sugestões de cupons (já filtra cupons automáticos em cooldown)
             $suggestedCoupons = SmartCouponService::getSuggestedCoupons(Auth::id(), $books);
             
             // Obter cupons disponíveis
             $availableCoupons = Coupon::getAvailableCouponsForUser(Auth::id());
+            
             
         } else {
             // Para usuários não logados, usar sessão (compatibilidade)

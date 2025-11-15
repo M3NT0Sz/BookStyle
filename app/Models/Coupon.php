@@ -44,6 +44,14 @@ class Coupon extends Model
         return $this->belongsTo(User::class);
     }
 
+    // Relacionamento com usuários que usaram o cupom
+    public function usedByUsers()
+    {
+        return $this->belongsToMany(User::class, 'coupon_user')
+            ->withPivot('order_id', 'used_at')
+            ->withTimestamps();
+    }
+
     // ============================================
     // MÉTODOS ESTÁTICOS PARA COMPATIBILIDADE
     // ============================================
@@ -89,6 +97,35 @@ class Coupon extends Model
             return ['valid' => false, 'message' => 'Cupom inativo ou não encontrado'];
         }
 
+        // NOVO: Verificar se o usuário já usou este cupom
+        $pdo = \App\Models\DatabaseSingleton::getInstance()->getConnection();
+        $checkUsageStmt = $pdo->prepare("SELECT COUNT(*) FROM coupon_user WHERE coupon_id = ? AND user_id = ?");
+        $checkUsageStmt->execute([$couponData['id'], $userId]);
+        
+        if ($checkUsageStmt->fetchColumn() > 0) {
+            return ['valid' => false, 'message' => 'Você já usou este cupom anteriormente'];
+        }
+
+        // NOVO: Verificar cooldown APENAS para cupons automáticos (gerados por IA)
+        if (isset($couponData['is_auto_generated']) && $couponData['is_auto_generated']) {
+            $userStmt = $pdo->prepare("SELECT last_coupon_used_at FROM users WHERE id = ?");
+            $userStmt->execute([$userId]);
+            $userData = $userStmt->fetch(\PDO::FETCH_ASSOC);
+            
+            if ($userData && $userData['last_coupon_used_at']) {
+                $lastUsed = new \DateTime($userData['last_coupon_used_at']);
+                $cooldownDays = 7; // 7 dias para cupons IA
+                $nextAvailable = $lastUsed->modify("+{$cooldownDays} days");
+                $now = new \DateTime();
+                
+                if ($now < $nextAvailable) {
+                    $daysRemaining = $now->diff($nextAvailable)->days;
+                    return ['valid' => false, 'message' => "Aguarde {$daysRemaining} dias para usar outro cupom automático"];
+                }
+            }
+        }
+        // Cupons criados por admin NÃO têm cooldown
+
         // Verificar expiração
         if ($couponData['expires_at'] && strtotime($couponData['expires_at']) < time()) {
             return ['valid' => false, 'message' => 'Cupom expirado'];
@@ -128,7 +165,6 @@ class Coupon extends Model
                 }, $applicableGenres);
                 
                 // Buscar gêneros dos livros no carrinho
-                $pdo = \App\Models\DatabaseSingleton::getInstance()->getConnection();
                 $bookIds = array_column($cartItems, 'id');
                 
                 if (empty($bookIds)) {
@@ -237,7 +273,18 @@ class Coupon extends Model
             $couponData['generated_at']
         ]);
         
-        return $pdo->lastInsertId();
+        $couponId = $pdo->lastInsertId();
+        
+        // NOTIFICAR USUÁRIO VIA OBSERVER
+        \App\Services\NotificationService::notifyCouponAvailable(
+            $userId,
+            $couponId,
+            $couponData['code'],
+            $couponData['discount'],
+            $couponData['type']
+        );
+        
+        return $couponId;
     }
 
     /**
@@ -346,23 +393,16 @@ class Coupon extends Model
         $pdo = \App\Models\DatabaseSingleton::getInstance()->getConnection();
         $suggestions = [];
         
-        // Buscar cupons específicos do usuário que estão ativos
-        // Agrupa por trigger_type e pega apenas o melhor de cada tipo
+        // Buscar cupons específicos do usuário que estão ativos e NÃO foram usados
+        // Para cupons automáticos, verificar cooldown de 7 dias
         $sql = "SELECT c.* FROM coupons c
-                INNER JOIN (
-                    SELECT trigger_type, MAX(discount) as max_discount
-                    FROM coupons 
-                    WHERE is_active = 1 
-                    AND user_id = ?
-                    AND (expires_at IS NULL OR expires_at >= CURDATE())
-                    AND (max_uses IS NULL OR used_count < max_uses)
-                    GROUP BY trigger_type
-                ) best ON c.trigger_type = best.trigger_type AND c.discount = best.max_discount
                 WHERE c.is_active = 1 
                 AND c.user_id = ?
                 AND (c.expires_at IS NULL OR c.expires_at >= CURDATE())
                 AND (c.max_uses IS NULL OR c.used_count < c.max_uses)
-                GROUP BY c.trigger_type
+                AND c.id NOT IN (
+                    SELECT coupon_id FROM coupon_user WHERE user_id = ?
+                )
                 ORDER BY c.discount DESC
                 LIMIT 3";
         
@@ -370,7 +410,26 @@ class Coupon extends Model
         $stmt->execute([$user->id, $user->id]);
         $userCoupons = $stmt->fetchAll(\PDO::FETCH_ASSOC);
         
+        // Verificar cooldown apenas para cupons automáticos
+        $userStmt = $pdo->prepare("SELECT last_coupon_used_at FROM users WHERE id = ?");
+        $userStmt->execute([$user->id]);
+        $userData = $userStmt->fetch(\PDO::FETCH_ASSOC);
+        $inAutoCooldown = false;
+        
+        if ($userData && $userData['last_coupon_used_at']) {
+            $lastUsed = new \DateTime($userData['last_coupon_used_at']);
+            $nextAvailable = clone $lastUsed;
+            $nextAvailable->modify('+7 days');
+            $now = new \DateTime();
+            $inAutoCooldown = ($now < $nextAvailable);
+        }
+        
         foreach ($userCoupons as $coupon) {
+            // Pular cupons automáticos se estiver em cooldown
+            if ($coupon['is_auto_generated'] && $inAutoCooldown) {
+                continue;
+            }
+            
             $message = '';
             $genreInfo = '';
             
@@ -420,8 +479,10 @@ class Coupon extends Model
             ];
         }
         
-        // Tentar criar cupom baseado na última compra se não existir
-        self::tryCreateGenreBasedCoupon($user->id);
+        // Tentar criar cupom baseado na última compra se puder (verifica cooldown internamente)
+        if (!$inAutoCooldown) {
+            self::tryCreateGenreBasedCoupon($user->id);
+        }
         
         return $suggestions;
     }

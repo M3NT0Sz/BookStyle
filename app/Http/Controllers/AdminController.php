@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Models\Coupon;
 use App\Adapters\CsvExportAdapter;
 use App\Adapters\JsonExport;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
@@ -311,6 +312,7 @@ class AdminController extends Controller
             return redirect()->route('admin.orders')->with('error', 'Pedido não encontrado.');
         }
 
+        $oldStatus = $order->status;
         $order->status = $request->status;
         
         // Atualizar timestamps específicos
@@ -321,6 +323,24 @@ class AdminController extends Controller
         }
         
         $order->save();
+
+        // Enviar notificação de mudança de status
+        NotificationService::notifyOrderStatusChanged(
+            $order->user_id,
+            $order->id,
+            $order->order_number,
+            $oldStatus,
+            $request->status
+        );
+
+        // Se o pedido foi entregue, enviar notificação para solicitar avaliação
+        if ($request->status === 'delivered') {
+            NotificationService::notifyOrderDelivered(
+                $order->user_id,
+                $order->id,
+                $order->order_number
+            );
+        }
 
         return redirect()->route('admin.orders.show', $order->id)
             ->with('success', 'Status do pedido atualizado com sucesso!');

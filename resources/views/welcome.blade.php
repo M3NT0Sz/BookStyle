@@ -230,6 +230,49 @@
 
             <div class="nav-actions">
                 @if(Auth::check())
+                    <div style="position: relative; margin-right: 10px;">
+                        <button onclick="toggleNotifications()" class="button-login" style="position: relative; border: none; cursor: pointer;">
+                            <i class="fas fa-bell"></i>
+                            @php
+                                $unreadCount = Auth::user()->unreadNotificationsCount();
+                            @endphp
+                            @if($unreadCount > 0)
+                                <span id="notification-badge" style="position: absolute; top: -5px; right: -5px; background: #ef4444; color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold;">
+                                    {{ $unreadCount > 9 ? '9+' : $unreadCount }}
+                                </span>
+                            @endif
+                        </button>
+                        
+                        <!-- Dropdown de Notificações -->
+                        <div id="notifications-dropdown" style="display: none; position: absolute; top: 100%; right: 0; margin-top: 10px; width: 380px; max-height: 500px; overflow-y: auto; background: white; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); z-index: 1000;">
+                            <div style="padding: 16px; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; background: #f9fafb; border-radius: 12px 12px 0 0;">
+                                <h3 style="margin: 0; font-size: 18px; font-weight: bold; color: #111827;">
+                                    🔔 Notificações
+                                </h3>
+                                <div style="display: flex; gap: 8px;">
+                                    <button onclick="markAllAsRead()" style="font-size: 12px; color: #3b82f6; background: none; border: none; cursor: pointer; padding: 4px 8px;">
+                                        Marcar todas como lidas
+                                    </button>
+                                    <button onclick="toggleNotifications()" style="font-size: 18px; color: #6b7280; background: none; border: none; cursor: pointer; padding: 0 4px;">
+                                        ×
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div id="notifications-list" style="max-height: 400px; overflow-y: auto;">
+                                <!-- Notificações serão carregadas aqui via AJAX -->
+                                <div style="padding: 20px; text-align: center; color: #9ca3af;">
+                                    <i class="fas fa-spinner fa-spin"></i> Carregando...
+                                </div>
+                            </div>
+                            
+                            <div style="padding: 12px; border-top: 1px solid #e5e7eb; text-align: center; background: #f9fafb; border-radius: 0 0 12px 12px;">
+                                <a href="{{ route('notifications.index') }}" style="color: #3b82f6; text-decoration: none; font-size: 14px; font-weight: 500;">
+                                    Ver todas as notificações →
+                                </a>
+                            </div>
+                        </div>
+                    </div>
                     <a class="button-login" href="{{ route('user.profile') }}">
                         <i class="fas fa-user"></i>
                         Perfil
@@ -859,6 +902,144 @@
         <p class="footer-bottom">@2025 BookStyle. Todos os direitos reservados.</p>
 
     </footer>
+
+    <script>
+        let notificationsDropdown = null;
+        let notificationsLoaded = false;
+
+        function toggleNotifications() {
+            notificationsDropdown = document.getElementById('notifications-dropdown');
+            
+            if (notificationsDropdown.style.display === 'none') {
+                notificationsDropdown.style.display = 'block';
+                if (!notificationsLoaded) {
+                    loadNotifications();
+                    notificationsLoaded = true;
+                }
+            } else {
+                notificationsDropdown.style.display = 'none';
+            }
+        }
+
+        function loadNotifications() {
+            fetch('/notifications/unread')
+                .then(response => response.json())
+                .then(data => {
+                    const notificationsList = document.getElementById('notifications-list');
+                    
+                    if (data.notifications.length === 0) {
+                        notificationsList.innerHTML = `
+                            <div style="padding: 40px 20px; text-align: center; color: #9ca3af;">
+                                <i class="fas fa-bell-slash" style="font-size: 48px; margin-bottom: 12px; opacity: 0.5;"></i>
+                                <p style="margin: 0; font-size: 14px;">Nenhuma notificação não lida</p>
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    notificationsList.innerHTML = data.notifications.map(notif => {
+                        const icons = {
+                            'order_created': '🎉',
+                            'order_status': '📦',
+                            'coupon_available': '🎁',
+                            'review_received': '⭐',
+                            'request_review': '📝'
+                        };
+                        
+                        const icon = icons[notif.type] || '📬';
+                        const timeAgo = formatTimeAgo(notif.created_at);
+                        
+                        return `
+                            <div style="padding: 16px; border-bottom: 1px solid #f3f4f6; cursor: pointer; transition: background 0.2s;" 
+                                 onmouseover="this.style.background='#f9fafb'" 
+                                 onmouseout="this.style.background='white'"
+                                 onclick="markAsReadAndRedirect(${notif.id}, '${getNotificationLink(notif)}')">
+                                <div style="display: flex; gap: 12px;">
+                                    <span style="font-size: 24px; flex-shrink: 0;">${icon}</span>
+                                    <div style="flex: 1; min-width: 0;">
+                                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 4px;">
+                                            <h4 style="margin: 0; font-size: 14px; font-weight: 600; color: #111827;">${notif.title}</h4>
+                                            ${!notif.is_read ? '<span style="width: 8px; height: 8px; background: #3b82f6; border-radius: 50%; flex-shrink: 0;"></span>' : ''}
+                                        </div>
+                                        <p style="margin: 0; font-size: 13px; color: #6b7280; line-height: 1.4;">${notif.message}</p>
+                                        <span style="font-size: 11px; color: #9ca3af; margin-top: 4px; display: block;">${timeAgo}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                })
+                .catch(error => {
+                    console.error('Erro ao carregar notificações:', error);
+                    document.getElementById('notifications-list').innerHTML = `
+                        <div style="padding: 20px; text-align: center; color: #ef4444;">
+                            <i class="fas fa-exclamation-circle"></i> Erro ao carregar notificações
+                        </div>
+                    `;
+                });
+        }
+
+        function getNotificationLink(notification) {
+            if (notification.data?.order_id) {
+                return '/orders/' + notification.data.order_id;
+            }
+            if (notification.data?.book_id) {
+                return '/books/show/' + notification.data.book_id;
+            }
+            return '/notifications';
+        }
+
+        function formatTimeAgo(datetime) {
+            const now = new Date();
+            const past = new Date(datetime);
+            const diffInSeconds = Math.floor((now - past) / 1000);
+            
+            if (diffInSeconds < 60) return 'Agora mesmo';
+            if (diffInSeconds < 3600) return Math.floor(diffInSeconds / 60) + ' min atrás';
+            if (diffInSeconds < 86400) return Math.floor(diffInSeconds / 3600) + 'h atrás';
+            if (diffInSeconds < 604800) return Math.floor(diffInSeconds / 86400) + 'd atrás';
+            return past.toLocaleDateString('pt-BR');
+        }
+
+        function markAsReadAndRedirect(notificationId, link) {
+            fetch(`/notifications/${notificationId}/read`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                }
+            }).then(() => {
+                window.location.href = link;
+            });
+        }
+
+        function markAllAsRead() {
+            if (!confirm('Marcar todas as notificações como lidas?')) return;
+            
+            fetch('/notifications/mark-all-read', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                }
+            }).then(() => {
+                notificationsLoaded = false;
+                loadNotifications();
+                const badge = document.getElementById('notification-badge');
+                if (badge) badge.remove();
+            });
+        }
+
+        // Fechar dropdown ao clicar fora
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('notifications-dropdown');
+            const button = event.target.closest('.button-login');
+            
+            if (dropdown && dropdown.style.display === 'block' && !dropdown.contains(event.target) && !button) {
+                dropdown.style.display = 'none';
+            }
+        });
+    </script>
 
 @push('scripts')
 @vite('resources/js/home.js')

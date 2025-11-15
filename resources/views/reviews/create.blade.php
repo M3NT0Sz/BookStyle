@@ -352,9 +352,29 @@
 
             <!-- Informações do Produto -->
             <div class="product-info">
-                <img src="{{ $book->images[0] ?? 'https://via.placeholder.com/100x140?text=Sem+Capa' }}" 
-                     alt="{{ $book->name }}" 
-                     class="product-image">
+                @php
+                    $bookImages = [];
+                    if (isset($book->images)) {
+                        if (is_string($book->images)) {
+                            $decoded = json_decode($book->images, true);
+                            $bookImages = is_array($decoded) ? $decoded : [];
+                        } elseif (is_array($book->images)) {
+                            $bookImages = $book->images;
+                        }
+                    }
+                    $firstImage = !empty($bookImages) ? $bookImages[0] : null;
+                @endphp
+                
+                @if($firstImage)
+                    <img src="{{ asset('storage/' . $firstImage) }}" 
+                         alt="{{ $book->name }}" 
+                         class="product-image">
+                @else
+                    <div class="product-image" style="background: #f1f5f9; display: flex; align-items: center; justify-content: center; color: #94a3b8;">
+                        <i class="fas fa-book" style="font-size: 3rem;"></i>
+                    </div>
+                @endif
+                
                 <div class="product-details">
                     <h2 class="product-name">{{ $book->name }}</h2>
                     <p class="product-author">{{ $book->author }}</p>
