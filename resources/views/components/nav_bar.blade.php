@@ -5,9 +5,6 @@
         <li><a href="{{ route('about') }}">Quem Somos</a></li>
         <li><a href="{{ route('books.index') }}">Livros</a></li>
         <li><a href="{{ route('cart.index') }}">Carrinho</a></li>
-        @auth
-            <li><a href="{{ route('orders.index') }}">Meus Pedidos</a></li>
-        @endauth
     </ul>
     @if(Auth::check())
         <a class="button-login" href="{{ route('user.profile') }}">Perfil</a>

@@ -9,6 +9,16 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\CouponController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\ReviewController;
+
+// API Routes for AJAX requests
+Route::get('/api/books/{id}', function($id) {
+    $book = Book::find($id);
+    if (!$book) {
+        return response()->json(['error' => 'Livro não encontrado'], 404);
+    }
+    return response()->json($book);
+});
 
 // Rotas de administrador (sem middleware admin para teste)
 Route::prefix('admin')->group(function () {
@@ -68,22 +78,28 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/user/update/{user}', [UserController::class, 'update'])->name('user.update');
     
     // Rotas de pedidos (requer autenticação)
-    Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
-    Route::get('/orders/filter/status', [OrderController::class, 'filterByStatus'])->name('orders.filter');
-    Route::get('/orders/search', [OrderController::class, 'search'])->name('orders.search');
     Route::delete('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
     
     // Rotas de checkout
     Route::get('/checkout', [OrderController::class, 'checkout'])->name('checkout');
     Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
+    
+    // Rotas de avaliações (requer autenticação)
+    Route::get('/reviews/create/{order}/{book}', [ReviewController::class, 'create'])->name('reviews.create');
+    Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
+    Route::delete('/reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
 });
+
+// Rotas públicas de avaliações
+Route::get('/books/{book}/reviews', [ReviewController::class, 'index'])->name('reviews.index');
 
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
 Route::post('/cart/add/{bookId}', [CartController::class, 'add'])->name('cart.add');
 Route::post('/cart/remove/{bookId}', [CartController::class, 'remove'])->name('cart.remove');
 Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
 Route::post('/cart/apply-coupon', [CartController::class, 'applyCoupon'])->name('cart.applyCoupon');
+Route::post('/cart/remove-coupon', [CartController::class, 'removeCoupon'])->name('cart.removeCoupon');
 Route::get('/cart/count', [CartController::class, 'count'])->name('cart.count');
 Route::post('/cart/update-quantity/{bookId}', [CartController::class, 'updateQuantity'])->name('cart.updateQuantity');
 

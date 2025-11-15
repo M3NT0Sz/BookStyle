@@ -12,19 +12,24 @@ class Order extends Model
     protected $fillable = [
         'order_number',
         'user_id',
-        'total',
+        'total_amount',
+        'discount_amount',
+        'coupon_code',
         'status',
         'payment_status',
         'payment_method',
         'billing_address',
         'shipping_address',
+        'shipping_city',
+        'shipping_zip',
         'notes',
         'shipped_at',
         'delivered_at'
     ];
 
     protected $casts = [
-        'total' => 'decimal:2',
+        'total_amount' => 'decimal:2',
+        'discount_amount' => 'decimal:2',
         'billing_address' => 'json',
         'shipping_address' => 'json',
         'shipped_at' => 'datetime',
@@ -62,6 +67,14 @@ class Order extends Model
     }
 
     /**
+     * Relacionamento com avaliações
+     */
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    /**
      * Calcular total do pedido baseado nos itens
      */
     public function calculateTotal(): float
@@ -74,7 +87,7 @@ class Order extends Model
      */
     public function updateTotal(): void
     {
-        $this->update(['total' => $this->calculateTotal()]);
+        $this->update(['total_amount' => $this->calculateTotal()]);
     }
 
     /**

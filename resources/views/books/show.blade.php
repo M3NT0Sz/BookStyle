@@ -42,12 +42,33 @@
                 <!-- Image Gallery Section -->
                 <div class="book-gallery-section">
                     @php
-                        $images = is_array($book)
-                            ? (isset($book['images']) ? (is_array($book['images']) ? $book['images'] : json_decode($book['images'], true)) : [])
-                            : (isset($book->images) ? (is_array($book->images) ? $book->images : json_decode($book->images, true)) : []);
-                        if (!is_array($images)) $images = [];
+                        // Processar imagens - pode vir como array, string JSON ou string vazia
+                        $rawImages = is_array($book) ? ($book['images'] ?? null) : ($book->images ?? null);
+                        
+                        $images = [];
+                        if (!empty($rawImages)) {
+                            if (is_string($rawImages)) {
+                                // Tentar decodificar JSON
+                                $decoded = json_decode($rawImages, true);
+                                if (is_array($decoded)) {
+                                    $images = $decoded;
+                                } else {
+                                    // Se não for JSON válido, pode ser uma URL única
+                                    $images = [$rawImages];
+                                }
+                            } elseif (is_array($rawImages)) {
+                                $images = $rawImages;
+                            }
+                        }
+                        
+                        // Limpar e normalizar imagens
                         $images = array_filter(array_map(function($img) {
-                            return trim($img);
+                            if (!is_string($img)) return null;
+                            $img = trim($img);
+                            if (empty($img)) return null;
+                            // Remover prefixo 'storage/' se existir
+                            $img = preg_replace('#^storage/#', '', $img);
+                            return $img;
                         }, $images), fn($img) => !empty($img));
                         
                         $bookName = is_array($book) ? $book['name'] : $book->name;
@@ -57,9 +78,17 @@
                     <div class="gallery-container">
                         <div class="main-image">
                             @if(count($images) > 0)
+                                @php
+                                    $firstImage = $images[0];
+                                    // Se começar com http, usar diretamente, senão usar asset
+                                    $imageUrl = (str_starts_with($firstImage, 'http') || str_starts_with($firstImage, 'https')) 
+                                        ? $firstImage 
+                                        : asset('storage/' . $firstImage);
+                                @endphp
                                 <img id="mainBookImage" 
-                                     src="{{ asset('storage/' . $images[0]) }}" 
-                                     alt="{{ $bookName }}">
+                                     src="{{ $imageUrl }}" 
+                                     alt="{{ $bookName }}"
+                                     onerror="this.onerror=null; this.src='https://via.placeholder.com/400x600?text=Imagem+Indisponível';">
                             @else
                                 <div class="placeholder-image">
                                     <i class="fas fa-book"></i>
@@ -77,9 +106,16 @@
                         @if(count($images) > 1)
                             <div class="thumbnail-gallery">
                                 @foreach($images as $idx => $img)
+                                    @php
+                                        $thumbUrl = (str_starts_with($img, 'http') || str_starts_with($img, 'https')) 
+                                            ? $img 
+                                            : asset('storage/' . $img);
+                                    @endphp
                                     <div class="thumbnail{{ $idx === 0 ? ' active' : '' }}" 
-                                         onclick="changeMainImage('{{ asset('storage/' . $img) }}', this)">
-                                        <img src="{{ asset('storage/' . $img) }}" alt="Imagem {{ $idx + 1 }}">
+                                         onclick="changeMainImage('{{ $thumbUrl }}', this)">
+                                        <img src="{{ $thumbUrl }}" 
+                                             alt="Imagem {{ $idx + 1 }}"
+                                             onerror="this.onerror=null; this.src='https://via.placeholder.com/100x150?text=Erro';">
                                     </div>
                                 @endforeach
                             </div>
@@ -251,6 +287,16 @@
                 </button>
             </div>
         </div>
+    </div>
+
+    <!-- Seção de Avaliações -->
+    <div class="container" style="margin-top: 2rem; margin-bottom: 3rem;">
+        @include('reviews.partials.reviews-list', [
+            'reviews' => $reviews,
+            'averageRating' => $averageRating,
+            'totalReviews' => $totalReviews,
+            'ratingDistribution' => $ratingDistribution
+        ])
     </div>
 
     <!-- Image Modal -->

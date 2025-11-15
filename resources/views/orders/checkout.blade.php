@@ -1038,6 +1038,58 @@
                             @endforeach
                         </div>
                         
+                        <!-- Seção de Cupom -->
+                        <div style="padding: 1.5rem; background: rgba(102, 126, 234, 0.05); border-radius: 12px; margin-bottom: 1.5rem;">
+                            @if(session('cart_coupon'))
+                                @php
+                                    $cartCoupon = session('cart_coupon');
+                                @endphp
+                                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 1rem; border-radius: 10px; margin-bottom: 1rem;">
+                                    <div style="display: flex; align-items: center; justify-content: space-between; color: white;">
+                                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                            <i class="fas fa-check-circle" style="font-size: 1.25rem;"></i>
+                                            <div>
+                                                <div style="font-weight: 600; font-size: 0.9rem;">{{ $cartCoupon['code'] }}</div>
+                                                <div style="font-size: 0.8rem; opacity: 0.9;">
+                                                    {{ $cartCoupon['type'] == 'percent' ? $cartCoupon['discount'] . '% OFF' : 'R$ ' . number_format($cartCoupon['discount'], 2, ',', '.') . ' OFF' }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <form action="{{ route('cart.removeCoupon') }}" method="POST" style="margin: 0;">
+                                            @csrf
+                                            <button type="submit" style="background: rgba(255,255,255,0.2); border: none; color: white; padding: 0.5rem; border-radius: 6px; cursor: pointer;">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            @else
+                                <form action="{{ route('cart.applyCoupon') }}" method="POST">
+                                    @csrf
+                                    <div style="display: flex; gap: 0.5rem; margin-bottom: 0.75rem;">
+                                        <div style="flex: 1; position: relative;">
+                                            <input 
+                                                type="text" 
+                                                name="coupon_code" 
+                                                placeholder="Código do cupom" 
+                                                style="width: 100%; padding: 0.7rem 1rem; padding-left: 2.5rem; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 0.875rem;"
+                                                required>
+                                            <i class="fas fa-ticket-alt" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #999;"></i>
+                                        </div>
+                                        <button type="submit" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 0.7rem 1.25rem; border-radius: 8px; font-weight: 600; cursor: pointer; white-space: nowrap;">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                    </div>
+                                </form>
+                                
+                                @if(session('coupon_error'))
+                                    <div style="padding: 0.65rem; background: #fee; border-left: 3px solid #f44; border-radius: 6px; color: #c33; font-size: 0.8rem;">
+                                        <i class="fas fa-exclamation-circle"></i> {{ session('coupon_error') }}
+                                    </div>
+                                @endif
+                            @endif
+                        </div>
+                        
                         <div class="summary-totals">
                             <div class="total-row">
                                 <span class="total-label">Subtotal</span>
@@ -1047,14 +1099,29 @@
                                 <span class="total-label">Frete</span>
                                 <span class="total-value" style="color: #10b981;">Grátis</span>
                             </div>
-                            <div class="total-row">
-                                <span class="total-label">Desconto</span>
-                                <span class="total-value">-</span>
-                            </div>
+                            @if(session('cart_coupon'))
+                                @php
+                                    $cartCoupon = session('cart_coupon');
+                                    $discount = $cartCoupon['type'] == 'percent' ? ($total * ($cartCoupon['discount'] / 100)) : $cartCoupon['discount'];
+                                    $finalTotal = max($total - $discount, 0);
+                                @endphp
+                                <div class="total-row" style="color: #10b981;">
+                                    <span class="total-label">Desconto</span>
+                                    <span class="total-value">-R$ {{ number_format($discount, 2, ',', '.') }}</span>
+                                </div>
+                            @else
+                                @php
+                                    $finalTotal = $total;
+                                @endphp
+                                <div class="total-row">
+                                    <span class="total-label">Desconto</span>
+                                    <span class="total-value">-</span>
+                                </div>
+                            @endif
                             <div class="final-total">
                                 <div class="total-row">
                                     <span class="total-label">Total</span>
-                                    <span class="total-value">R$ {{ number_format($total, 2, ',', '.') }}</span>
+                                    <span class="total-value">R$ {{ number_format($finalTotal, 2, ',', '.') }}</span>
                                 </div>
                             </div>
                         </div>

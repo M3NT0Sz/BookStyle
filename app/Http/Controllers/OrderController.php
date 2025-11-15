@@ -124,7 +124,7 @@ class OrderController extends Controller
             // Criar o pedido
             $order = Order::create([
                 'user_id' => Auth::id(),
-                'total' => 0, // Será calculado depois
+                'total_amount' => 0, // Será calculado depois
                 'status' => 'pending',
                 'payment_status' => 'pending',
                 'payment_method' => $request->payment_method,
@@ -154,8 +154,31 @@ class OrderController extends Controller
                 $total += $orderItem->subtotal;
             }
 
+            // Aplicar desconto de cupom se houver
+            $discount = 0;
+            $couponCode = null;
+            if (session('cart_coupon')) {
+                $cartCoupon = session('cart_coupon');
+                $discount = $cartCoupon['type'] == 'percent' 
+                    ? ($total * ($cartCoupon['discount'] / 100)) 
+                    : $cartCoupon['discount'];
+                $discount = min($discount, $total); // Não pode ser maior que o total
+                $couponCode = $cartCoupon['code'];
+                
+                // Marcar cupom como usado
+                if (isset($cartCoupon['id'])) {
+                    Coupon::markAsUsed($cartCoupon['id']);
+                }
+            }
+
+            $finalTotal = max($total - $discount, 0);
+
             // Atualizar o total do pedido
-            $order->update(['total' => $total]);
+            $order->update([
+                'total_amount' => $finalTotal,
+                'discount_amount' => $discount,
+                'coupon_code' => $couponCode
+            ]);
 
             // Limpar o carrinho do usuário específico - LIMPEZA ROBUSTA
             if (Auth::check()) {
@@ -163,8 +186,9 @@ class OrderController extends Controller
                 \Log::info('CartItems deletados: ' . $deleted . ' para usuário: ' . Auth::id());
             }
             
-            // Limpar sessão completamente
+            // Limpar sessão completamente (incluindo cupom)
             session()->forget('cart');
+            session()->forget('cart_coupon');
             session()->save(); // Forçar salvamento da sessão
 
             DB::commit();
@@ -172,12 +196,6 @@ class OrderController extends Controller
             // ========== TRIGGERS INTELIGENTES DE CUPONS ==========
             // Detectar primeiro pedido e gerar cupom de boas-vindas futuro
             SmartCouponService::handleFirstPurchase(Auth::id());
-            
-            // Marcar cupom como usado se foi aplicado
-            $sessionCart = session('cart', []);
-            if (isset($sessionCart['coupon']) && isset($sessionCart['coupon']['id'])) {
-                Coupon::markAsUsed($sessionCart['coupon']['id']);
-            }
 
             // Redirecionar para o carrinho para mostrar que foi esvaziado
             return redirect()->route('cart.index')

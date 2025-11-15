@@ -100,7 +100,7 @@ class CartController extends Controller
             ]);
         }
         
-        return redirect()->back()->with('success', 'Livro adicionado ao carrinho!' . ($coupon ? ' Cupom aplicado!' : ''));
+        return redirect()->route('cart.index')->with('success', 'Livro adicionado ao carrinho!' . ($coupon ? ' Cupom aplicado!' : ''));
     }
 
     public function remove($bookId)
@@ -122,48 +122,83 @@ class CartController extends Controller
             return redirect()->back()->with('coupon_error', 'Informe o código do cupom.');
         }
         
+        // Verificar se o carrinho está vazio
+        if (Auth::check()) {
+            $cartCount = CartItem::where('user_id', Auth::id())->count();
+            if ($cartCount == 0) {
+                return redirect()->back()->with('coupon_error', 'Adicione produtos ao carrinho antes de aplicar um cupom.');
+            }
+        } else {
+            $cart = session('cart', []);
+            $cartItems = array_filter($cart, fn($key) => $key !== 'coupon', ARRAY_FILTER_USE_KEY);
+            if (empty($cartItems)) {
+                return redirect()->back()->with('coupon_error', 'Adicione produtos ao carrinho antes de aplicar um cupom.');
+            }
+        }
+        
         $coupon = Coupon::findByCode($code);
         if (!$coupon) {
             return redirect()->back()->with('coupon_error', 'Cupom inválido.');
         }
         
-        // ========== VALIDAÇÃO INTELIGENTE DE CUPONS ==========
+        // Obter itens do carrinho (usuário logado ou sessão)
+        $cartBooks = [];
+        
         if (Auth::check()) {
-            $userId = Auth::id();
-            
-            // Obter itens do carrinho para validação
-            $cartItems = CartItem::with('book')->where('user_id', $userId)->get();
-            $books = [];
+            // Para usuários logados, buscar do banco
+            $cartItems = CartItem::with('book')->where('user_id', Auth::id())->get();
             foreach ($cartItems as $item) {
-                $book = $item->book->toArray();
-                $book['quantity'] = $item->quantity;
-                $books[] = $book;
-            }
-            
-            // Validação inteligente
-            $validation = Coupon::isValidForUser($coupon, $userId, $books);
-            
-            if (!$validation['valid']) {
-                return redirect()->back()->with('coupon_error', $validation['message']);
+                if ($item->book) {
+                    $cartBooks[] = [
+                        'id' => $item->book->id,
+                        'name' => $item->book->title,
+                        'price' => $item->book->price,
+                        'quantity' => $item->quantity,
+                        'genre' => $item->book->genre ?? null
+                    ];
+                }
             }
         } else {
-            // Validação básica para usuários não logados
-            if (isset($coupon['expires_at']) && $coupon['expires_at'] && strtotime($coupon['expires_at']) < time()) {
-                return redirect()->back()->with('coupon_error', 'Cupom expirado.');
+            // Para usuários não logados, buscar da sessão
+            $cart = session('cart', []);
+            foreach ($cart as $bookId => $item) {
+                if ($bookId !== 'coupon' && is_array($item)) {
+                    $cartBooks[] = $item;
+                }
             }
         }
         
-        // Aplicar cupom
-        $cart = session('cart', []);
-        $cart['coupon'] = [
+        if (empty($cartBooks)) {
+            return redirect()->back()->with('coupon_error', 'Seu carrinho está vazio.');
+        }
+        
+        // ========== VALIDAÇÃO INTELIGENTE DE CUPONS ==========
+        $userId = Auth::check() ? Auth::id() : null;
+        
+        // Validação inteligente
+        $validation = Coupon::isValidForUser($coupon, $userId, $cartBooks);
+        
+        if (!$validation['valid']) {
+            return redirect()->back()->with('coupon_error', $validation['message']);
+        }
+        
+        // Aplicar cupom na sessão
+        $couponData = [
             'id' => $coupon['id'],
             'code' => $coupon['code'],
             'discount' => $coupon['discount'],
             'type' => $coupon['type'],
         ];
-        session(['cart' => $cart]);
+        
+        session(['cart_coupon' => $couponData]);
         
         return redirect()->back()->with('coupon_success', 'Cupom aplicado com sucesso!');
+    }
+
+    public function removeCoupon()
+    {
+        session()->forget('cart_coupon');
+        return redirect()->back()->with('success', 'Cupom removido do carrinho.');
     }
 
     /**
@@ -181,18 +216,74 @@ class CartController extends Controller
      */
     public function updateQuantity(Request $request, $bookId)
     {
-        $quantity = $request->input('quantity', 1);
+        $action = $request->input('action'); // 'increase' ou 'decrease'
         
-        Cart::updateQuantity($bookId, $quantity);
-        
-        if ($request->ajax()) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Quantidade atualizada!',
-                'cart_count' => Cart::count()
-            ]);
+        if (Auth::check()) {
+            // Para usuários logados, atualizar no banco de dados
+            $cartItem = CartItem::where('user_id', Auth::id())
+                               ->where('book_id', $bookId)
+                               ->first();
+            
+            if (!$cartItem) {
+                return redirect()->back()->with('error', 'Livro não encontrado no carrinho');
+            }
+            
+            if ($action === 'increase') {
+                $cartItem->quantity++;
+                $cartItem->save();
+            } elseif ($action === 'decrease') {
+                $cartItem->quantity--;
+                
+                if ($cartItem->quantity <= 0) {
+                    $cartItem->delete();
+                    return redirect()->back()->with('success', 'Livro removido do carrinho');
+                }
+                
+                $cartItem->save();
+            }
+            
+            if ($request->ajax()) {
+                $cartCount = CartItem::where('user_id', Auth::id())->count();
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Quantidade atualizada!',
+                    'cart_count' => $cartCount
+                ]);
+            }
+            
+            return redirect()->back()->with('success', 'Quantidade atualizada!');
+        } else {
+            // Para usuários não logados, usar sessão
+            $cart = session('cart', []);
+            
+            if (!isset($cart[$bookId])) {
+                return redirect()->back()->with('error', 'Livro não encontrado no carrinho');
+            }
+            
+            if ($action === 'increase') {
+                $cart[$bookId]['quantity']++;
+            } elseif ($action === 'decrease') {
+                $cart[$bookId]['quantity']--;
+                
+                // Se a quantidade for 0, remove do carrinho
+                if ($cart[$bookId]['quantity'] <= 0) {
+                    unset($cart[$bookId]);
+                    session(['cart' => $cart]);
+                    return redirect()->back()->with('success', 'Livro removido do carrinho');
+                }
+            }
+            
+            session(['cart' => $cart]);
+            
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Quantidade atualizada!',
+                    'cart_count' => count($cart)
+                ]);
+            }
+            
+            return redirect()->back()->with('success', 'Quantidade atualizada!');
         }
-        
-        return redirect()->back()->with('success', 'Quantidade atualizada!');
     }
 }

@@ -524,7 +524,7 @@
         <div class="page-header">
             <!-- Breadcrumb -->
             <div class="mb-4">
-                <a href="{{ route('orders.index') }}" class="breadcrumb-link">
+                <a href="{{ route('user.profile') }}#pedidos" class="breadcrumb-link">
                     <i class="fas fa-arrow-left"></i>
                     Voltar para Meus Pedidos
                 </a>
@@ -615,6 +615,30 @@
                                     <div class="price-sub">
                                         Subtotal: R$ {{ number_format($item->subtotal, 2, ',', '.') }}
                                     </div>
+                                    
+                                    @if($order->status === 'delivered' && auth()->check())
+                                        @php
+                                            $hasReview = \App\Models\Review::where('user_id', auth()->id())
+                                                ->where('book_id', $item->book_id)
+                                                ->where('order_id', $order->id)
+                                                ->exists();
+                                        @endphp
+                                        
+                                        @if($hasReview)
+                                            <div style="margin-top: 0.5rem;">
+                                                <span style="color: #10b981; font-size: 0.85rem; font-weight: 600;">
+                                                    <i class="fas fa-check-circle"></i> Já avaliado
+                                                </span>
+                                            </div>
+                                        @else
+                                            <div style="margin-top: 0.5rem;">
+                                                <a href="{{ route('reviews.create', ['order' => $order->id, 'book' => $item->book_id]) }}" 
+                                                   style="display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.5rem 1rem; background: linear-gradient(45deg, #667eea, #764ba2); color: white; border-radius: 8px; font-size: 0.85rem; font-weight: 600; text-decoration: none; transition: all 0.3s;">
+                                                    <i class="fas fa-star"></i> Avaliar
+                                                </a>
+                                            </div>
+                                        @endif
+                                    @endif
                                 </div>
                             </div>
                             @endforeach

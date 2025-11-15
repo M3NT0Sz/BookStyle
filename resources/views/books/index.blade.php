@@ -173,7 +173,7 @@
                     @if(count($books) > 0)
                         <div class="books-listing-grid" id="booksGrid">
                             @foreach ($books as $book)
-                                <div class="book-listing-card">
+                                <div class="book-listing-card" onclick="window.location.href='{{ route('books.show', is_array($book) ? $book['id'] : $book->id) }}'" style="cursor: pointer;">
                                     <div class="book-listing-image">
                                         @php
                                             $images = is_array($book)
@@ -224,11 +224,11 @@
                                         </div>
                                         
                                         <div class="book-listing-actions">
-                                            <a href="{{ route('books.show', $bookData['id']) }}" class="book-listing-btn primary">
+                                            <a href="{{ route('books.show', $bookData['id']) }}" class="book-listing-btn primary" onclick="event.stopPropagation();">
                                                 <i class="fas fa-eye"></i>
                                                 Ver Detalhes
                                             </a>
-                                            <form action="{{ route('cart.add', ['bookId' => $bookData['id']]) }}" method="POST" class="add-to-cart-form" style="display: inline;">
+                                            <form action="{{ route('cart.add', ['bookId' => $bookData['id']]) }}" method="POST" class="add-to-cart-form" style="display: inline;" onclick="event.stopPropagation();">
                                                 @csrf
                                                 <input type="hidden" name="quantity" value="1">
                                                 <button type="submit" class="book-listing-btn secondary add-to-cart-btn" data-book-id="{{ $bookData['id'] }}" data-book-name="{{ $bookData['name'] }}">

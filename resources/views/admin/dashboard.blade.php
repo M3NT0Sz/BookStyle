@@ -496,6 +496,31 @@
                     </div>
                 </div>
             </a>
+
+            <!-- Gerenciar Pedidos -->
+            <a href="{{ route('admin.orders') }}" class="admin-nav-card card-stats animate-fade-in">
+                <div class="nav-card-icon">
+                    <i class="fas fa-shopping-bag"></i>
+                </div>
+                <h3 class="nav-card-title">Gerenciar Pedidos</h3>
+                <p class="nav-card-description">
+                    Visualize e gerencie todos os pedidos realizados. 
+                    Acompanhe status e processamento.
+                </p>
+                <div class="nav-card-stats">
+                    <div class="stat-item">
+                        <span class="stat-value">{{ $totalOrders ?? '0' }}</span>
+                        <span class="stat-label">Hoje</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value">{{ \App\Models\Order::count() }}</span>
+                        <span class="stat-label">Total</span>
+                    </div>
+                    <div class="stat-item">
+                        <i class="fas fa-arrow-right" style="color: #8b5cf6; font-size: 1.2rem;"></i>
+                    </div>
+                </div>
+            </a>
         </div>
 
         <!-- Botão Voltar -->

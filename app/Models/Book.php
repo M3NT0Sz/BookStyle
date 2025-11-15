@@ -58,6 +58,30 @@ class Book extends Model
         return $this->belongsTo(User::class);
     }
 
+    /**
+     * Relacionamento com avaliações
+     */
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    /**
+     * Obter média de avaliações
+     */
+    public function getAverageRating(): float
+    {
+        return $this->reviews()->approved()->avg('rating') ?? 0;
+    }
+
+    /**
+     * Obter total de avaliações
+     */
+    public function getReviewsCount(): int
+    {
+        return $this->reviews()->approved()->count();
+    }
+
     public static function getAllBooks($columns = ['*'])
     {
         $pdo = DatabaseSingleton::getInstance()->getConnection();

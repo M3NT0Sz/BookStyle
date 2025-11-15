@@ -18,7 +18,27 @@ class AdminController extends Controller
         if (!auth()->check() || !auth()->user()->is_admin) {
             return redirect('/')->with('error', 'Acesso não autorizado.');
         }
-        return view('admin.dashboard');
+        
+        // Coletar estatísticas do sistema
+        $totalBooks = Book::count();
+        $totalUsers = User::count();
+        $totalCoupons = Coupon::where('is_active', true)->count();
+        $totalOrders = Order::whereDate('created_at', today())->count();
+        
+        // Estatísticas adicionais para os cards
+        $newBooksToday = Book::whereDate('created_at', today())->count();
+        $adminUsers = User::where('is_admin', true)->count();
+        $usedCoupons = Coupon::where('used_count', '>', 0)->count();
+        
+        return view('admin.dashboard', compact(
+            'totalBooks',
+            'totalUsers',
+            'totalCoupons',
+            'totalOrders',
+            'newBooksToday',
+            'adminUsers',
+            'usedCoupons'
+        ));
     }
 
     public function books()

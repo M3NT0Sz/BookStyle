@@ -39,13 +39,17 @@ document.addEventListener('DOMContentLoaded', function() {
     // Smooth scroll for anchor links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
-            if (target) {
-                target.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
+            const href = this.getAttribute('href');
+            // Only handle actual anchor links (starting with #)
+            if (href && href.startsWith('#')) {
+                e.preventDefault();
+                const target = document.querySelector(href);
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
             }
         });
     });
@@ -427,15 +431,136 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeCarousels();
 
     // Quick view functionality
-    window.quickView = function(bookId) {
-        showNotification('Visualização rápida em desenvolvimento', 'info');
-        // Here you could implement a modal or redirect to book details
+    window.quickView = async function(bookId) {
+        const modal = document.getElementById('quickViewModal');
+        const loading = document.getElementById('quickViewLoading');
+        const body = document.getElementById('quickViewBody');
+        
+        // Show modal
+        modal.style.display = 'flex';
+        loading.style.display = 'flex';
+        body.style.display = 'none';
+        document.body.style.overflow = 'hidden';
+        
+        try {
+            // Fetch book data
+            const response = await fetch(`/api/books/${bookId}`);
+            if (!response.ok) throw new Error('Erro ao carregar livro');
+            
+            const book = await response.json();
+            
+            // Get first image
+            let images = [];
+            if (book.images) {
+                images = typeof book.images === 'string' ? JSON.parse(book.images) : book.images;
+            }
+            const firstImage = images.length > 0 ? images[0] : null;
+            
+            // Update modal content
+            document.getElementById('quickViewImage').src = firstImage ? `/storage/${firstImage}` : 'https://via.placeholder.com/400x500?text=Livro';
+            document.getElementById('quickViewTitle').textContent = book.name;
+            document.getElementById('quickViewAuthor').textContent = book.author || 'Autor não informado';
+            document.getElementById('quickViewPrice').innerHTML = `<span class="current-price">R$ ${parseFloat(book.price).toFixed(2).replace('.', ',')}</span>`;
+            document.getElementById('quickViewDescription').textContent = book.description || 'Sem descrição disponível.';
+            
+            // Update buttons
+            const detailsBtn = document.getElementById('quickViewDetailsBtn');
+            const cartBtn = document.getElementById('quickViewCartBtn');
+            
+            detailsBtn.href = `/books/show/${book.id}`;
+            cartBtn.setAttribute('data-book-id', book.id);
+            cartBtn.setAttribute('data-book-name', book.name);
+            
+            // Remove old event listeners by cloning
+            const newCartBtn = cartBtn.cloneNode(true);
+            cartBtn.parentNode.replaceChild(newCartBtn, cartBtn);
+            
+            // Add new event listener
+            newCartBtn.addEventListener('click', function() {
+                addToCartFromQuickView(book.id, book.name);
+            });
+            
+            // Show content
+            loading.style.display = 'none';
+            body.style.display = 'flex';
+            
+        } catch (error) {
+            console.error('Erro ao carregar visualização:', error);
+            showNotification('Erro ao carregar visualização do livro', 'error');
+            closeQuickView();
+        }
+    };
+    
+    window.closeQuickView = function() {
+        const modal = document.getElementById('quickViewModal');
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    };
+    
+    window.addToCartFromQuickView = function(bookId, bookName) {
+        // Show notification
+        showNotification(`${bookName} adicionado ao carrinho! Redirecionando...`, 'success');
+        
+        // Close modal
+        closeQuickView();
+        
+        // Create form and submit
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/cart/add/${bookId}`;
+        form.style.display = 'none';
+        
+        const csrfToken = document.querySelector('meta[name="csrf-token"]');
+        if (csrfToken) {
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = '_token';
+            csrfInput.value = csrfToken.content;
+            form.appendChild(csrfInput);
+        }
+        
+        const quantityInput = document.createElement('input');
+        quantityInput.type = 'hidden';
+        quantityInput.name = 'quantity';
+        quantityInput.value = '1';
+        form.appendChild(quantityInput);
+        
+        document.body.appendChild(form);
+        
+        // Submit after small delay to show notification
+        setTimeout(() => form.submit(), 500);
     };
 
     // Add to cart from overlay
     window.addToCart = function(bookId) {
-        showNotification('Livro adicionado ao carrinho!', 'success');
-        // Here you could implement actual cart functionality
+        // Show notification
+        showNotification('Livro adicionado ao carrinho! Redirecionando...', 'success');
+        
+        // Create form and submit
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/cart/add/${bookId}`;
+        form.style.display = 'none';
+        
+        const csrfToken = document.querySelector('meta[name="csrf-token"]');
+        if (csrfToken) {
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = '_token';
+            csrfInput.value = csrfToken.content;
+            form.appendChild(csrfInput);
+        }
+        
+        const quantityInput = document.createElement('input');
+        quantityInput.type = 'hidden';
+        quantityInput.name = 'quantity';
+        quantityInput.value = '1';
+        form.appendChild(quantityInput);
+        
+        document.body.appendChild(form);
+        
+        // Submit after small delay to show notification
+        setTimeout(() => form.submit(), 500);
     };
 
     console.log('BookStyle Home - JavaScript loaded successfully!');

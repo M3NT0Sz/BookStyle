@@ -63,7 +63,7 @@
     <div class="cart-main">
         <div class="container">
             @php
-                $cartCoupon = session('cart.coupon', null);
+                $cartCoupon = session('cart_coupon', null);
                 $total = 0;
             @endphp
             
@@ -102,9 +102,26 @@
                                             {{ $book['author'] }}
                                         </p>
                                         <div class="cart-item-info">
-                                            <div class="quantity-info">
+                                            <div class="quantity-control">
                                                 <i class="fas fa-cube"></i>
-                                                <span>Quantidade: {{ $book['quantity'] }}</span>
+                                                <span>Quantidade:</span>
+                                                <div class="quantity-buttons">
+                                                    <form action="{{ route('cart.updateQuantity', $book['id']) }}" method="POST" style="display: inline;">
+                                                        @csrf
+                                                        <input type="hidden" name="action" value="decrease">
+                                                        <button type="submit" class="qty-btn" {{ $book['quantity'] <= 1 ? 'disabled' : '' }}>
+                                                            <i class="fas fa-minus"></i>
+                                                        </button>
+                                                    </form>
+                                                    <span class="qty-display">{{ $book['quantity'] }}</span>
+                                                    <form action="{{ route('cart.updateQuantity', $book['id']) }}" method="POST" style="display: inline;">
+                                                        @csrf
+                                                        <input type="hidden" name="action" value="increase">
+                                                        <button type="submit" class="qty-btn">
+                                                            <i class="fas fa-plus"></i>
+                                                        </button>
+                                                    </form>
+                                                </div>
                                             </div>
                                             <div class="price-info">
                                                 <span class="unit-price">R$ {{ number_format($book['price'], 2, ',', '.') }}/un</span>
@@ -133,19 +150,62 @@
                             </div>
                             
                             <div class="summary-content">
-                                @if($cartCoupon)
-                                    <div class="applied-coupon">
-                                        <div class="coupon-info">
-                                            <i class="fas fa-tag"></i>
-                                            <div class="coupon-details">
-                                                <span class="coupon-code">{{ $cartCoupon['code'] }}</span>
-                                                <span class="coupon-discount">
-                                                    {{ $cartCoupon['type'] == 'percent' ? $cartCoupon['discount'] . '% OFF' : 'R$ ' . number_format($cartCoupon['discount'], 2, ',', '.') . ' OFF' }}
-                                                </span>
+                                <!-- Seção de Cupom -->
+                                <div class="coupon-section" style="margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid #e0e0e0;">
+                                    @if($cartCoupon)
+                                        <div class="applied-coupon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 1rem; border-radius: 12px; margin-bottom: 1rem;">
+                                            <div class="coupon-info" style="display: flex; align-items: center; justify-content: space-between;">
+                                                <div style="display: flex; align-items: center; gap: 0.75rem; color: white;">
+                                                    <i class="fas fa-check-circle" style="font-size: 1.5rem;"></i>
+                                                    <div class="coupon-details">
+                                                        <span class="coupon-code" style="display: block; font-weight: 600; font-size: 1rem;">{{ $cartCoupon['code'] }}</span>
+                                                        <span class="coupon-discount" style="display: block; font-size: 0.875rem; opacity: 0.9;">
+                                                            {{ $cartCoupon['type'] == 'percent' ? $cartCoupon['discount'] . '% OFF' : 'R$ ' . number_format($cartCoupon['discount'], 2, ',', '.') . ' OFF' }}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <form action="{{ route('cart.removeCoupon') }}" method="POST" style="margin: 0;">
+                                                    @csrf
+                                                    <button type="submit" style="background: rgba(255,255,255,0.2); border: none; color: white; padding: 0.5rem; border-radius: 8px; cursor: pointer; transition: all 0.3s;">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
+                                                </form>
                                             </div>
                                         </div>
-                                    </div>
-                                @endif
+                                    @else
+                                        <form action="{{ route('cart.applyCoupon') }}" method="POST" style="margin-bottom: 0;">
+                                            @csrf
+                                            <div style="display: flex; gap: 0.5rem;">
+                                                <div style="flex: 1; position: relative;">
+                                                    <input 
+                                                        type="text" 
+                                                        name="coupon_code" 
+                                                        placeholder="Digite o código do cupom" 
+                                                        style="width: 100%; padding: 0.75rem 1rem; padding-left: 2.5rem; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 0.875rem; transition: all 0.3s;"
+                                                        onfocus="this.style.borderColor='#667eea'"
+                                                        onblur="this.style.borderColor='#e0e0e0'"
+                                                        required>
+                                                    <i class="fas fa-ticket-alt" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #999;"></i>
+                                                </div>
+                                                <button type="submit" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 10px; font-weight: 600; cursor: pointer; transition: all 0.3s; white-space: nowrap;">
+                                                    <i class="fas fa-check"></i> Aplicar
+                                                </button>
+                                            </div>
+                                        </form>
+                                        
+                                        @if(session('coupon_error'))
+                                            <div style="margin-top: 0.75rem; padding: 0.75rem; background: #fee; border-left: 3px solid #f44; border-radius: 8px; color: #c33; font-size: 0.875rem;">
+                                                <i class="fas fa-exclamation-circle"></i> {{ session('coupon_error') }}
+                                            </div>
+                                        @endif
+                                        
+                                        @if(session('coupon_success'))
+                                            <div style="margin-top: 0.75rem; padding: 0.75rem; background: #efe; border-left: 3px solid #4a4; border-radius: 8px; color: #363; font-size: 0.875rem;">
+                                                <i class="fas fa-check-circle"></i> {{ session('coupon_success') }}
+                                            </div>
+                                        @endif
+                                    @endif
+                                </div>
                                 
                                 <div class="summary-lines">
                                     <div class="summary-line">
@@ -173,110 +233,6 @@
                                         </div>
                                     @endif
                                 </div>
-                                
-                                <div class="coupon-section">
-                                    <h4><i class="fas fa-percentage"></i> Cupom de Desconto</h4>
-                                    <form class="coupon-form" action="{{ route('cart.applyCoupon') }}" method="POST">
-                                        @csrf
-                                        <div class="coupon-input-group">
-                                            <input type="text" id="coupon_code" name="coupon_code" 
-                                                   placeholder="Digite o código do cupom" required>
-                                            <button type="submit">
-                                                <i class="fas fa-check"></i>
-                                                Aplicar
-                                            </button>
-                                        </div>
-                                    </form>
-                                    
-                                    @if(session('coupon_error'))
-                                        <div class="alert alert-error">
-                                            <i class="fas fa-exclamation-circle"></i>
-                                            {{ session('coupon_error') }}
-                                        </div>
-                                    @endif
-                                    
-                                    @if(session('coupon_success'))
-                                        <div class="alert alert-success">
-                                            <i class="fas fa-check-circle"></i>
-                                            {{ session('coupon_success') }}
-                                        </div>
-                                    @endif
-                                </div>
-
-                                {{-- ========== SEÇÃO DE CUPONS INTELIGENTES ========== --}}
-                                @auth
-                                    {{-- Notificação de novo cupom --}}
-                                    @if(session('new_coupon'))
-                                        <div class="new-coupon-notification">
-                                            <div class="new-coupon-content">
-                                                <i class="fas fa-gift"></i>
-                                                <div class="new-coupon-text">
-                                                    <h4>🎉 Novo cupom disponível!</h4>
-                                                    <p>{{ session('new_coupon.message') }}</p>
-                                                </div>
-                                                <button onclick="this.parentElement.style.display='none'" class="close-notification">
-                                                    <i class="fas fa-times"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    @endif
-
-                                    {{-- Cupons Sugeridos --}}
-                                    @if(isset($suggestedCoupons) && count($suggestedCoupons) > 0)
-                                        <div class="smart-coupons-section">
-                                            <h4><i class="fas fa-magic"></i> Cupons Recomendados para Você</h4>
-                                            <div class="smart-coupons-grid">
-                                                @foreach($suggestedCoupons as $suggestion)
-                                                    @php $coupon = $suggestion['coupon']; @endphp
-                                                    <div class="smart-coupon-card">
-                                                        <div class="smart-coupon-header">
-                                                            <span class="coupon-type-badge">
-                                                                @switch($coupon['trigger_type'])
-                                                                    @case('first_purchase')
-                                                                        <i class="fas fa-star"></i> Boas-vindas
-                                                                        @break
-                                                                    @case('birthday')
-                                                                        <i class="fas fa-birthday-cake"></i> Aniversário
-                                                                        @break
-                                                                    @case('loyalty')
-                                                                        <i class="fas fa-trophy"></i> Fidelidade
-                                                                        @break
-                                                                    @case('high_value_cart')
-                                                                        <i class="fas fa-gem"></i> VIP
-                                                                        @break
-                                                                    @case('genre_based')
-                                                                        <i class="fas fa-book"></i> Gênero
-                                                                        @break
-                                                                    @default
-                                                                        <i class="fas fa-gift"></i> Especial
-                                                                @endswitch
-                                                            </span>
-                                                            <div class="coupon-discount-display">
-                                                                {{ $coupon['type'] == 'percent' ? $coupon['discount'] . '% OFF' : 'R$ ' . number_format($coupon['discount'], 2, ',', '.') . ' OFF' }}
-                                                            </div>
-                                                        </div>
-                                                        <div class="smart-coupon-body">
-                                                            <div class="coupon-code-display">{{ $coupon['code'] }}</div>
-                                                            <p class="coupon-message">{{ $suggestion['message'] }}</p>
-                                                            @if($coupon['expires_at'])
-                                                                <div class="coupon-expires">
-                                                                    <i class="fas fa-clock"></i>
-                                                                    Válido até {{ date('d/m/Y', strtotime($coupon['expires_at'])) }}
-                                                                </div>
-                                                            @endif
-                                                        </div>
-                                                        <div class="smart-coupon-actions">
-                                                            <button class="apply-smart-coupon" onclick="applySuggestedCoupon('{{ $coupon['code'] }}')">
-                                                                <i class="fas fa-check"></i>
-                                                                Aplicar Cupom
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                @endforeach
-                                            </div>
-                                        </div>
-                                    @endif
-                                @endauth
                             </div>
                         </div>
                     </div>
@@ -383,231 +339,59 @@
                 }, 500);
             });
         }, 8000);
-
-        // ========== FUNCIONALIDADES DE CUPONS INTELIGENTES ==========
-        function applySuggestedCoupon(couponCode) {
-            document.getElementById('coupon_code').value = couponCode;
-            document.querySelector('.coupon-form').submit();
-        }
-
-        // Auto-ocultar notificação de novo cupom após 10 segundos
-        setTimeout(function() {
-            const notification = document.querySelector('.new-coupon-notification');
-            if (notification) {
-                notification.style.opacity = '0';
-                notification.style.transition = 'opacity 0.5s';
-                setTimeout(function() {
-                    notification.style.display = 'none';
-                }, 500);
-            }
-        }, 10000);
     </script>
-
-    {{-- ========== ESTILOS PARA CUPONS INTELIGENTES ========== --}}
+    
     <style>
-        /* Notificação de novo cupom */
-        .new-coupon-notification {
-            background: linear-gradient(135deg, #28a745, #20c997);
-            color: white;
-            padding: 1rem;
-            border-radius: 12px;
-            margin-bottom: 1.5rem;
-            animation: slideInFromTop 0.5s ease-out;
-            position: relative;
-        }
-
-        .new-coupon-content {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .new-coupon-content i {
-            font-size: 2rem;
-            color: #fff;
-        }
-
-        .new-coupon-text h4 {
-            margin: 0;
-            font-size: 1.2rem;
-            font-weight: 600;
-        }
-
-        .new-coupon-text p {
-            margin: 0.5rem 0 0 0;
-            opacity: 0.9;
-        }
-
-        .close-notification {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 1.2rem;
-            cursor: pointer;
-            position: absolute;
-            top: 0.5rem;
-            right: 0.5rem;
-            padding: 0.5rem;
-            opacity: 0.7;
-            transition: opacity 0.2s;
-        }
-
-        .close-notification:hover {
-            opacity: 1;
-        }
-
-        /* Seção de cupons inteligentes */
-        .smart-coupons-section {
-            margin-top: 2rem;
-            padding: 1.5rem;
-            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-            border-radius: 15px;
-            border: 1px solid #dee2e6;
-        }
-
-        .smart-coupons-section h4 {
-            color: #495057;
-            font-size: 1.3rem;
-            font-weight: 600;
-            margin-bottom: 1.5rem;
+        .quantity-control {
             display: flex;
             align-items: center;
             gap: 0.5rem;
         }
 
-        .smart-coupons-section h4 i {
-            color: #007bff;
-        }
-
-        .smart-coupons-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1rem;
-        }
-
-        /* Cards de cupons sugeridos */
-        .smart-coupon-card {
-            background: white;
-            border-radius: 12px;
-            border: 2px solid #e9ecef;
-            overflow: hidden;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            position: relative;
-        }
-
-        .smart-coupon-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
-            border-color: #007bff;
-        }
-
-        .smart-coupon-header {
-            background: linear-gradient(135deg, #007bff, #0056b3);
-            color: white;
-            padding: 1rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .coupon-type-badge {
-            font-size: 0.85rem;
-            font-weight: 600;
-            opacity: 0.9;
+        .quantity-buttons {
             display: flex;
             align-items: center;
             gap: 0.3rem;
-        }
-
-        .coupon-discount-display {
-            font-size: 1.4rem;
-            font-weight: 700;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
-        }
-
-        .smart-coupon-body {
-            padding: 1.5rem;
-        }
-
-        .coupon-code-display {
             background: #f8f9fa;
-            border: 2px dashed #dee2e6;
             border-radius: 8px;
-            padding: 0.75rem;
-            text-align: center;
-            font-family: 'Courier New', monospace;
-            font-weight: 700;
-            font-size: 1.1rem;
-            color: #495057;
-            margin-bottom: 1rem;
+            padding: 0.2rem;
         }
 
-        .coupon-message {
-            color: #6c757d;
-            font-size: 0.95rem;
-            line-height: 1.4;
-            margin-bottom: 1rem;
-        }
-
-        .coupon-expires {
-            font-size: 0.85rem;
-            color: #dc3545;
-            display: flex;
-            align-items: center;
-            gap: 0.3rem;
-            font-weight: 500;
-        }
-
-        .smart-coupon-actions {
-            padding: 0 1.5rem 1.5rem 1.5rem;
-        }
-
-        .apply-smart-coupon {
-            width: 100%;
-            background: linear-gradient(135deg, #28a745, #20c997);
-            color: white;
-            border: none;
-            padding: 0.8rem 1rem;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
+        .qty-btn {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            width: 28px;
+            height: 28px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 0.5rem;
+            cursor: pointer;
+            color: #667eea;
+            transition: all 0.2s ease;
+            padding: 0;
         }
 
-        .apply-smart-coupon:hover {
-            background: linear-gradient(135deg, #218838, #1ea085);
-            transform: scale(1.02);
+        .qty-btn:hover:not(:disabled) {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+            transform: scale(1.1);
         }
 
-        /* Animação */
-        @keyframes slideInFromTop {
-            0% {
-                transform: translateY(-20px);
-                opacity: 0;
-            }
-            100% {
-                transform: translateY(0);
-                opacity: 1;
-            }
+        .qty-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
         }
 
-        /* Responsividade */
-        @media (max-width: 768px) {
-            .smart-coupons-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .new-coupon-content {
-                flex-direction: column;
-                text-align: center;
-            }
+        .qty-display {
+            font-weight: 600;
+            min-width: 30px;
+            text-align: center;
+            color: #495057;
         }
     </style>
     
     @include('components.footer')
 @endsection
+

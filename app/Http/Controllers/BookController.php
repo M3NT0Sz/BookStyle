@@ -200,13 +200,81 @@ class BookController extends Controller
         
         $userId = is_array($book) ? ($book['user_id'] ?? null) : $book->user_id;
         $user = $userId ? \App\Models\User::find($userId) : null;
-        return view('books.show', compact('book', 'user'));
+        
+        // Buscar avaliações do livro
+        $bookModel = Book::find($id);
+        $reviews = \App\Models\Review::where('book_id', $id)
+            ->approved()
+            ->with('user')
+            ->orderBy('created_at', 'desc')
+            ->paginate(5);
+        
+        $averageRating = $bookModel->getAverageRating();
+        $totalReviews = $bookModel->getReviewsCount();
+        
+        // Distribuição de estrelas
+        $ratingDistribution = [];
+        for ($i = 5; $i >= 1; $i--) {
+            $count = \App\Models\Review::where('book_id', $id)
+                ->approved()
+                ->where('rating', $i)
+                ->count();
+            $ratingDistribution[$i] = [
+                'count' => $count,
+                'percentage' => $totalReviews > 0 ? ($count / $totalReviews * 100) : 0
+            ];
+        }
+        
+        // Verificar se o usuário logado pode avaliar este produto
+        $userCanReview = false;
+        $userOrderId = null;
+        
+        if (auth()->check()) {
+            // Buscar pedido entregue do usuário que contenha este livro
+            $order = \App\Models\Order::where('user_id', auth()->id())
+                ->where('status', 'delivered')
+                ->whereHas('orderItems', function($query) use ($id) {
+                    $query->where('book_id', $id);
+                })
+                ->first();
+            
+            if ($order) {
+                // Verificar se já avaliou
+                $hasReviewed = \App\Models\Review::where('user_id', auth()->id())
+                    ->where('book_id', $id)
+                    ->where('order_id', $order->id)
+                    ->exists();
+                
+                $userCanReview = !$hasReviewed;
+                $userOrderId = $order->id;
+            }
+        }
+        
+        $bookId = $id;
+        
+        return view('books.show', compact('book', 'user', 'reviews', 'averageRating', 'totalReviews', 'ratingDistribution', 'userCanReview', 'userOrderId', 'bookId'));
     }
 
     public function destroy($id)
     {
         $book = Book::find($id);
         if ($book) {
+            // Deletar imagens do livro antes de deletar o registro
+            if (!empty($book->images)) {
+                $images = is_string($book->images) ? json_decode($book->images, true) : $book->images;
+                
+                if (is_array($images)) {
+                    foreach ($images as $imagePath) {
+                        // Remove prefixo storage/ se existir
+                        $imagePath = preg_replace('#^storage/#', '', trim($imagePath));
+                        
+                        if (\Storage::disk('public')->exists($imagePath)) {
+                            \Storage::disk('public')->delete($imagePath);
+                        }
+                    }
+                }
+            }
+            
             $book->delete();
             return redirect()->route('user.profile')->with('success', 'Livro deletado com sucesso!');
         }

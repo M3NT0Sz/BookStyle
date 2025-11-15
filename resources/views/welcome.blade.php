@@ -1,6 +1,221 @@
 @extends('layouts.app')
 
 @section('content')
+<style>
+/* Quick View Modal Styles */
+.quick-view-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.quick-view-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+}
+
+.quick-view-content {
+    position: relative;
+    background: white;
+    border-radius: 20px;
+    max-width: 900px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: modalSlideIn 0.3s ease;
+}
+
+@keyframes modalSlideIn {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.quick-view-close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: white;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: #333;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+.quick-view-close:hover {
+    transform: rotate(90deg);
+    background: #ff4757;
+    color: white;
+}
+
+.quick-view-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem;
+    gap: 1rem;
+    color: #667eea;
+}
+
+.quick-view-loading i {
+    font-size: 3rem;
+}
+
+.quick-view-body {
+    display: flex;
+    gap: 2rem;
+    padding: 2rem;
+}
+
+.quick-view-image {
+    flex: 0 0 400px;
+}
+
+.quick-view-image img {
+    width: 100%;
+    height: 500px;
+    object-fit: cover;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.quick-view-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.quick-view-title {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #1e293b;
+    margin: 0;
+}
+
+.quick-view-author {
+    font-size: 1.1rem;
+    color: #64748b;
+    margin: 0;
+}
+
+.quick-view-rating {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.quick-view-rating .stars {
+    color: #fbbf24;
+}
+
+.quick-view-rating .rating-text {
+    color: #64748b;
+}
+
+.quick-view-price {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1abc9c;
+    margin: 1rem 0;
+}
+
+.quick-view-description {
+    color: #475569;
+    line-height: 1.6;
+    margin: 1rem 0;
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+.quick-view-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: auto;
+    padding-top: 1rem;
+}
+
+.quick-view-actions .btn {
+    flex: 1;
+    padding: 1rem;
+    border-radius: 10px;
+    font-weight: 600;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.quick-view-actions .btn-primary {
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    color: white;
+}
+
+.quick-view-actions .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+}
+
+.quick-view-actions .btn-secondary {
+    background: #f1f5f9;
+    color: #334155;
+}
+
+.quick-view-actions .btn-secondary:hover {
+    background: #e2e8f0;
+}
+
+@media (max-width: 768px) {
+    .quick-view-body {
+        flex-direction: column;
+        padding: 1rem;
+    }
+    
+    .quick-view-image {
+        flex: 0 0 auto;
+    }
+    
+    .quick-view-image img {
+        height: 300px;
+    }
+    
+    .quick-view-actions {
+        flex-direction: column;
+    }
+}
+</style>
+
     <header class="header-container">
         <nav class="nav-container">
             <a href="{{ route('index') }}" class="logo-link">
@@ -157,7 +372,7 @@
                     <div class="books-grid">
                         @foreach ($booksNew as $book)
                             @php $book = (object) $book; @endphp
-                            <div class="book-card">
+                            <div class="book-card" onclick="window.location.href='{{ route('books.show', $book->id) }}'" style="cursor: pointer;">
                                 <div class="book-image">
                                     @if(!empty($book->images))
                                         @php
@@ -175,10 +390,10 @@
                                     @endif
                                     <div class="book-badge">Novo</div>
                                     <div class="book-overlay">
-                                        <button class="quick-view-btn" onclick="quickView({{ $book->id }})">
+                                        <button class="quick-view-btn" onclick="event.stopPropagation(); quickView({{ $book->id }})">
                                             <i class="fas fa-eye"></i>
                                         </button>
-                                        <button class="add-to-cart-btn" onclick="addToCart({{ $book->id }})">
+                                        <button class="add-to-cart-btn" onclick="event.stopPropagation(); addToCart({{ $book->id }})">
                                             <i class="fas fa-shopping-cart"></i>
                                         </button>
                                     </div>
@@ -199,7 +414,7 @@
                                     <div class="book-price">
                                         <span class="current-price">R$ {{ $book->price }}</span>
                                     </div>
-                                    <a href="{{ route('books.show', $book->id) }}" class="book-btn">
+                                    <a href="{{ route('books.show', $book->id) }}" class="book-btn" onclick="event.stopPropagation();">
                                         <i class="fas fa-shopping-bag"></i>
                                         Comprar
                                     </a>
@@ -239,7 +454,7 @@
                     <div class="books-grid">
                         @foreach ($booksOld as $book)
                             @php $book = (object) $book; @endphp
-                            <div class="book-card">
+                            <div class="book-card" onclick="window.location.href='{{ route('books.show', $book->id) }}'" style="cursor: pointer;">
                                 <div class="book-image">
                                     @if(!empty($book->images))
                                         @php
@@ -257,10 +472,10 @@
                                     @endif
                                     <div class="book-badge used">Usado</div>
                                     <div class="book-overlay">
-                                        <button class="quick-view-btn" onclick="quickView({{ $book->id }})">
+                                        <button class="quick-view-btn" onclick="event.stopPropagation(); quickView({{ $book->id }})">
                                             <i class="fas fa-eye"></i>
                                         </button>
-                                        <button class="add-to-cart-btn" onclick="addToCart({{ $book->id }})">
+                                        <button class="add-to-cart-btn" onclick="event.stopPropagation(); addToCart({{ $book->id }})">
                                             <i class="fas fa-shopping-cart"></i>
                                         </button>
                                     </div>
@@ -282,7 +497,7 @@
                                         <span class="current-price">R$ {{ $book->price }}</span>
                                         <span class="savings">Economia sustentável!</span>
                                     </div>
-                                    <a href="{{ route('books.show', $book->id) }}" class="book-btn">
+                                    <a href="{{ route('books.show', $book->id) }}" class="book-btn" onclick="event.stopPropagation();">
                                         <i class="fas fa-shopping-bag"></i>
                                         Comprar
                                     </a>
@@ -546,6 +761,58 @@
             </div>
         </section>
     </main>
+
+    <!-- Modal de Visualização Rápida -->
+    <div id="quickViewModal" class="quick-view-modal" style="display: none;">
+        <div class="quick-view-overlay" onclick="closeQuickView()"></div>
+        <div class="quick-view-content">
+            <button class="quick-view-close" onclick="closeQuickView()">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <div id="quickViewLoading" class="quick-view-loading">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Carregando...</p>
+            </div>
+            
+            <div id="quickViewBody" class="quick-view-body" style="display: none;">
+                <div class="quick-view-image">
+                    <img id="quickViewImage" src="" alt="">
+                </div>
+                
+                <div class="quick-view-info">
+                    <h2 id="quickViewTitle" class="quick-view-title"></h2>
+                    <p id="quickViewAuthor" class="quick-view-author"></p>
+                    
+                    <div id="quickViewRating" class="quick-view-rating">
+                        <div class="stars">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <span class="rating-text">(4.5)</span>
+                    </div>
+                    
+                    <div id="quickViewPrice" class="quick-view-price"></div>
+                    
+                    <div id="quickViewDescription" class="quick-view-description"></div>
+                    
+                    <div class="quick-view-actions">
+                        <a id="quickViewDetailsBtn" href="#" class="btn btn-secondary">
+                            <i class="fas fa-eye"></i>
+                            Ver Detalhes Completos
+                        </a>
+                        <button id="quickViewCartBtn" class="btn btn-primary" type="button">
+                            <i class="fas fa-shopping-cart"></i>
+                            Adicionar ao Carrinho
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <footer class="footer-container">
         <section class="footer-content">
