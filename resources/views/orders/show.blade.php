@@ -558,8 +558,32 @@
                     </h1>
                 </div>
                 
-                @if($order->canBeCancelled())
-                <div class="flex-shrink-0">
+                <div class="flex-shrink-0 flex gap-3">
+                    @if($order->payment_status === 'pending' || $order->payment_status === 'failed')
+                        @if($order->payment_method === 'pix' && $order->payment_id)
+                            <a href="{{ route('payment.pix', $order->id) }}" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold rounded-lg shadow-lg hover:from-green-600 hover:to-green-700 transform hover:scale-105 transition-all duration-200">
+                                <i class="fas fa-qrcode mr-2"></i>
+                                Ver QR Code PIX
+                            </a>
+                        @elseif($order->payment_method === 'boleto' && $order->payment_id)
+                            <a href="{{ route('payment.boleto', $order->id) }}" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold rounded-lg shadow-lg hover:from-blue-600 hover:to-blue-700 transform hover:scale-105 transition-all duration-200">
+                                <i class="fas fa-barcode mr-2"></i>
+                                Ver Boleto
+                            </a>
+                        @elseif(in_array($order->payment_method, ['credit_card', 'debit_card']))
+                            <a href="{{ route('checkout') }}" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold rounded-lg shadow-lg hover:from-green-600 hover:to-green-700 transform hover:scale-105 transition-all duration-200">
+                                <i class="fas fa-credit-card mr-2"></i>
+                                Tentar Novamente
+                            </a>
+                        @else
+                            <a href="{{ route('checkout') }}" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold rounded-lg shadow-lg hover:from-green-600 hover:to-green-700 transform hover:scale-105 transition-all duration-200">
+                                <i class="fas fa-credit-card mr-2"></i>
+                                Pagar Agora
+                            </a>
+                        @endif
+                    @endif
+                    
+                    @if($order->canBeCancelled())
                     <form method="POST" action="{{ route('orders.cancel', $order) }}" class="inline">
                         @csrf
                         @method('DELETE')
@@ -570,8 +594,8 @@
                             Cancelar Pedido
                         </button>
                     </form>
+                    @endif
                 </div>
-                @endif
             </div>
         </div>
 
@@ -592,15 +616,19 @@
                             @foreach($order->orderItems as $item)
                             <div class="order-item slide-in-left" style="animation-delay: {{ $loop->index * 0.1 }}s">
                                 <div class="item-image">
-                                    <i class="fas fa-book"></i>
+                                    @if($item->book->images && count($item->book->images) > 0)
+                                        <img src="{{ asset('storage/' . $item->book->images[0]) }}" alt="{{ $item->book->name }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
+                                    @else
+                                        <i class="fas fa-book"></i>
+                                    @endif
                                 </div>
                                 
                                 <div class="item-details">
                                     <h3 class="item-title">
-                                        📚 {{ $item->book->title }}
+                                        {{ $item->book->name }}
                                     </h3>
                                     <p class="item-author">
-                                        ✍️ {{ $item->book->author }}
+                                        por {{ $item->book->author }}
                                     </p>
                                     <span class="item-quantity">
                                         <i class="fas fa-cube"></i>
@@ -809,22 +837,24 @@
                     
                     <div class="space-y-4">
                         <div class="summary-row">
-                            <span>Subtotal ({{ $order->orderItems->sum('quantity') }} itens)</span>
-                            <span>R$ {{ number_format($order->total, 2, ',', '.') }}</span>
+                            <span>Subtotal ({{ $order->orderItems->sum('quantity') }} {{ $order->orderItems->sum('quantity') == 1 ? 'item' : 'itens' }})</span>
+                            <span>R$ {{ number_format($order->orderItems->sum(function($item) { return $item->price * $item->quantity; }), 2, ',', '.') }}</span>
                         </div>
                         <div class="summary-row">
                             <span>Frete</span>
                             <span class="text-green-300 font-bold">Grátis</span>
                         </div>
+                        @if($order->discount_amount > 0)
                         <div class="summary-row">
-                            <span>Desconto</span>
-                            <span>R$ 0,00</span>
+                            <span>Desconto @if($order->coupon_code)({{ $order->coupon_code }})@endif</span>
+                            <span class="text-green-400">-R$ {{ number_format($order->discount_amount, 2, ',', '.') }}</span>
                         </div>
+                        @endif
                     </div>
                     
                     <div class="summary-total">
-                        <div class="text-lg font-semibold mb-2">💰 Total Pago</div>
-                        <div class="total-amount">R$ {{ number_format($order->total, 2, ',', '.') }}</div>
+                        <div class="text-lg font-semibold mb-2">💰 Total {{ $order->payment_status === 'paid' ? 'Pago' : '' }}</div>
+                        <div class="total-amount">R$ {{ number_format($order->total_amount, 2, ',', '.') }}</div>
                     </div>
                 </div>
             </div>

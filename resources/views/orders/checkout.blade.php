@@ -2,6 +2,10 @@
 
 @section('title', 'Checkout - BookStyle')
 
+@push('scripts')
+<script src="https://sdk.mercadopago.com/js/v2"></script>
+@endpush
+
 @section('content')
 <style>
 /* Layout moderno para checkout */
@@ -862,6 +866,15 @@
                                 </p>
                             </div>
                         </div>
+                        
+                        <!-- Campo de CPF para pagamento -->
+                        <div class="mt-6 p-4 bg-gray-50 rounded-lg">
+                            <div class="form-group">
+                                <label class="form-label">CPF do Titular</label>
+                                <input type="text" id="card_holder_cpf" name="card_holder_cpf" class="form-input" placeholder="000.000.000-00" maxlength="14">
+                                <small class="text-gray-600">Necessário para processar o pagamento</small>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Endereço de Cobrança -->
@@ -1071,9 +1084,8 @@
                                             <input 
                                                 type="text" 
                                                 name="coupon_code" 
-                                                placeholder="Código do cupom" 
-                                                style="width: 100%; padding: 0.7rem 1rem; padding-left: 2.5rem; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 0.875rem;"
-                                                required>
+                                                placeholder="Código do cupom (opcional)" 
+                                                style="width: 100%; padding: 0.7rem 1rem; padding-left: 2.5rem; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 0.875rem;">
                                             <i class="fas fa-ticket-alt" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #999;"></i>
                                         </div>
                                         <button type="submit" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 0.7rem 1.25rem; border-radius: 8px; font-weight: 600; cursor: pointer; white-space: nowrap;">
@@ -1251,6 +1263,24 @@
 </div>
 
 <script>
+// Variável global do Mercado Pago
+let mpInstance = null;
+
+// Inicializar Mercado Pago apenas quando necessário
+function initializeMercadoPago() {
+    if (!mpInstance && typeof MercadoPago !== 'undefined') {
+        try {
+            mpInstance = new MercadoPago('{{ config("mercadopago.public_key") }}', {
+                locale: 'pt-BR'
+            });
+            console.log('Mercado Pago inicializado');
+        } catch (error) {
+            console.error('Erro ao inicializar Mercado Pago:', error);
+        }
+    }
+    return mpInstance;
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     // Elementos do DOM
     const paymentMethods = document.querySelectorAll('input[name="payment_method"]');
@@ -1258,16 +1288,30 @@ document.addEventListener('DOMContentLoaded', function() {
     const sameAddressCheckbox = document.getElementById('same-address');
     const shippingFields = document.getElementById('shipping-fields');
     const form = document.getElementById('checkout-form');
+    const cpfInput = document.getElementById('card_holder_cpf');
+    
+    // Máscara para CPF
+    if (cpfInput) {
+        cpfInput.addEventListener('input', function(e) {
+            let value = this.value.replace(/\D/g, '');
+            value = value.replace(/(\d{3})(\d)/, '$1.$2');
+            value = value.replace(/(\d{3})(\d)/, '$1.$2');
+            value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+            this.value = value;
+        });
+    }
     
     // Configurar métodos de pagamento
     paymentMethods.forEach(method => {
         method.addEventListener('change', function() {
-            // Remover classe active de todos os métodos
+            console.log('Método selecionado:', this.value);
+            
+            // Remover classe selected de todos
             document.querySelectorAll('.payment-method').forEach(pm => {
                 pm.classList.remove('selected');
             });
             
-            // Adicionar classe active ao método selecionado
+            // Adicionar classe ao selecionado
             this.closest('.payment-method').classList.add('selected');
             
             // Mostrar/ocultar campos do cartão
@@ -1275,20 +1319,24 @@ document.addEventListener('DOMContentLoaded', function() {
                 cardFields.classList.remove('hidden');
                 cardFields.classList.add('animate-fade-in');
                 
+                // Inicializar Mercado Pago quando selecionar cartão
+                initializeMercadoPago();
+                
                 // Tornar campos obrigatórios
                 document.getElementById('card_name').required = true;
                 document.getElementById('card_number').required = true;
                 document.getElementById('card_expiry').required = true;
                 document.getElementById('card_cvv').required = true;
+                if (cpfInput) cpfInput.required = true;
             } else {
                 cardFields.classList.add('hidden');
-                cardFields.classList.remove('animate-fade-in');
                 
                 // Tornar campos opcionais
                 document.getElementById('card_name').required = false;
                 document.getElementById('card_number').required = false;
                 document.getElementById('card_expiry').required = false;
                 document.getElementById('card_cvv').required = false;
+                if (cpfInput) cpfInput.required = false;
             }
         });
     });
@@ -1296,7 +1344,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Máscara para cartão de crédito
     const cardNumber = document.getElementById('card_number');
     if (cardNumber) {
-        cardNumber.addEventListener('input', function() {
+        cardNumber.addEventListener('input', function(e) {
             let value = this.value.replace(/\D/g, '');
             value = value.replace(/(\d{4})(?=\d)/g, '$1 ');
             this.value = value;
@@ -1306,7 +1354,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Máscara para data de validade
     const cardExpiry = document.getElementById('card_expiry');
     if (cardExpiry) {
-        cardExpiry.addEventListener('input', function() {
+        cardExpiry.addEventListener('input', function(e) {
             let value = this.value.replace(/\D/g, '');
             if (value.length >= 2) {
                 value = value.substring(0, 2) + '/' + value.substring(2, 4);
@@ -1318,31 +1366,18 @@ document.addEventListener('DOMContentLoaded', function() {
     // Máscara para CVV
     const cardCvv = document.getElementById('card_cvv');
     if (cardCvv) {
-        cardCvv.addEventListener('input', function() {
+        cardCvv.addEventListener('input', function(e) {
             this.value = this.value.replace(/\D/g, '');
         });
     }
-    
-    // Máscara para CEP
-    const cepInputs = document.querySelectorAll('[id$="_cep"]');
-    cepInputs.forEach(input => {
-        input.addEventListener('input', function() {
-            let value = this.value.replace(/\D/g, '');
-            value = value.replace(/^(\d{5})(\d)/, '$1-$2');
-            this.value = value;
-            
-            // Buscar endereço quando CEP estiver completo
-            if (value.length === 9) {
-                buscarCEP(this);
-            }
-        });
-    });
     
     // Função para buscar CEP
     async function buscarCEP(input) {
         const cep = input.value.replace(/\D/g, '');
         const isShipping = input.id.includes('shipping');
         const prefix = isShipping ? 'shipping' : 'billing';
+        
+        console.log('Buscando CEP:', cep, 'Prefixo:', prefix);
         
         if (cep.length === 8) {
             const loadingElement = document.getElementById(`${prefix}_cep_loading`);
@@ -1354,14 +1389,27 @@ document.addEventListener('DOMContentLoaded', function() {
                 const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
                 const data = await response.json();
                 
+                console.log('Resposta ViaCEP:', data);
+                
                 if (!data.erro) {
-                    document.getElementById(`${prefix}_street`).value = data.logradouro || '';
-                    document.getElementById(`${prefix}_neighborhood`).value = data.bairro || '';
-                    document.getElementById(`${prefix}_city`).value = data.localidade || '';
-                    document.getElementById(`${prefix}_state`).value = data.uf || '';
+                    const streetField = document.getElementById(`${prefix}_street`);
+                    const neighborhoodField = document.getElementById(`${prefix}_neighborhood`);
+                    const cityField = document.getElementById(`${prefix}_city`);
+                    const stateField = document.getElementById(`${prefix}_state`);
+                    
+                    if (streetField) streetField.value = data.logradouro || '';
+                    if (neighborhoodField) neighborhoodField.value = data.bairro || '';
+                    if (cityField) cityField.value = data.localidade || '';
+                    if (stateField) stateField.value = data.uf || '';
+                    
+                    console.log('Campos preenchidos com sucesso');
+                } else {
+                    console.error('CEP não encontrado');
+                    alert('CEP não encontrado');
                 }
             } catch (error) {
                 console.error('Erro ao buscar CEP:', error);
+                alert('Erro ao buscar CEP. Tente novamente.');
             } finally {
                 if (loadingElement) {
                     loadingElement.classList.add('hidden');
@@ -1370,38 +1418,57 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Checkbox "mesmo endereço"
-    sameAddressCheckbox.addEventListener('change', function() {
-        if (this.checked) {
-            // Copiar dados do endereço de cobrança para entrega
-            const billingFields = {
-                postal_code: document.querySelector('[name="billing_address[postal_code]"]').value,
-                street: document.querySelector('[name="billing_address[street]"]').value,
-                number: document.querySelector('[name="billing_address[number]"]').value,
-                complement: document.querySelector('[name="billing_address[complement]"]').value,
-                neighborhood: document.querySelector('[name="billing_address[neighborhood]"]').value,
-                city: document.querySelector('[name="billing_address[city]"]').value,
-                state: document.querySelector('[name="billing_address[state]"]').value
-            };
+    // Máscara para CEP
+    const cepInputs = document.querySelectorAll('[id$="_cep"]');
+    console.log('Campos CEP encontrados:', cepInputs.length);
+    
+    cepInputs.forEach(input => {
+        input.addEventListener('input', function(e) {
+            let value = this.value.replace(/\D/g, '');
+            value = value.replace(/^(\d{5})(\d)/, '$1-$2');
+            this.value = value;
             
-            Object.keys(billingFields).forEach(field => {
-                const shippingField = document.querySelector(`[name="shipping_address[${field}]"]`);
-                if (shippingField && billingFields[field]) {
-                    shippingField.value = billingFields[field];
-                }
-            });
-            
-            // Desabilitar campos de entrega
-            shippingFields.style.opacity = '0.6';
-            shippingFields.style.pointerEvents = 'none';
-        } else {
-            // Habilitar campos de entrega
-            shippingFields.style.opacity = '1';
-            shippingFields.style.pointerEvents = 'auto';
-        }
+            // Buscar endereço quando CEP estiver completo
+            if (value.length === 9) {
+                console.log('CEP completo, buscando...');
+                buscarCEP(this);
+            }
+        });
+        
+        console.log('Listener adicionado ao campo:', input.id);
     });
     
-    // Animações de entrada
+    // Checkbox "mesmo endereço"
+    if (sameAddressCheckbox) {
+        sameAddressCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                const billingFields = {
+                    postal_code: document.querySelector('[name="billing_address[postal_code]"]')?.value,
+                    street: document.querySelector('[name="billing_address[street]"]')?.value,
+                    number: document.querySelector('[name="billing_address[number]"]')?.value,
+                    complement: document.querySelector('[name="billing_address[complement]"]')?.value,
+                    neighborhood: document.querySelector('[name="billing_address[neighborhood]"]')?.value,
+                    city: document.querySelector('[name="billing_address[city]"]')?.value,
+                    state: document.querySelector('[name="billing_address[state]"]')?.value
+                };
+                
+                Object.keys(billingFields).forEach(field => {
+                    const shippingField = document.querySelector(`[name="shipping_address[${field}]"]`);
+                    if (shippingField && billingFields[field]) {
+                        shippingField.value = billingFields[field];
+                    }
+                });
+                
+                shippingFields.style.opacity = '0.6';
+                shippingFields.style.pointerEvents = 'none';
+            } else {
+                shippingFields.style.opacity = '1';
+                shippingFields.style.pointerEvents = 'auto';
+            }
+        });
+    }
+    
+    // Animações
     const observerOptions = {
         threshold: 0.1,
         rootMargin: '0px 0px -50px 0px'
@@ -1416,7 +1483,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }, observerOptions);
     
-    // Observar elementos para animação
     document.querySelectorAll('.animate-slide-in').forEach(el => {
         el.style.opacity = '0';
         el.style.transform = 'translateY(30px)';
@@ -1424,63 +1490,126 @@ document.addEventListener('DOMContentLoaded', function() {
         observer.observe(el);
     });
     
-    // Validação do formulário
-    form.addEventListener('submit', function(e) {
+    // Processamento do formulário
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const submitButton = document.querySelector('.finalize-button');
+        const originalText = submitButton.innerHTML;
         const paymentMethod = document.querySelector('input[name="payment_method"]:checked');
         
         if (!paymentMethod) {
-            e.preventDefault();
             alert('Por favor, selecione um método de pagamento.');
             return;
         }
         
-        // Validação específica para cartão
-        if ((paymentMethod.value === 'credit_card' || paymentMethod.value === 'debit_card')) {
+        // Se for PIX ou Boleto, submeter normalmente
+        if (paymentMethod.value === 'pix' || paymentMethod.value === 'boleto') {
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processando...';
+            submitButton.disabled = true;
+            form.submit();
+            return;
+        }
+        
+        // Validação para cartão
+        if (paymentMethod.value === 'credit_card' || paymentMethod.value === 'debit_card') {
             const cardName = document.getElementById('card_name').value.trim();
             const cardNumber = document.getElementById('card_number').value.replace(/\s/g, '');
             const cardExpiry = document.getElementById('card_expiry').value;
             const cardCvv = document.getElementById('card_cvv').value;
+            const cpf = cpfInput ? cpfInput.value.replace(/\D/g, '') : '';
             
-            if (!cardName || !cardNumber || !cardExpiry || !cardCvv) {
-                e.preventDefault();
-                alert('Por favor, preencha todos os dados do cartão.');
+            if (!cardName || !cardNumber || !cardExpiry || !cardCvv || !cpf) {
+                alert('Por favor, preencha todos os dados do cartão e CPF.');
                 return;
             }
             
             if (cardNumber.length < 13) {
-                e.preventDefault();
                 alert('Número do cartão inválido.');
                 return;
             }
             
             if (cardExpiry.length < 5) {
-                e.preventDefault();
                 alert('Data de validade inválida.');
                 return;
             }
             
             if (cardCvv.length < 3) {
-                e.preventDefault();
                 alert('CVV inválido.');
                 return;
             }
+            
+            if (cpf.length !== 11) {
+                alert('CPF inválido.');
+                return;
+            }
+            
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processando pagamento...';
+            submitButton.disabled = true;
+            
+            try {
+                const mp = initializeMercadoPago();
+                
+                if (!mp) {
+                    throw new Error('Erro ao inicializar Mercado Pago');
+                }
+                
+                // Criar token usando createCardToken com dados diretos
+                const expiryParts = cardExpiry.split('/');
+                
+                const cardData = {
+                    cardNumber: cardNumber,
+                    cardholderName: cardName,
+                    cardExpirationMonth: expiryParts[0],
+                    cardExpirationYear: '20' + expiryParts[1],
+                    securityCode: cardCvv,
+                    identificationType: 'CPF',
+                    identificationNumber: cpf
+                };
+                
+                console.log('Criando token com dados:', { ...cardData, cardNumber: '****', securityCode: '***' });
+                
+                // Usar createCardToken do SDK v2
+                mp.createCardToken(cardData)
+                    .then(cardToken => {
+                        console.log('Token criado:', cardToken);
+                        
+                        if (cardToken.error) {
+                            throw new Error(cardToken.error.message || 'Erro ao processar dados do cartão');
+                        }
+                        
+                        // Adicionar token ao formulário
+                        const tokenInput = document.createElement('input');
+                        tokenInput.type = 'hidden';
+                        tokenInput.name = 'card_token';
+                        tokenInput.value = cardToken.id;
+                        form.appendChild(tokenInput);
+                        
+                        // Submeter formulário
+                        form.submit();
+                    })
+                    .catch(error => {
+                        console.error('Erro ao criar token:', error);
+                        alert('Erro ao processar pagamento: ' + error.message);
+                        
+                        submitButton.innerHTML = originalText;
+                        submitButton.disabled = false;
+                    });
+                
+            } catch (error) {
+                console.error('Erro ao processar pagamento:', error);
+                alert('Erro ao processar pagamento: ' + error.message);
+                
+                submitButton.innerHTML = originalText;
+                submitButton.disabled = false;
+            }
         }
-        
-        // Mostrar loading
-        const submitButton = document.querySelector('.finalize-button');
-        const originalText = submitButton.innerHTML;
-        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processando...';
-        submitButton.disabled = true;
-        
-        // Simular processamento (remover em produção)
-        setTimeout(() => {
-            submitButton.innerHTML = originalText;
-            submitButton.disabled = false;
-        }, 3000);
     });
+    
+    console.log('Checkout inicializado com sucesso');
 });
 
-// Função para toggle do modal de informações
+// Função para toggle do modal
 function togglePaymentInfo() {
     const modal = document.getElementById('paymentInfoModal');
     if (modal.style.display === 'flex') {

@@ -16,13 +16,19 @@ class SmartCouponService
      */
     public static function handleFirstPurchase($userId)
     {
-        // Verificar se é realmente o primeiro pedido usando PDO
+        // Verificar se é realmente o primeiro pedido (excluindo pedidos cancelados)
         $pdo = \App\Models\DatabaseSingleton::getInstance()->getConnection();
-        $stmt = $pdo->prepare('SELECT COUNT(*) as count FROM orders WHERE user_id = ?');
+        $stmt = $pdo->prepare("
+            SELECT COUNT(*) as count FROM orders 
+            WHERE user_id = ? 
+            AND status != 'cancelled' 
+            AND payment_status = 'paid'
+        ");
         $stmt->execute([$userId]);
         $result = $stmt->fetch();
         $orderCount = $result['count'];
         
+        // Só gerar cupom se for exatamente o primeiro pedido PAGO
         if ($orderCount === 1) {
             // Verificar se já não existe um cupom de primeiro pedido
             $stmt2 = $pdo->prepare("
@@ -87,8 +93,8 @@ class SmartCouponService
                         'abandoned_value' => $totalValue
                     ]);
                     
-                    // Enviar notificação
-                    self::sendCouponNotification($userId, $couponId, 'Volte e ganhe desconto nos livros que você escolheu!');
+                    // NÃO enviar notificação - cupom será mostrado silenciosamente
+                    // self::sendCouponNotification($userId, $couponId, 'Volte e ganhe desconto nos livros que você escolheu!');
                     
                     return $couponId;
                 }
@@ -167,8 +173,8 @@ class SmartCouponService
                 'message' => 'Descobrimos que você ama ' . ucfirst($preferredGenre) . '! Aqui está um desconto especial.'
             ]);
             
-            // Enviar notificação
-            self::sendCouponNotification($userId, $couponId, 'Desconto especial para livros de ' . ucfirst($preferredGenre) . '!');
+            // NÃO enviar notificação - cupom será mostrado no carrinho silenciosamente
+            // self::sendCouponNotification($userId, $couponId, 'Desconto especial para livros de ' . ucfirst($preferredGenre) . '!');
             
             return $couponId;
         }
@@ -220,8 +226,8 @@ class SmartCouponService
                         'message' => 'Parabéns por ser um cliente fiel! Você chegou ao marco de ' . $milestone . ' pedidos!'
                     ]);
                     
-                    // Enviar notificação
-                    self::sendCouponNotification($userId, $couponId, '🏆 Cliente Fiel! Você ganhou um cupom especial!');
+                    // NÃO enviar notificação - cupom será mostrado silenciosamente no carrinho
+                    // self::sendCouponNotification($userId, $couponId, '🏆 Cliente Fiel! Você ganhou um cupom especial!');
                     
                     return $couponId;
                 }
@@ -236,6 +242,8 @@ class SmartCouponService
      */
     public static function handleHighValueCart($userId, $cartTotal)
     {
+        // Função desabilitada - cupons de alto valor agora são criados silenciosamente via getSuggestedCoupons
+        return null;
         // Só para carrinhos acima de R$ 200
         if ($cartTotal >= 200) {
             // Verificar se já não tem cupom de alto valor recente
@@ -255,8 +263,8 @@ class SmartCouponService
                     'message' => 'Carrinho VIP detectado! Ganhe desconto extra nesta compra especial.'
                 ]);
                 
-                // Enviar notificação
-                self::sendCouponNotification($userId, $couponId, '💎 Carrinho VIP! Desconto especial disponível!');
+                // NÃO enviar notificação - cupom será mostrado silenciosamente
+                // self::sendCouponNotification($userId, $couponId, '💎 Carrinho VIP! Desconto especial disponível!');
                 
                 return $couponId;
             }

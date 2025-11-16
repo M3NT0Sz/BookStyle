@@ -9,12 +9,14 @@
     <link rel="shortcut icon" href="{{ Vite::asset('resources/img/favicon.png') }}" type="image/x-icon">
     <title>@yield('title', 'BookStyle')</title>
     @vite('resources/css/app.css')
+    @stack('head')
 </head>
 
 <body>
     @yield('content')
     @vite('resources/js/app.js')
     @vite('resources/js/home.js')
+    @stack('scripts')
 </body>
 
 </html>

@@ -67,6 +67,14 @@ class Order extends Model
     }
 
     /**
+     * Alias para orderItems (compatibilidade)
+     */
+    public function items(): HasMany
+    {
+        return $this->hasMany(OrderItem::class);
+    }
+
+    /**
      * Relacionamento com avaliações
      */
     public function reviews(): HasMany

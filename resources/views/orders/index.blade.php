@@ -822,6 +822,13 @@
 
                         <!-- Ações do pedido -->
                         <div class="order-actions">
+                            @if($order->payment_status === 'pending')
+                                <a href="{{ route('payment.checkout', $order->id) }}" class="btn btn-success" style="background: linear-gradient(135deg, #10b981, #059669); border: none;">
+                                    <i class="fas fa-credit-card"></i>
+                                    Pagar Agora
+                                </a>
+                            @endif
+                            
                             <a href="{{ route('orders.show', $order) }}" class="btn btn-primary">
                                 <i class="fas fa-eye"></i>
                                 Ver Detalhes

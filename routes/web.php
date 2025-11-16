@@ -105,7 +105,20 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/wishlist/check/{bookId}', [\App\Http\Controllers\WishlistController::class, 'check'])->name('wishlist.check');
     Route::post('/wishlist/{bookId}/price-alert', [\App\Http\Controllers\WishlistController::class, 'updatePriceAlert'])->name('wishlist.updatePriceAlert');
     Route::get('/wishlist/count', [\App\Http\Controllers\WishlistController::class, 'count'])->name('wishlist.count');
+    
+    // Rotas de Pagamento
+    Route::post('/checkout/process', [\App\Http\Controllers\CheckoutController::class, 'processPayment'])->name('checkout.process');
+    Route::get('/payment/checkout/{orderId}', [\App\Http\Controllers\PaymentController::class, 'checkout'])->name('payment.checkout');
+    Route::get('/payment/pix/{order}', [\App\Http\Controllers\PaymentController::class, 'pix'])->name('payment.pix');
+    Route::get('/payment/boleto/{order}', [\App\Http\Controllers\PaymentController::class, 'boleto'])->name('payment.boleto');
+    Route::get('/payment/success', [\App\Http\Controllers\PaymentController::class, 'success'])->name('payment.success');
+    Route::get('/payment/failure', [\App\Http\Controllers\PaymentController::class, 'failure'])->name('payment.failure');
+    Route::get('/payment/pending', [\App\Http\Controllers\PaymentController::class, 'pending'])->name('payment.pending');
+    Route::get('/payment/status/{orderId}', [\App\Http\Controllers\PaymentController::class, 'checkStatus'])->name('payment.status');
 });
+
+// Webhook do Mercado Pago (deve ser público)
+Route::post('/api/mercadopago/webhook', [\App\Http\Controllers\PaymentController::class, 'webhook'])->name('mercadopago.webhook');
 
 // Rotas públicas de avaliações
 Route::get('/books/{book}/reviews', [ReviewController::class, 'index'])->name('reviews.index');

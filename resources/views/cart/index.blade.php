@@ -180,11 +180,10 @@
                                                     <input 
                                                         type="text" 
                                                         name="coupon_code" 
-                                                        placeholder="Digite o código do cupom" 
+                                                        placeholder="Digite o código do cupom (opcional)" 
                                                         style="width: 100%; padding: 0.75rem 1rem; padding-left: 2.5rem; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 0.875rem; transition: all 0.3s;"
                                                         onfocus="this.style.borderColor='#667eea'"
-                                                        onblur="this.style.borderColor='#e0e0e0'"
-                                                        required>
+                                                        onblur="this.style.borderColor='#e0e0e0'">
                                                     <i class="fas fa-ticket-alt" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #999;"></i>
                                                 </div>
                                                 <button type="submit" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 10px; font-weight: 600; cursor: pointer; transition: all 0.3s; white-space: nowrap;">

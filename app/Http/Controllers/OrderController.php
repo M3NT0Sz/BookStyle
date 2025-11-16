@@ -9,6 +9,7 @@ use App\Models\Book;
 use App\Models\Coupon;
 use App\Services\SmartCouponService;
 use App\Services\NotificationService;
+use App\Services\MercadoPagoService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -210,14 +211,94 @@ class OrderController extends Controller
                 $finalTotal
             );
 
-            // ========== TRIGGERS INTELIGENTES DE CUPONS ==========
-            // Detectar primeiro pedido e gerar cupom de boas-vindas futuro
-            SmartCouponService::handleFirstPurchase(Auth::id());
-
-            // Redirecionar para o carrinho para mostrar que foi esvaziado
-            return redirect()->route('cart.index')
-                ->with('success', 'Pedido #' . $order->order_number . ' realizado com sucesso! Seu carrinho foi esvaziado.')
-                ->with('order_created', $order->id);
+            // ========== PROCESSAR PAGAMENTO COM MERCADO PAGO (CHECKOUT TRANSPARENTE) ==========
+            // Se tiver token do cartão, processar pagamento direto
+            if ($request->has('card_token') && $request->card_token) {
+                try {
+                    $mercadoPagoService = new MercadoPagoService();
+                    $paymentResult = $mercadoPagoService->processCardPayment($order, $request->card_token);
+                    
+                    if ($paymentResult['success']) {
+                        // Atualizar pedido com dados do pagamento
+                        $order->update([
+                            'payment_id' => $paymentResult['payment_id'],
+                            'payment_status' => $paymentResult['status']
+                        ]);
+                        
+                        // Se aprovado, marcar como pago
+                        if ($paymentResult['status'] === 'approved') {
+                            $order->update([
+                                'status' => 'processing',
+                                'paid_at' => now()
+                            ]);
+                            
+                            // ========== TRIGGERS INTELIGENTES DE CUPONS (APENAS APÓS PAGAMENTO APROVADO) ==========
+                            SmartCouponService::handleFirstPurchase(Auth::id());
+                            
+                            return redirect()->route('payment.success', ['order' => $order->id])
+                                ->with('success', 'Pagamento aprovado! Seu pedido está sendo processado.');
+                        } elseif ($paymentResult['status'] === 'pending' || $paymentResult['status'] === 'in_process') {
+                            return redirect()->route('payment.pending', ['order' => $order->id])
+                                ->with('info', 'Pagamento pendente. Aguardando confirmação.');
+                        } else {
+                            return redirect()->route('payment.failure', ['order' => $order->id])
+                                ->with('error', 'Pagamento recusado. Tente outro cartão.');
+                        }
+                    } else {
+                        // Erro no pagamento
+                        return redirect()->route('orders.show', $order)
+                            ->with('error', 'Erro ao processar pagamento: ' . ($paymentResult['error'] ?? 'Erro desconhecido'))
+                            ->with('warning', 'Seu pedido foi criado. Você pode tentar pagar novamente clicando em "Pagar Agora".');
+                    }
+                } catch (\Exception $e) {
+                    \Log::error('Erro ao processar pagamento com cartão: ' . $e->getMessage());
+                    
+                    return redirect()->route('orders.show', $order)
+                        ->with('error', 'Erro ao processar pagamento: ' . $e->getMessage())
+                        ->with('warning', 'Seu pedido foi criado. Você pode tentar pagar novamente.');
+                }
+            }
+            
+            // Se não tiver token, processar PIX ou Boleto
+            if ($request->payment_method === 'pix') {
+                try {
+                    $mercadoPagoService = new MercadoPagoService();
+                    $pixResult = $mercadoPagoService->createPixPayment($order);
+                    
+                    if ($pixResult['success']) {
+                        // Atualizar pedido com dados do PIX
+                        $order->update([
+                            'payment_id' => $pixResult['payment_id'],
+                            'payment_status' => $pixResult['status']
+                        ]);
+                        
+                        // Redirecionar para página de PIX com QR Code
+                        return redirect()->route('payment.pix', ['order' => $order->id])
+                            ->with('pix_data', $pixResult);
+                    } else {
+                        return redirect()->route('orders.show', $order)
+                            ->with('error', 'Erro ao gerar PIX: ' . ($pixResult['error'] ?? 'Erro desconhecido'));
+                    }
+                } catch (\Exception $e) {
+                    \Log::error('Erro ao criar pagamento PIX: ' . $e->getMessage());
+                    
+                    return redirect()->route('orders.show', $order)
+                        ->with('error', 'Erro ao processar pagamento PIX: ' . $e->getMessage());
+                }
+            }
+            
+            if ($request->payment_method === 'boleto') {
+                // Criar pedido com pagamento pendente (boleto será gerado na tela de boleto)
+                // Em ambiente de teste, o Mercado Pago pode não suportar boleto
+                // Então vamos apenas redirecionar para a página informativa
+                
+                return redirect()->route('payment.boleto', ['order' => $order->id])
+                    ->with('info', 'Boleto será gerado. Em ambiente de teste, use PIX ou cartão para testar pagamentos.');
+            }
+            
+            // Fallback: método de pagamento não suportado
+            return redirect()->route('orders.show', $order)
+                ->with('error', 'Método de pagamento não suportado: ' . $request->payment_method);
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -231,7 +312,7 @@ class OrderController extends Controller
     /**
      * Mostrar página de checkout
      */
-    public function checkout(): View
+    public function checkout()
     {
         if (!Auth::check()) {
             return redirect()->route('login');

@@ -26,19 +26,6 @@ class CartController extends Controller
                 $books[] = $book;
             }
             
-            // ========== INTEGRAÇÃO CUPONS INTELIGENTES ==========
-            // Análise automática de comportamento
-            SmartCouponService::analyzeBehaviorAndSuggestCoupons(Auth::id());
-            
-            // Verificar carrinho de alto valor
-            $cartTotal = array_sum(array_map(function($book) {
-                return $book['price'] * $book['quantity'];
-            }, $books));
-            
-            if ($cartTotal >= 200) {
-                SmartCouponService::handleHighValueCart(Auth::id(), $cartTotal);
-            }
-            
             // Obter sugestões de cupons (já filtra cupons automáticos em cooldown)
             $suggestedCoupons = SmartCouponService::getSuggestedCoupons(Auth::id(), $books);
             
@@ -68,40 +55,60 @@ class CartController extends Controller
 
     public function add(Request $request, $bookId)
     {
-        \Log::info('Método add do carrinho chamado', [
-            'bookId_param' => $bookId,
-            'bookId_input' => $request->input('book_id'),
-            'quantity' => $request->input('quantity'),
-            'user_authenticated' => Auth::check(),
-            'user_id' => Auth::id()
-        ]);
-        
-        $quantity = $request->input('quantity', 1);
-        $couponCode = $request->input('coupon_code');
-        $discount = 0;
-        $coupon = null;
-
-        if ($couponCode) {
-            $coupon = \App\Models\Coupon::findByCode($couponCode);
-            if ($coupon) {
-                $cart = session('cart', []);
-                $cart['coupon'] = $coupon;
-                session(['cart' => $cart]);
-            }
-        }
-        
-        Cart::add($bookId, $quantity);
-        
-        // Se for requisição AJAX, retornar JSON
-        if ($request->ajax()) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Livro adicionado ao carrinho!' . ($coupon ? ' Cupom aplicado!' : ''),
-                'cart_count' => Cart::count()
+        try {
+            \Log::info('Método add do carrinho chamado', [
+                'bookId_param' => $bookId,
+                'bookId_input' => $request->input('book_id'),
+                'quantity' => $request->input('quantity'),
+                'user_authenticated' => Auth::check(),
+                'user_id' => Auth::id(),
+                'is_ajax' => $request->ajax(),
+                'wants_json' => $request->wantsJson(),
+                'expects_json' => $request->expectsJson()
             ]);
+            
+            $quantity = $request->input('quantity', 1);
+            $couponCode = $request->input('coupon_code');
+            $discount = 0;
+            $coupon = null;
+
+            if ($couponCode) {
+                $coupon = \App\Models\Coupon::findByCode($couponCode);
+                if ($coupon) {
+                    $cart = session('cart', []);
+                    $cart['coupon'] = $coupon;
+                    session(['cart' => $cart]);
+                }
+            }
+            
+            Cart::add($bookId, $quantity);
+            
+            // Se for requisição AJAX ou espera JSON, retornar JSON
+            if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Livro adicionado ao carrinho!' . ($coupon ? ' Cupom aplicado!' : ''),
+                    'cart_count' => Cart::count()
+                ]);
+            }
+            
+            return redirect()->route('cart.index')->with('success', 'Livro adicionado ao carrinho!' . ($coupon ? ' Cupom aplicado!' : ''));
+            
+        } catch (\Exception $e) {
+            \Log::error('Erro ao adicionar ao carrinho', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Erro ao adicionar ao carrinho: ' . $e->getMessage()
+                ], 500);
+            }
+            
+            return redirect()->back()->with('error', 'Erro ao adicionar ao carrinho.');
         }
-        
-        return redirect()->route('cart.index')->with('success', 'Livro adicionado ao carrinho!' . ($coupon ? ' Cupom aplicado!' : ''));
     }
 
     public function remove($bookId)

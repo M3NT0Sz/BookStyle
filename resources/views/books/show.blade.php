@@ -245,7 +245,7 @@
                                 Adicionar ao Carrinho
                             </button>
                             
-                            <button type="button" class="buy-now-btn">
+                            <button type="button" class="buy-now-btn" onclick="buyNow()">
                                 <i class="fas fa-bolt"></i>
                                 Comprar Agora
                             </button>
@@ -457,6 +457,85 @@
                 console.error('Erro ao verificar estado:', error);
             }
         });
+        
+        // Função Comprar Agora
+        async function buyNow() {
+            @guest
+                showToast('Faça login para comprar', 'error');
+                setTimeout(() => window.location.href = '/login', 1500);
+                return;
+            @endguest
+            
+            const quantityInput = document.getElementById('quantity');
+            const quantity = quantityInput ? parseInt(quantityInput.value) : 1;
+            const bookId = BOOK_ID;
+            
+            if (!bookId) {
+                showToast('Erro ao identificar o livro', 'error');
+                return;
+            }
+            
+            // Desabilitar botão
+            const buyBtn = document.querySelector('.buy-now-btn');
+            if (buyBtn) {
+                buyBtn.disabled = true;
+                buyBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando...';
+            }
+            
+            try {
+                console.log('Enviando requisição para adicionar ao carrinho:', {
+                    url: `/cart/add/${bookId}`,
+                    bookId: bookId,
+                    quantity: quantity
+                });
+                
+                // Adicionar ao carrinho
+                const response = await fetch(`/cart/add/${bookId}`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({
+                        book_id: bookId,
+                        quantity: quantity
+                    })
+                });
+                
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers.get('content-type'));
+                
+                // Verificar se a resposta é JSON
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    console.error('Resposta não é JSON:', contentType);
+                    const text = await response.text();
+                    console.error('Conteúdo da resposta:', text.substring(0, 500));
+                    throw new Error('Erro no servidor. Por favor, tente novamente.');
+                }
+                
+                const data = await response.json();
+                console.log('Resposta do servidor:', data);
+                
+                if (response.ok && data.success) {
+                    // Redirecionar para o carrinho
+                    window.location.href = '/cart';
+                } else {
+                    throw new Error(data.message || 'Erro ao adicionar ao carrinho');
+                }
+            } catch (error) {
+                console.error('Erro completo:', error);
+                showToast(error.message || 'Erro ao processar compra', 'error');
+                
+                // Reabilitar botão
+                if (buyBtn) {
+                    buyBtn.disabled = false;
+                    buyBtn.innerHTML = '<i class="fas fa-bolt"></i> Comprar Agora';
+                }
+            }
+        }
         
         // CSS para animações
         const style = document.createElement('style');
