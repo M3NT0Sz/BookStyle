@@ -242,7 +242,7 @@
                                                 <input type="hidden" name="quantity" value="1">
                                                 <button type="submit" class="book-listing-btn secondary add-to-cart-btn" data-book-id="{{ $bookData['id'] }}" data-book-name="{{ $bookData['name'] }}">
                                                     <i class="fas fa-cart-plus"></i>
-                                                    <span class="btn-text">Carrinho</span>
+                                                    
                                                 </button>
                                             </form>
                                         </div>

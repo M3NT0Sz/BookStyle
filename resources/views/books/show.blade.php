@@ -242,7 +242,7 @@
 
                             <button type="submit" class="add-to-cart-btn">
                                 <i class="fas fa-shopping-cart"></i>
-                                Adicionar ao Carrinho
+                                
                             </button>
                             
                             <button type="button" class="buy-now-btn" onclick="buyNow()">
